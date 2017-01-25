@@ -24,5 +24,15 @@
   "bugs": {
     "url": "https://github.com/RodinJS/Rodin-Lib/issues"
   },
-  "homepage": "https://rodin.io"
+  "homepage": "https://rodin.io",
+  "devDependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-core": "^6.22.1",
+    "babel-preset-es2015": "^6.22.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "mocha": "^3.2.0",
+    "run-sequence": "^1.2.2"
+  }
 }
