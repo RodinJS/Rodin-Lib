@@ -2,9 +2,6 @@
 Rodin-JS is currently in beta and under active development.
 During beta, new features will be added regularly and APIs will evolve based on user feedback.
 
-Check out our [directory of design documents](https://github.com/angular/material2/wiki/Design-doc-directory)
-for more insight into our process.
-
 High level items planned for January 2017:
 * Initial version of physics and teleport functionality
 * Improvements to https://rodin.io
@@ -14,16 +11,18 @@ High level items planned for January 2017:
 
 #### Feature status:
 
-| Feature          | Status                              | Docs         | Issue          |
-|------------------|-------------------------------------|--------------|----------------|
-| sculpt           |                           Available | [README][0]  |              - |
-| controllers      |                           Available | [README][0]  |              - |
-| animation        |                           Available | [README][0]  |              - |
-| logger           |                           Available | [README][0]  |              - |
-| error            |                           Available | [README][0]  |              - |
-| raycaster        |                           Available | [README][0]  |              - |
-| scene            |                           Available | [README][0]  |              - |
-| time             |                           Available | [README][0]  |              - |
+| Feature          | Status                              |Version   | Docs         | Issue          |
+|------------------|-------------------------------------|----------|--------------|----------------|
+| sculpt           |                           Available |   v0.0.1 | [README][0]  |              - |
+| controllers      |                           Available |   v0.0.1 | [README][0]  |              - |
+| animation        |                           Available |   v0.0.1 | [README][0]  |              - |
+| logger           |                           Available |   v0.0.1 | [README][0]  |              - |
+| error            |                           Available |   v0.0.1 | [README][0]  |              - |
+| raycaster        |                           Available |   v0.0.1 | [README][0]  |              - |
+| scene            |                           Available |   v0.0.1 | [README][0]  |              - |
+| time             |                           Available |   v0.0.1 | [README][0]  |              - |
+| physics          |                           in v0.0.2 |   v0.0.2 | [README][0]  |              - |
+| teleport         |                           in v0.0.2 |   v0.0.2 | [README][0]  |              - |
 
 
 [0]: https://docs.rodin.space
