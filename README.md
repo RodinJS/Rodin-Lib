@@ -1,5 +1,3 @@
-# Material Design for Angular
-
 ### Installation
 
 The latest release of rodin.js Library can be installed from
