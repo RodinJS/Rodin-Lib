@@ -1,8 +1,21 @@
+# Material Design for Angular
+
+### Installation
+
+The latest release of rodin.js Library can be installed from
+
+`npm install --save rodin/core`
+
+The latest release of rodin.js physics wrapper can be installed from
+
+`npm install --save rodin/physics`
+
+
 ### Project status
 Rodin-JS is currently in beta and under active development.
 During beta, new features will be added regularly and APIs will evolve based on user feedback.
 
-High level items planned for January 2017:
+High level items planned for Febrary 2017:
 * Initial version of physics and teleport functionality
 * Improvements to https://rodin.io
 * Continued expanding e2e test coverage
@@ -13,6 +26,7 @@ High level items planned for January 2017:
 
 | Feature          | Status                              |Version   | Docs         | Issue          |
 |------------------|-------------------------------------|----------|--------------|----------------|
+| core             |  Initial version, features evolving |   v0.0.1 | [README][0]  |              - |
 | sculpt           |                           Available |   v0.0.1 | [README][0]  |              - |
 | controllers      |                           Available |   v0.0.1 | [README][0]  |              - |
 | animation        |                           Available |   v0.0.1 | [README][0]  |              - |
@@ -21,8 +35,8 @@ High level items planned for January 2017:
 | raycaster        |                           Available |   v0.0.1 | [README][0]  |              - |
 | scene            |                           Available |   v0.0.1 | [README][0]  |              - |
 | time             |                           Available |   v0.0.1 | [README][0]  |              - |
-| physics          |                           in v0.0.2 |   v0.0.2 | [README][0]  |              - |
-| teleport         |                           in v0.0.2 |   v0.0.2 | [README][0]  |              - |
+| physics          |                         In-progress |   v0.0.2 | [README][0]  |              - |
+| teleport         |                  Design in-progress |   v0.0.2 | [README][0]  |              - |
 
 
 [0]: https://docs.rodin.space
