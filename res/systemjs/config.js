@@ -1,16 +1,37 @@
-{
-	map: {
-		glsl: 'res/systemjs/glsl.js'  // path to glsl.js file
-	},
-	meta: {
-		'build/*.glsl': {   // for all glsl files on your project
-			loader: 'glsl'
-		}
-	},
-	packages: {
-		'/': {
-			main: 'index',  // load rodin/sculpt/index.js by typing rodin/sculpt
-			"defaultJSExtensions": true
-		}
+(function (global) {
+
+	var paths = {
+		'npm:': 'dist/'
+	};
+
+	var map = {
+		'rodin/core': 'npm:core',
+		'rodin/physics': 'npm:physics'		
+	};	
+
+	var packages = {
+		'dist': { main: 'index.js', defaultExtension: 'js' },
+		'rodin/core': { main: 'index.js', defaultExtension: 'js' },
+		'rodin/physics': { main: 'index.js', defaultExtension: 'js' },
+	};
+
+	var moduleNames = [
+		'core/error',
+		'core/time',
+	];
+
+	function packIndex(moduleName) {
+		packages['' + paths['npm:'] + moduleName + ''] = { main: 'index.js', defaultExtension: 'js' };
 	}
-}
+
+	moduleNames.forEach(packIndex);
+
+	var config = {
+		paths: paths,
+		map: map,
+		packages: packages
+	};
+
+	System.config(config);
+
+})(this);
