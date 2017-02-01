@@ -86,3 +86,6 @@ jspm_packages
 
 #IDE files
 .idea
+
+#temprorary remove dist folder
+dist
