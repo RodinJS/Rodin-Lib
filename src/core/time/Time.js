@@ -1,4 +1,4 @@
-import {ErrorSingletonClass, ErrorBadValueParameter, ErrorProtectedFieldChange} from '../error';
+import {ErrorSingletonClass, ErrorInvalidArgument, ErrorProtectedFieldChange} from '../error';
 
 let instance = null;
 let enforce = function () {
@@ -16,7 +16,7 @@ export class Time {
         let speed = 1;
         this.setSpeed = value => {
             if (isNaN(value) || value < 0) {
-                throw new ErrorBadValueParameter();
+                throw new ErrorInvalidArgument('number');
             }
 
             this.msBeforeLastSpeedChange = this.now();
