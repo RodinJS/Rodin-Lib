@@ -18,6 +18,8 @@
 	var moduleNames = [
 		'core/error',
 		'core/time',
+		'core/scene',
+		'core/sculpt',
 	];
 
 	function packIndex(moduleName) {
