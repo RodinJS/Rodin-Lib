@@ -92,12 +92,6 @@ export class ErrorInvalidFileFormat extends RodinError {
     }
 }
 
-export class ErrorBadValueParameter extends RodinError {
-    constructor () {
-        super('Bad argument');
-    }
-}
-
 export class ErrorProtectedFieldChange extends RodinError {
     constructor (field = '') {
         super(`Protected field ${field} can not be changed`);
