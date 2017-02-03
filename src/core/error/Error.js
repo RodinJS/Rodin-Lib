@@ -134,3 +134,8 @@ export class ErrorUnsupportedModelType extends RodinError {
     }
 }
 
+export class ErrorInvalidArgument extends RodinError {
+	constructor (typename) {
+		super(`Invalid argument, expected ${typename}`);
+	}
+}
