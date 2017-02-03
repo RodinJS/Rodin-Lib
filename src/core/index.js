@@ -1,6 +1,6 @@
 'use strict';
 
-export * from './error';
-export * from './time';
+export * from './Error';
+export * from './Time';
 // export * from './sculpt';
 // export * from './scene';
