@@ -14,6 +14,7 @@ class RodinError extends Error {
         }
     }
 }
+
 export class ErrorAbstractClassInstance extends RodinError {
     constructor () {
         super("Cant make instance of abstract class");

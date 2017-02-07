@@ -56,6 +56,7 @@ gulp.task('vendor', () => {
 
 gulp.task('watch', () => {
 	gulp.watch(JS, ['js']);
+	gulp.watch(VENDOR, ['vendor']);
 });
 
 gulp.task('clean', () => {
