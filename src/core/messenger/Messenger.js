@@ -8,7 +8,7 @@ export class Messenger {
     }
 
     post(name, body) {
-        if (this.channels[name]) {
+        if (!this.channels[name]) {
             return;
         }
 
@@ -24,6 +24,6 @@ export class Messenger {
     }
 }
 
-const instance = new Messenger();
+const messenger = new Messenger();
 
-export { instance };
+export { messenger };

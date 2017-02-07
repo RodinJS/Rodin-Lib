@@ -20,6 +20,8 @@
 		'core/time',
 		'core/scene',
 		'core/sculpt',
+		'core/messenger',
+		'core/eventEmitter',
 	];
 
 	function packIndex(moduleName) {
