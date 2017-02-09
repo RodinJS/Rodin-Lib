@@ -135,3 +135,8 @@ export class ErrorUnsupportedModelType extends RodinError {
     }
 }
 
+export class ErrorProtectedClassInstance extends RodinError {
+    constructor (classname) {
+        super(`Cant create instance of class ${classname}`);
+    }
+}

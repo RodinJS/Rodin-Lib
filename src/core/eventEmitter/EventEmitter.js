@@ -36,6 +36,20 @@ export class EventEmitter {
     }
 
     /**
+     * Add listener to Event that called once
+     * @param {string[]|string} eventNames - event name(s)
+     * @param {function} callback - callback function
+     */
+    once(eventNames, callback) {
+        const tmp = () => {
+            callback(...arguments);
+            this.removeEventListener(eventNames, tmp);
+        };
+
+        this.addEventListener(eventNames, tmp);
+    }
+
+    /**
      * Remove specific listener from Event
      * @param {string} eventName - event name
      * @param {function} callback - callback function
@@ -54,21 +68,20 @@ export class EventEmitter {
     /**
      * Emit Event with params
      * @param {String} eventName
-     * @param {Event} customEvt - a custom Event object
+     * @param {RodinEvent} rodinEvent - a custom Event object
      * @param {Array} args - arguments to be passed to the event callback
      */
-    emit(eventName, customEvt, ...args) {
+    emit(eventName, rodinEvent, ...args) {
         customEvt.name = eventName;
 
-        if (customEvt.propagation === false) {
+        if (rodinEvent.propagation === false) {
             return;
         }
 
-        let events = this.getEvents();
         if (this.events[eventName] && this.events[eventName].length > 0) {
             for (let f = 0; f < this.events[eventName].length; f++) {
                 if (typeof this.events[eventName][f] === "function") {
-                    this.events[eventName][f].apply((customEvt && customEvt.target), [customEvt].concat(args));
+                    this.events[eventName][f].apply((rodinEvent && rodinEvent.target), [rodinEvent].concat(args));
                 }
             }
         }

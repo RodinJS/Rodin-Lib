@@ -1,48 +1,24 @@
-import {ErrorSingletonClass, ErrorBadValueParameter, ErrorProtectedFieldChange} from '../error';
+import {ErrorProtectedClassInstance} from '../error';
+import {messenger} from '../messenger';
 
 let instance = null;
 let enforce = function () {
 };
+
+let activeTime = null;
+let instances = {};
 
 /**
  * Time class
  */
 export class Time {
     constructor (e) {
-        if (e !== enforce) {
-            throw new ErrorSingletonClass();
+        if(e !== enforce) {
+            throw new ErrorProtectedClassInstance('Time');
         }
 
-        let speed = 1;
-        this.setSpeed = value => {
-            if (isNaN(value) || value < 0) {
-                throw new ErrorBadValueParameter();
-            }
-
-            this.msBeforeLastSpeedChange = this.now();
-            this.lastSpeedChange = Date.now();
-            speed = value;
-        };
-
-        this.getSpeed = () => {
-            return speed;
-        };
-
-        let delta = 0;
-        this.setDelta = (value, e) => {
-            if(e !== enforce) {
-                throw new ErrorProtectedFieldChange('delta');
-            }
-
-            delta = value;
-        };
-
-        /**
-         * @returns {number} - time between last two teaks
-         */
-        this.deltaTime = () => {
-            return delta;
-        };
+        this.speed = 1;
+        this.delta = 0;
 
         this.lastTeak = 0;
         this.msBeforeLastSpeedChange = 0;
@@ -51,24 +27,10 @@ export class Time {
     }
 
     /**
-     * @param {number} value - new speed
-     */
-    set speed (value) {
-        this.setSpeed(value);
-    }
-
-    /**
-     * @returns {number} - current speed
-     */
-    get speed () {
-        return this.getSpeed();
-    }
-
-    /**
      * call this function on each render
      */
     tick () {
-        this.setDelta(this.now() - this.lastTeak, enforce);
+        this.delta = this.now() - this.lastTeak;
         this.lastTeak = this.now();
     }
 
@@ -79,11 +41,27 @@ export class Time {
         return (Date.now() - this.lastSpeedChange) * this.speed + this.msBeforeLastSpeedChange;
     }
 
-    static getInstance () {
-        if (!instance) {
-            instance = new Time(enforce);
-        }
+    static tick() {
+        activeTime.tick();
+    }
 
-        return instance;
+    static delta() {
+        return activeTime.delta
+    }
+
+    static set speed(value) {
+        activeTime.speed = value;
+        return value;
+    }
+
+    static get speed() {
+        return activeTime.speed;
     }
 }
+
+messenger.post('requestactivescene', {});
+messenger.on('activescene', (scene) => {
+    if(!instances[scene]) {
+        instances[scene] = new Time();
+    }
+});
