@@ -22,6 +22,8 @@
 		'core/sculpt',
 		'core/messenger',
 		'core/eventEmitter',
+		'core/utils',
+		'core/set'
 	];
 
 	function packIndex(moduleName) {
