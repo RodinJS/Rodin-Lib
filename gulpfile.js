@@ -1,19 +1,20 @@
-var gulp = require('gulp');
-var babel = require('gulp-babel');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var sequence = require('run-sequence');
-var del = require('del');
-var notify = require('gulp-notify');
-var plumber = require('gulp-plumber');
-var size = require('gulp-size');
-var connect = require('gulp-connect');
-var sourcemaps = require('gulp-sourcemaps');
+const gulp = require('gulp');
+const babel = require('gulp-babel');
+const uglify = require('gulp-uglify');
+const concat = require('gulp-concat');
+const sequence = require('run-sequence');
+const del = require('del');
+const notify = require('gulp-notify');
+const plumber = require('gulp-plumber');
+const size = require('gulp-size');
+const connect = require('gulp-connect');
+const sourcemaps = require('gulp-sourcemaps');
+const gzip = require('gulp-gzip');
 
-var JS = ['src/**/*.js', '!src/vendor/**'];
-var VENDOR = ['src/vendor/**/*.js'];
+const JS = ['src/**/*.js', '!src/vendor/**'];
+const VENDOR = ['src/vendor/joi.min.js', 'src/vendor/three.min.js', 'src/vendor/**/*.js'];
 
-var ERROR_MESSAGE = {
+const ERROR_MESSAGE = {
 	errorHandler: notify.onError("Error: <%= error.message %>")
 };
 
@@ -23,12 +24,17 @@ const UGLIFY_AGRESIVE = {
     compress: true
 };
 
+const GZIP_OPTIONS = {
+	deleteMode: 'dist/'
+};
+
 gulp.task('js', () => {
-	var s = size({title: 'JS -> ', pretty: true});
+	const s = size({title: 'JS -> ', pretty: true});
 	return gulp.src(JS)
 		.pipe(plumber(ERROR_MESSAGE))
 		.pipe(babel())
 		.pipe(s)
+		// .pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist'))
 		.pipe(notify({
@@ -41,11 +47,13 @@ gulp.task('vendor', () => {
 	const s = size({title: 'JS production -> ', pretty: true});
 	return gulp.src(VENDOR)
 		.pipe(plumber(ERROR_MESSAGE))
-		.pipe(sourcemaps.init())
+		// .pipe(sourcemaps.init())
 		.pipe(uglify(UGLIFY_AGRESIVE))
 		.pipe(concat('vendor.js'))
-		.pipe(sourcemaps.write('.'))
+		// .pipe(sourcemaps.write('.'))
 		.pipe(s)
+		// .pipe(gzip())
+		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist/vendor'))
 		.pipe(notify({
 			onLast: true,

@@ -42,6 +42,10 @@ export class Time {
         return (Date.now() - this.lastSpeedChange) * this.speed + this.msBeforeLastSpeedChange;
     }
 
+    static now() {
+        return activeTime.now();
+    }
+
     static tick() {
         activeTime.tick();
     }
@@ -72,8 +76,10 @@ messenger.post('requestactivescene', {});
 
 messenger.on('activescene', (scene) => {
     if(!instances[scene]) {
-        instances[scene] = new Time();
+        instances[scene] = new Time(enforce);
     }
+
+    activeTime = instances[scene];
 });
 
 messenger.on('renderstart', () => {

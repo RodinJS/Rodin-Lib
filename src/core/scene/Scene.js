@@ -35,8 +35,8 @@ export class Scene extends EventEmitter {
 
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
+        this._camera.aspect = window.innerWidth / window.innerHeight;
+        this._camera.updateProjectionMatrix();
         Scene.renderer.setPixelRatio(window.devicePixelRatio >= 2 ? 2 : window.devicePixelRatio);
     }
 
@@ -49,7 +49,6 @@ export class Scene extends EventEmitter {
     static webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
 
     static start() {
-        console.log('starting');
         shouldRender = true;
         if(!renderRequested) {
             Scene.requestFrame(enforce);
@@ -61,18 +60,6 @@ export class Scene extends EventEmitter {
     }
 
     static go(scene) {
-        if (scene.isScene) {
-            activeScene = scene;
-        } else if (instances[scene]) {
-            activeScene = instances[scene];
-        } else {
-            const filteredScene = instances.filter(scene => scene.name === scene);
-            if(filteredScene && filteredScene[0]) {
-
-            }
-
-        }
-
         switch (true)
         {
             case scene.isScene:
@@ -91,6 +78,7 @@ export class Scene extends EventEmitter {
                 throw new ErrorBadValueParameter();
         }
 
+        messenger.post('activescene', activeScene);
         Scene.onResize();
     }
 
@@ -111,16 +99,15 @@ export class Scene extends EventEmitter {
         messenger.post('renderstart', {});
 
         // Update VR headset position and apply to camera.
-        Scene.active.controls.update();
+        Scene.active._controls.update();
 
         preRenderFunctions.map(fn => fn());
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
         messenger.post('render', {realTimestamp: timestamp});
         postRenderFunctions.map(fn => fn());
 
-        Scene.requestFrame();
+        Scene.requestFrame(enforce);
 
-        console.log('asd');
         messenger.post('renerend', {});
     }
 
