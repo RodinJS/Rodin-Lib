@@ -24,6 +24,7 @@ export class Time {
         this.msBeforeLastSpeedChange = 0;
         this.lastSpeedChange = Date.now();
         this.startTime = Date.now();
+        this.currentFrameTimestamp = 0;
     }
 
     /**
@@ -57,11 +58,25 @@ export class Time {
     static get speed() {
         return activeTime.speed;
     }
+
+    static set currentFrameTimestamp(timestamp) {
+        return activeTime.currentFrameTimestamp = timestamp;
+    }
+
+    static get currentFrameTimestamp() {
+        return activeTime.currentFrameTimestamp;
+    }
 }
 
 messenger.post('requestactivescene', {});
+
 messenger.on('activescene', (scene) => {
     if(!instances[scene]) {
         instances[scene] = new Time();
     }
+});
+
+messenger.on('renderstart', () => {
+    Time.tick();
+    Time.currentFrameTimestamp = Time.now();
 });

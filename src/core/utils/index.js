@@ -1,3 +1,5 @@
-/**
- * Created by rodin on 2/9/17.
- */
+import * as string from './string';
+
+export {
+    string
+}

@@ -1,3 +1,1 @@
-/**
- * Created by rodin on 2/9/17.
- */
+export * from './Scene';
