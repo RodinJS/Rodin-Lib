@@ -72,7 +72,7 @@ export class EventEmitter {
      * @param {Array} args - arguments to be passed to the event callback
      */
     emit(eventName, rodinEvent, ...args) {
-        customEvt.name = eventName;
+        rodinEvent.type = eventName;
 
         if (rodinEvent.propagation === false) {
             return;
@@ -85,5 +85,12 @@ export class EventEmitter {
                 }
             }
         }
+    }
+
+    emitAsync() {
+        const tmpTimeout = setTimeout(() => {
+            this.emit(...arguments);
+            clearTimeout(tmpTimeout);
+        }, 0);
     }
 }
