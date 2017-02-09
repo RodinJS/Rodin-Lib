@@ -75,11 +75,11 @@ export class Time {
 messenger.post('requestactivescene', {});
 
 messenger.on('activescene', (scene) => {
-    if(!instances[scene]) {
-        instances[scene] = new Time(enforce);
+    if(!instances[scene.name]) {
+        instances[scene.name] = new Time(enforce);
     }
 
-    activeTime = instances[scene];
+    activeTime = instances[scene.name];
 });
 
 messenger.on('renderstart', () => {

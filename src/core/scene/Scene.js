@@ -161,6 +161,8 @@ if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
     };
 }
 
+document.body.appendChild(Scene.renderer.domElement);
+
 const mainScene = new Scene('Main');
 Scene.go(mainScene);
 Scene.start();
