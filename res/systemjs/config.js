@@ -23,7 +23,9 @@
 		'core/messenger',
 		'core/eventEmitter',
 		'core/utils',
-		'core/set'
+		'core/set',
+		'core/initializer',
+		'core/constants'
 	];
 
 	function packIndex(moduleName) {

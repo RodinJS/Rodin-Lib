@@ -1,5 +1,7 @@
 import {ErrorProtectedClassInstance} from '../error';
 import {messenger} from '../messenger';
+import * as CONSTANTS from '../constants';
+
 
 let instance = null;
 let enforce = function () {
@@ -42,15 +44,15 @@ export class Time {
         return (Date.now() - this.lastSpeedChange) * this.speed + this.msBeforeLastSpeedChange;
     }
 
-    static now() {
-        return activeTime.now();
-    }
-
     static tick() {
         activeTime.tick();
     }
 
-    static delta() {
+    static get now() {
+        return activeTime.now();
+    }
+
+    static get delta() {
         return activeTime.delta
     }
 
@@ -72,9 +74,9 @@ export class Time {
     }
 }
 
-messenger.post('requestactivescene', {});
+messenger.post(CONSTANTS.REQUEST_ACTIVE_SCENE, {});
 
-messenger.on('activescene', (scene) => {
+messenger.on(CONSTANTS.ACTIVE_SCENE, (scene) => {
     if(!instances[scene.name]) {
         instances[scene.name] = new Time(enforce);
     }
@@ -82,7 +84,7 @@ messenger.on('activescene', (scene) => {
     activeTime = instances[scene.name];
 });
 
-messenger.on('renderstart', () => {
+messenger.on(CONSTANTS.RENDER_START, () => {
     Time.tick();
-    Time.currentFrameTimestamp = Time.now();
+    Time.currentFrameTimestamp = Time.now;
 });

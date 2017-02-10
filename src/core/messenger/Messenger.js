@@ -22,8 +22,17 @@ export class Messenger {
 
         this.channels[name].push(callback);
     }
+
+    once(name, callback) {
+        const tmp = () => {
+            callback();
+            this.channels[name].splice(this.channels[name].indexOf(callback), 1);
+        };
+
+        this.on(name, callback);
+    }
 }
 
 const messenger = new Messenger();
 
-export { messenger };
+export {messenger};
