@@ -42,15 +42,15 @@ export class Time {
         return (Date.now() - this.lastSpeedChange) * this.speed + this.msBeforeLastSpeedChange;
     }
 
-    static now() {
-        return activeTime.now();
-    }
-
     static tick() {
         activeTime.tick();
     }
 
-    static delta() {
+    static get now() {
+        return activeTime.now();
+    }
+
+    static get delta() {
         return activeTime.delta
     }
 
@@ -84,5 +84,5 @@ messenger.on('activescene', (scene) => {
 
 messenger.on('renderstart', () => {
     Time.tick();
-    Time.currentFrameTimestamp = Time.now();
+    Time.currentFrameTimestamp = Time.now;
 });

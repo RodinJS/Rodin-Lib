@@ -25,7 +25,7 @@ export class RodinEvent {
 
         this.keys = [];
 
-        this.timestamp = Time.now();
+        this.timestamp = Time.now;
         this.realTimestamp = Date.now();
         this.propagation = true;
     }
