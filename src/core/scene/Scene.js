@@ -26,7 +26,12 @@ export class Scene extends EventEmitter {
         this._scene.add(this._camera);
         this._controls = new THREE.VRControls(this._camera);
         this._controls.standing = true;
+
         this.name = name;
+
+        this._preRenderFunctions = new Set();
+        this._postRenderFunctions = new Set();
+
         instances.push(this);
     }
 
@@ -34,11 +39,31 @@ export class Scene extends EventEmitter {
         return true;
     }
 
+    add() {
+        for (let i = 0; i < arguments.length; i++) {
+            this._scene.add(arguments[i]);
+        }
+    }
+
+    remove() {
+        for (let i = 0; i < arguments.length; i++) {
+            this._scene.remove(arguments[i]);
+        }
+    }
+
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
         this._camera.aspect = window.innerWidth / window.innerHeight;
         this._camera.updateProjectionMatrix();
         Scene.renderer.setPixelRatio(window.devicePixelRatio >= 2 ? 2 : window.devicePixelRatio);
+    }
+
+    preRender(callback) {
+        this._preRenderFunctions.push(callback);
+    }
+
+    postRender(callback) {
+        this._postRenderFunctions.push(callback);
     }
 
     static renderer = new THREE.WebGLRenderer({
@@ -51,7 +76,7 @@ export class Scene extends EventEmitter {
 
     static start() {
         shouldRender = true;
-        if(!renderRequested) {
+        if (!renderRequested) {
             Scene.requestFrame(enforce);
         }
     }
@@ -61,8 +86,7 @@ export class Scene extends EventEmitter {
     }
 
     static go(scene) {
-        switch (true)
-        {
+        switch (true) {
             case scene.isScene:
                 activeScene = scene;
                 break;
@@ -71,7 +95,7 @@ export class Scene extends EventEmitter {
                 break;
             case true:
                 const filteredScene = instances.filter(scene => scene.name === scene);
-                if(filteredScene && filteredScene[0]) {
+                if (filteredScene && filteredScene[0]) {
                     activeScene = filteredScene;
                     break;
                 }
@@ -81,6 +105,14 @@ export class Scene extends EventEmitter {
 
         messenger.post(CONSTANTS.ACTIVE_SCENE, activeScene);
         Scene.onResize();
+    }
+
+    static add() {
+        Scene.active.add(...arguments);
+    }
+
+    static remove() {
+        Scene.active.remove(...arguments);
     }
 
     static onResize() {
@@ -118,11 +150,11 @@ export class Scene extends EventEmitter {
         // shouldRender is false
         renderRequested = false;
 
-        if(!shouldRender) {
+        if (!shouldRender) {
             return;
         }
 
-        if(e !== enforce) {
+        if (e !== enforce) {
             throw new ErrorProtectedMethodCall('requestFrame');
         }
 
