@@ -3,6 +3,7 @@ import {messenger} from '../messenger';
 import {Set} from '../set';
 import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
 import * as utils from '../utils';
+import * as CONSTANTS from '../constants';
 
 function enforce() {
 }
@@ -46,7 +47,7 @@ export class Scene extends EventEmitter {
 
     static effect = new THREE.VREffect(Scene.renderer);
 
-    static webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
+    static webVRmanager = null;
 
     static start() {
         shouldRender = true;
@@ -78,7 +79,7 @@ export class Scene extends EventEmitter {
                 throw new ErrorBadValueParameter();
         }
 
-        messenger.post('activescene', activeScene);
+        messenger.post(CONSTANTS.ACTIVE_SCENE, activeScene);
         Scene.onResize();
     }
 
@@ -161,8 +162,10 @@ if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
     };
 }
 
-document.body.appendChild(Scene.renderer.domElement);
-
-const mainScene = new Scene('Main');
-Scene.go(mainScene);
-Scene.start();
+messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
+    Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
+    document.body.appendChild(Scene.renderer.domElement);
+    const mainScene = new Scene('Main');
+    Scene.go(mainScene);
+    Scene.start();
+});
