@@ -135,7 +135,9 @@ export class Scene extends EventEmitter {
         Scene.active._controls.update();
 
         preRenderFunctions.map(fn => fn());
+        Scene.active._preRenderFunctions.map(fn => fn());
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
+        Scene.active._postRenderFunctions.map(fn => fn());
         messenger.post('render', {realTimestamp: timestamp});
         postRenderFunctions.map(fn => fn());
 
