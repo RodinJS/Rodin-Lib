@@ -194,10 +194,7 @@ export class Scene extends EventEmitter {
      * @param e {Function} Enforce function
      * @param timestamp {number}
      */
-    static render(e, timestamp) {
-        if (e !== enforce) {
-            throw new ErrorProtectedMethodCall('render');
-        }
+    static render(timestamp) {
 
         messenger.post(CONSTANTS.RENDER_START, {});
 
