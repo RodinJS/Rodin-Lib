@@ -4,6 +4,9 @@
 
 let oldPush = Array.prototype.push;
 
+/**
+ * Class for collecting unique fields
+ */
 export class Set extends Array {
     constructor() {
         super(...arguments);
