@@ -1,41 +1,66 @@
 import {ErrorInvalidArgument} from '../error';
+import {Set} from '../set';
+import {EventEmitter} from '../eventEmitter';
+import {string} from '../utils';
 
-export class Sculpt {
+function normalizeArguments(args) {
+
+}
+
+export class Sculpt extends EventEmitter {
 
 	constructor(arg) {
+        super();
 
+        //normalize imports into a single object
 		switch (true) {
 			case arg.isObject3D:
 				//if we get a three object 3D
 				//use it as our base
-				this._threeObject = arg;
+				arg = {threeObject: arg};
 				break;
 			case arg.isSculpt:
 				//if we get a Sculpt object
 				//copy it into us
-				this.copy(arg);
+				arg = {Sculpt: arg};
 				break;
 			case typeof arg === 'string':
 				//assume we got a url to a model
 				//todo: handle loading model from a url
+                arg = {url: arg};
 				break;
 			case typeof arg == 'object':
-
-				let args = Object.assign({
-					name: undefined,
-					url: undefined,
-					THREEObject3D: undefined,
-					Sculpt: undefined
-				}, arg);
-
-				this.name = args.name;
-			//todo: handle url and stuff
-
+                break;
 			default:
-				this._threeObject = new THREE.Object3D();
+			    arg = {threeObject: new THREE.Object3D()};
 		}
 
-		this.children = [];
+        const args = Object.assign({
+            name: undefined,
+            // todo: figure out if we actually need a uid
+            // if we don't use it by the time lib is ready remove it
+            id: string.UID(),
+            url: undefined,
+            threeObject: undefined,
+            Sculpt: undefined
+        }, arg);
+
+
+        this.name = args.name;
+        //process object
+        switch(true){
+            case !!args.threeObject:
+                this._threeObject = args.threeObject;
+                break;
+            case !!args.Sculpt:
+                this.copy(args.Sculpt);
+                break;
+            case !!args.url:
+                //load a model from a url
+                break;
+        }
+
+		this.children = new Set();
 		this._parent = undefined;
 	}
 
@@ -56,21 +81,17 @@ export class Sculpt {
 	}
 
 
-	/*
+	/**
 	 * changes our parent
 	 * returns the same object as passed (parent)
-	 * @return {Sculpt}
 	 */
 	set parent(parent) {
 		this._parent = parent;
 		//todo: handle all the THREEJS parent stuff
-
 		//this._threeObject
-
-		return parent;
 	}
 
-	/*
+	/**
 	 * Copies obj into our object
 	 * @param {Sculpt} sculpt
 	 * @param {boolean} [recursive=true]
@@ -86,7 +107,7 @@ export class Sculpt {
 		return this;
 	}
 
-	/*
+	/**
 	 * Creates a new sculpt object that is a clone of our object
 	 * @param {boolean} [recursive=true]
 	 */
@@ -94,19 +115,19 @@ export class Sculpt {
 		return new this.constructor().copy(this, recursive);
 	}
 
-	/*
+	/**
 	 * Gets the matrix of our object with respect to its parent (local)
-	 * @return {THREE.matrix4} [recursive=true]
+	 * @return {THREE.Matrix4} [recursive=true]
 	 */
 	get matrix() {
 		//todo: check if this is updated
 		return this._threeObject.matrix;
 	}
 
-	/*
+	/**
 	 * Gets the matrix of our object with respect to the scene it is in (global)
 	 * if our object doesn't have a parent same as .matrix
-	 * @return {THREE.matrix4} [recursive=true]
+	 * @return {THREE.Matrix4} [recursive=true]
 	 */
 	get globalMatrix() {
 		//todo: check if this is updated

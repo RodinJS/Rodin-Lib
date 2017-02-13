@@ -14,6 +14,7 @@ class RodinError extends Error {
         }
     }
 }
+
 export class ErrorAbstractClassInstance extends RodinError {
     constructor () {
         super("Cant make instance of abstract class");
@@ -92,6 +93,12 @@ export class ErrorInvalidFileFormat extends RodinError {
     }
 }
 
+export class ErrorBadValueParameter extends RodinError {
+    constructor () {
+        super('Bad argument');
+    }
+}
+
 export class ErrorProtectedFieldChange extends RodinError {
     constructor (field = '') {
         super(`Protected field ${field} can not be changed`);
@@ -132,4 +139,10 @@ export class ErrorInvalidArgument extends RodinError {
 	constructor (typename) {
 		super(`Invalid argument, expected a ${typename}`);
 	}
+}
+
+export class ErrorProtectedClassInstance extends RodinError {
+    constructor (classname) {
+        super(`Cant create instance of class ${classname}`);
+    }
 }

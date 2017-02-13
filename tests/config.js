@@ -1,7 +1,7 @@
 (function (global) {
 
 	var paths = {
-		'npm:': 'dist/'
+		'npm:': '../dist/'
 	};
 
 	var map = {
@@ -23,9 +23,7 @@
 		'core/messenger',
 		'core/eventEmitter',
 		'core/utils',
-		'core/set',
-		'core/initializer',
-		'core/constants'
+		'core/set'
 	];
 
 	function packIndex(moduleName) {
