@@ -191,7 +191,6 @@ export class Scene extends EventEmitter {
     /**
      * Render function
      * Not available for user
-     * @param e {Function} Enforce function
      * @param timestamp {number}
      */
     static render(timestamp) {
@@ -205,12 +204,12 @@ export class Scene extends EventEmitter {
         Scene.active._preRenderFunctions.map(fn => fn());
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
         Scene.active._postRenderFunctions.map(fn => fn());
-        messenger.post('render', {realTimestamp: timestamp});
+        messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
         postRenderFunctions.map(fn => fn());
 
         Scene.requestFrame(enforce);
 
-        messenger.post('renerend', {});
+        messenger.post(CONSTANTS.RENDER_END, {});
     }
 
     /**
