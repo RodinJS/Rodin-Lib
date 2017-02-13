@@ -2,34 +2,52 @@
  * Created by gor on 2/7/17.
  */
 
+/**
+ * Messenger for collaborating classes
+ */
 export class Messenger {
     constructor() {
         this.channels = {};
     }
 
-    post(name, body) {
-        if (!this.channels[name]) {
+    /**
+     * Post message to channel
+     * @param channel {string} channel to post message
+     * @param body {*} body to post
+     */
+    post(channel, body) {
+        if (!this.channels[channel]) {
             return;
         }
 
-        this.channels[name].map(cb => cb(body));
+        this.channels[channel].map(cb => cb(body));
     }
 
-    on(name, callback) {
-        if (!this.channels[name]) {
-            this.channels[name] = [];
+    /**
+     * Receive messages from channel.
+     * @param channel {string} channel
+     * @param callback {Function} calls this function each time when someone posts message to this channel
+     */
+    on(channel, callback) {
+        if (!this.channels[channel]) {
+            this.channels[channel] = [];
         }
 
-        this.channels[name].push(callback);
+        this.channels[channel].push(callback);
     }
 
-    once(name, callback) {
+    /**
+     * Receive messages from channel.
+     * @param channel {string} channel
+     * @param callback {Function} calls this function only once when someone posts message to this channel
+     */
+    once(channel, callback) {
         const tmp = () => {
             callback();
-            this.channels[name].splice(this.channels[name].indexOf(callback), 1);
+            this.channels[channel].splice(this.channels[channel].indexOf(callback), 1);
         };
 
-        this.on(name, callback);
+        this.on(channel, callback);
     }
 }
 

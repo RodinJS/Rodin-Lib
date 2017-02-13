@@ -17,6 +17,9 @@ const postRenderFunctions = new Set();
 
 const instances = new Set();
 
+/**
+ *
+ */
 export class Scene extends EventEmitter {
     constructor(name = utils.string.UID()) {
         super();
@@ -35,22 +38,40 @@ export class Scene extends EventEmitter {
         instances.push(this);
     }
 
+    /**
+     * Check if your instance is scene
+     * @returns {boolean} always true
+     */
     get isScene() {
         return true;
     }
 
+    /**
+     * Add object to scene.
+     * Call with multiple arguments of Sculpt objects
+     */
     add() {
         for (let i = 0; i < arguments.length; i++) {
             this._scene.add(arguments[i]);
         }
     }
 
+    /**
+     * Remove object from scene
+     * Call with multiple arguments of Sculpt objects
+     */
     remove() {
         for (let i = 0; i < arguments.length; i++) {
             this._scene.remove(arguments[i]);
         }
     }
 
+    /**
+     * Reset effect size.
+     * Reset camera aspect.
+     * Update camera projection matrix
+     * Reset renderer pixel ratio
+     */
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
         this._camera.aspect = window.innerWidth / window.innerHeight;
@@ -58,10 +79,18 @@ export class Scene extends EventEmitter {
         Scene.renderer.setPixelRatio(window.devicePixelRatio >= 2 ? 2 : window.devicePixelRatio);
     }
 
+    /**
+     * Adds function that will called each time before renderer will render this scene
+     * @param callback {Function}
+     */
     preRender(callback) {
         this._preRenderFunctions.push(callback);
     }
 
+    /**
+     * Adds function that will called each time after renderer will render this scene
+     * @param callback {Function}
+     */
     postRender(callback) {
         this._postRenderFunctions.push(callback);
     }
@@ -74,6 +103,9 @@ export class Scene extends EventEmitter {
 
     static webVRmanager = null;
 
+    /**
+     * Starts render active scene.
+     */
     static start() {
         shouldRender = true;
         if (!renderRequested) {
@@ -81,10 +113,20 @@ export class Scene extends EventEmitter {
         }
     }
 
+    /**
+     * Stops render active scene.
+     */
     static stop() {
         shouldRender = false;
     }
 
+    /**
+     * Change Scene and go to other scene.
+     * If parameter is instance of Scene, go to this scene.
+     * If parameter is number, go to scene that created with this number
+     * If parameter is strig, got to scene with this name
+     * @param scene {Scene, number, string}
+     */
     static go(scene) {
         switch (true) {
             case scene.isScene:
@@ -94,7 +136,7 @@ export class Scene extends EventEmitter {
                 activeScene = instances[scene];
                 break;
             case true:
-                const filteredScene = instances.filter(scene => scene.name === scene);
+                const filteredScene = instances.filter(_scene => _scene.name === scene);
                 if (filteredScene && filteredScene[0]) {
                     activeScene = filteredScene;
                     break;
@@ -107,29 +149,57 @@ export class Scene extends EventEmitter {
         Scene.onResize();
     }
 
+    /**
+     * Add object to active scene.
+     * Call with multiple arguments of Sculpt objects
+     */
     static add() {
         Scene.active.add(...arguments);
     }
 
+    /**
+     * Remove object from active scene.
+     * Call with multiple arguments of Sculpt objects
+     */
     static remove() {
         Scene.active.remove(...arguments);
     }
 
+    /**
+     * Call active scene onResize method
+     */
     static onResize() {
         Scene.active.onResize();
     }
 
+    /**
+     * Adds function that will called each time before renderer will render any scene
+     * @param callback {Function}
+     */
     static preRender(callback) {
         preRenderFunctions.push(callback);
     }
 
+    /**
+     * Adds function that will called each time after renderer will render any scene
+     * @param callback {Function}
+     */
     static postRender(callback) {
         postRenderFunctions.push(callback);
     }
 
-    static render(timestamp) {
-        // todo: add constants
-        messenger.post('renderstart', {});
+    /**
+     * Render function
+     * Not available for user
+     * @param e {Function} Enforce function
+     * @param timestamp {number}
+     */
+    static render(e, timestamp) {
+        if (e !== enforce) {
+            throw new ErrorProtectedMethodCall('render');
+        }
+
+        messenger.post(CONSTANTS.RENDER_START, {});
 
         // Update VR headset position and apply to camera.
         Scene.active._controls.update();
@@ -146,18 +216,24 @@ export class Scene extends EventEmitter {
         messenger.post('renerend', {});
     }
 
+    /**
+     * Request render function
+     * Not available for user
+     * @param e {Function} Enforce function
+     */
     static requestFrame(e) {
         // renderRequested becomes false every time
         // render() calls requestFrame(), event if
         // shouldRender is false
+
+        if (e !== enforce) {
+            throw new ErrorProtectedMethodCall('requestFrame');
+        }
+
         renderRequested = false;
 
         if (!shouldRender) {
             return;
-        }
-
-        if (e !== enforce) {
-            throw new ErrorProtectedMethodCall('requestFrame');
         }
 
         if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) {
@@ -169,6 +245,9 @@ export class Scene extends EventEmitter {
         renderRequested = true;
     }
 
+    /**
+     * Active scene
+     */
     static get active() {
         return activeScene;
     }
