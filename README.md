@@ -25,8 +25,8 @@ High level items planned for Febrary 2017:
 | Feature          | Status                              |Version   | Docs         | Issue          |
 |------------------|-------------------------------------|----------|--------------|----------------|
 | core             |  Initial version, features evolving |   v0.0.2 | [README][0]  |              - |
-| sculpt           |                         in-progress |   v0.0.1 | [README][0]  |              - |
-| scene            |                         in-progress |   v0.0.1 | [README][0]  |              - |
+| sculpt           |                         in-progress |   v0.0.2 | [README][0]  |              - |
+| scene            |                           Available |   v0.0.2 | [README][0]  |              - |
 | error            |                           Available |   v0.0.2 | [README][0]  |              - |
 | time             |                           Available |   v0.0.2 | [README][0]  |              - |
 | teleport         |                  		 in-progress |   v0.0.2 | [README][0]  |              - |
