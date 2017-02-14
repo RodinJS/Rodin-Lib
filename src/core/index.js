@@ -8,6 +8,7 @@ export * from './messenger';
 export * from './eventEmitter';
 export * from './scene';
 export * from './initializer';
+export * from './sculpt';
 
 export {CONST};
 

@@ -1,6 +1,6 @@
 import {UID} from './string';
 
-export const getObjectId = (object) => {
+export const getId = (object) => {
     if(!object["__uid__"]) {
         object["__uid__"] = UID();
     }

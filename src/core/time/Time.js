@@ -115,7 +115,7 @@ export class Time {
 messenger.post(CONSTANTS.REQUEST_ACTIVE_SCENE, {});
 
 messenger.on(CONSTANTS.ACTIVE_SCENE, (scene) => {
-    const sceneId = utils.object.getObjectId(scene);
+    const sceneId = utils.object.getId(scene);
     if(!instances[sceneId]) {
         instances[sceneId] = new Time(enforce);
     }
