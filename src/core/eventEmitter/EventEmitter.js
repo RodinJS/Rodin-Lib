@@ -13,8 +13,7 @@ export class EventEmitter {
      * @param {function} callback - callback function
      */
     addEventListener(eventNames, callback) {
-        let events = this.events;
-        if (!Array.isArray(evts)) {
+        if (!Array.isArray(eventNames)) {
             eventNames = [eventNames];
         }
         for (let i = 0; i < eventNames.length; i++) {
@@ -87,9 +86,15 @@ export class EventEmitter {
         }
     }
 
-    emitAsync() {
+    /**
+     * Emit event async
+     * @param {String} eventName
+     * @param {RodinEvent} rodinEvent - a custom Event object
+     * @param {Array} args - arguments to be passed to the event callback
+     */
+    emitAsync(eventName, rodinEvent, ...args) {
         const tmpTimeout = setTimeout(() => {
-            this.emit(...arguments);
+            this.emit(eventName, rodinEvent, ...args);
             clearTimeout(tmpTimeout);
         }, 0);
     }
