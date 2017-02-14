@@ -1,6 +1,7 @@
 import {ErrorProtectedClassInstance, ErrorProtectedMethodCall} from '../error';
 import {messenger} from '../messenger';
 import * as CONSTANTS from '../constants';
+import * as utils from '../utils';
 
 
 let instance = null;
@@ -114,11 +115,12 @@ export class Time {
 messenger.post(CONSTANTS.REQUEST_ACTIVE_SCENE, {});
 
 messenger.on(CONSTANTS.ACTIVE_SCENE, (scene) => {
-    if(!instances[scene.name]) {
-        instances[scene.name] = new Time(enforce);
+    const sceneId = utils.object.getId(scene);
+    if(!instances[sceneId]) {
+        instances[sceneId] = new Time(enforce);
     }
 
-    activeTime = instances[scene.name];
+    activeTime = instances[sceneId];
 });
 
 messenger.on(CONSTANTS.RENDER_START, () => {

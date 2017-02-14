@@ -94,8 +94,8 @@ export class ErrorInvalidFileFormat extends RodinError {
 }
 
 export class ErrorBadValueParameter extends RodinError {
-    constructor () {
-        super('Bad argument');
+    constructor (param) {
+        super(`Bad argument, expected ${param}`);
     }
 }
 
@@ -133,6 +133,12 @@ export class ErrorUnsupportedModelType extends RodinError {
     constructor (typename) {
         super(`Unsupported model type ${typename}.`);
     }
+}
+
+export class ErrorInvalidArgument extends RodinError {
+	constructor (typename) {
+		super(`Invalid argument, expected a ${typename}`);
+	}
 }
 
 export class ErrorProtectedClassInstance extends RodinError {
