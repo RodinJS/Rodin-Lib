@@ -4,6 +4,7 @@ import {Set} from '../set';
 import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
 import * as utils from '../utils';
 import * as CONSTANTS from '../constants';
+import {RodinEvent} from '../rodinEvent';
 
 function enforce() {
 }
@@ -36,6 +37,8 @@ export class Scene extends EventEmitter {
         this._postRenderFunctions = new Set();
 
         instances.push(this);
+
+        this.children = new Set();
     }
 
     /**
@@ -51,8 +54,13 @@ export class Scene extends EventEmitter {
      * Call with multiple arguments of Sculpt objects
      */
     add() {
-        for (let i = 0; i < arguments.length; i++) {
-            this._scene.add(arguments[i]);
+        for(let i = 0; i < arguments.length; i++) {
+            if(!arguments[i].isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+            }
+
+            this.children.push(arguments[i]);
+            this._scene.add(arguments[i]._threeObject);
         }
     }
 
@@ -61,8 +69,13 @@ export class Scene extends EventEmitter {
      * Call with multiple arguments of Sculpt objects
      */
     remove() {
-        for (let i = 0; i < arguments.length; i++) {
-            this._scene.remove(arguments[i]);
+        for(let i = 0; i < arguments.length; i++) {
+            if(!arguments[i].isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+            }
+
+            this.children.splice(this.children.indexOf(arguments[i]), 1);
+            this._scene.remove(arguments[i]._threeObject);
         }
     }
 
@@ -202,6 +215,13 @@ export class Scene extends EventEmitter {
 
         preRenderFunctions.map(fn => fn());
         Scene.active._preRenderFunctions.map(fn => fn());
+
+        Scene.active.children.map(child => {
+            if(child.isReady) {
+                child.emit('update', new RodinEvent(child, {}));
+            }
+        });
+
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
         Scene.active._postRenderFunctions.map(fn => fn());
         messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
