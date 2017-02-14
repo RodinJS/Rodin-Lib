@@ -94,8 +94,8 @@ export class ErrorInvalidFileFormat extends RodinError {
 }
 
 export class ErrorBadValueParameter extends RodinError {
-    constructor () {
-        super('Bad argument');
+    constructor (param) {
+        super(`Bad argument, expected ${param}`);
     }
 }
 
