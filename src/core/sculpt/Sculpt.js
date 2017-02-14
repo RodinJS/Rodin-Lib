@@ -3,6 +3,7 @@ import {Set} from '../set';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
+import * as CONSTANTS from '../constants';
 
 function normalizeArguments(args) {
     switch (true) {
@@ -74,12 +75,12 @@ export class Sculpt extends EventEmitter {
         switch (true) {
             case !!args.sculpt:
                 this.copy(args.sculpt);
-                this.emitAsync('ready', new RodinEvent(this));
+                this.emitAsync(CONSTANTS.READY, new RodinEvent(this));
                 break;
 
             case !!args.threeObject:
                 this._threeObject = args.threeObject;
-                this.emitAsync('ready', new RodinEvent(this));
+                this.emitAsync(CONSTANTS.READY, new RodinEvent(this));
                 break;
         }
 

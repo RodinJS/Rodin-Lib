@@ -218,7 +218,7 @@ export class Scene extends EventEmitter {
 
         Scene.active.children.map(child => {
             if(child.isReady) {
-                child.emit('update', new RodinEvent(child, {}));
+                child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
         });
 
