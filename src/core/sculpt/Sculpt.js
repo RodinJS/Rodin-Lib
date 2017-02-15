@@ -135,13 +135,8 @@ export class Sculpt extends EventEmitter {
      * Set new parent
      */
     set parent(parent) {
-        let globalMatrix = this.globalMatrix;
-        let currParent = this.parent;
-        currParent && currParent.remove(this);
         parent.add(this);
-        this.globalMatrix = globalMatrix;
     }
-
 
     /**
      * Sets the position of our object with respect to its parent (local)
