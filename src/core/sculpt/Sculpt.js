@@ -161,6 +161,22 @@ export class Sculpt extends EventEmitter {
 
 
     /**
+     * Sets the scale of our object
+     * @param scale {THREE.Vector3}
+     */
+    set scale(scale) {
+        this._threeObject.scale.copy(scale);
+    }
+
+    /**
+     * Gets the scale of our object
+     * @return {THREE.Vector3}
+     */
+    get scale() {
+        return this._threeObject.scale;
+    }
+
+    /**
      * Sets the matrix of out object with respect to its parent (local)
      * @param matrix {THREE.Matrix4}
      */
