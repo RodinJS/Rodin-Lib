@@ -1,9 +1,12 @@
-import {ErrorBadValueParameter} from '../error';
+import {ErrorBadValueParameter, ErrorProtectedMethodCall} from '../error';
 import {Set} from '../set';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONSTANTS from '../constants';
+
+function enforce() {
+}
 
 function normalizeArguments(args) {
     switch (true) {
@@ -135,7 +138,7 @@ export class Sculpt extends EventEmitter {
      * Set new parent
      */
     set parent(parent) {
-        parent.add(this);
+        parent.add(enforce, this);
     }
 
     /**
@@ -156,6 +159,33 @@ export class Sculpt extends EventEmitter {
 
 
     /**
+     * Sets the position of our object with respect to scene (global)
+     * @param position {THREE.Vector3}
+     */
+    set globalPosition(position) {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix.compose(position, initialRotation, initialScale);
+    }
+
+    /**
+     * Gets the position of our object with respect to scene (global)
+     * @return {THREE.Vector3}
+     */
+    get globalPosition() {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        return initialPosition;
+    }
+
+
+    /**
      * Sets the scale of our object
      * @param scale {THREE.Vector3}
      */
@@ -169,6 +199,32 @@ export class Sculpt extends EventEmitter {
      */
     get scale() {
         return this._threeObject.scale;
+    }
+
+    /**
+     * Sets the scale of our object with respect to scene (global)
+     * @param scale {THREE.Vector3}
+     */
+    set globalScale(scale) {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix.compose(initialPosition, initialRotation, scale);
+    }
+
+    /**
+     * Gets the scale of our object with respect to scene (global)
+     * @return {THREE.Vector3}
+     */
+    get globalScale() {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        return initialScale;
     }
 
     /**
@@ -231,7 +287,13 @@ export class Sculpt extends EventEmitter {
         }
 
         this.name = sculpt.name;
-        this._threeObject = sculpt._threeObject.clone();
+        this._threeObject = sculpt._threeObject.clone(recursive);
+
+        if(recursive) {
+            for (let i = 0; i < sculpt._children.length; i++) {
+                sculpt._children[i].clone(recursive).parent = this;
+            }
+        }
 
         return this;
     }
@@ -247,9 +309,14 @@ export class Sculpt extends EventEmitter {
     /**
      * Add object(s) to this object.
      * Call with multiple arguments of Sculpt objects
+     * Not available for user
      */
-    add() {
-        for (let i = 0; i < arguments.length; i++) {
+    add(e) {
+        if(e !== enforce) {
+            throw new ErrorProtectedMethodCall('add');
+        }
+
+        for (let i = 1; i < arguments.length; i++) {
             if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
             }
@@ -269,9 +336,14 @@ export class Sculpt extends EventEmitter {
     /**
      * Remove object(s) from
      * Call with multiple arguments of Sculpt objects
+     * Not available for user
      */
-    remove() {
-        for (let i = 0; i < arguments.length; i++) {
+    remove(e) {
+        if(e !== enforce) {
+            throw new ErrorProtectedMethodCall('remove');
+        }
+
+        for (let i = 1; i < arguments.length; i++) {
             if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
             }
