@@ -323,7 +323,7 @@ export class Sculpt extends EventEmitter {
 
             let globalMatrix = arguments[i].globalMatrix;
             let currParent = arguments[i].parent;
-            currParent && currParent.remove(arguments[i]);
+            currParent && currParent.remove(enforce, arguments[i]);
 
             arguments[i]._parent = this;
             this._threeObject.add(arguments[i]._threeObject);
