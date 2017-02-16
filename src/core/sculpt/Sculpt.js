@@ -1,9 +1,12 @@
-import {ErrorBadValueParameter} from '../error';
+import {ErrorBadValueParameter, ErrorProtectedMethodCall} from '../error';
 import {Set} from '../set';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONSTANTS from '../constants';
+
+function enforce() {
+}
 
 function normalizeArguments(args) {
     switch (true) {
@@ -135,9 +138,101 @@ export class Sculpt extends EventEmitter {
      * Set new parent
      */
     set parent(parent) {
-        //todo: check if this functionality is ok
-        this._parent.remove(this);
-        parent.add(this);
+        parent.add(enforce, this);
+    }
+
+    /**
+     * Sets the position of our object with respect to its parent (local)
+     * @param position {THREE.Vector3}
+     */
+    set position(position) {
+        this._threeObject.position.copy(position);
+    }
+
+    /**
+     * Gets the position of our object with respect to its parent (local)
+     * @return {THREE.Vector3}
+     */
+    get position() {
+        return this._threeObject.position;
+    }
+
+
+    /**
+     * Sets the position of our object with respect to scene (global)
+     * @param position {THREE.Vector3}
+     */
+    set globalPosition(position) {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix.compose(position, initialRotation, initialScale);
+    }
+
+    /**
+     * Gets the position of our object with respect to scene (global)
+     * @return {THREE.Vector3}
+     */
+    get globalPosition() {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        return initialPosition;
+    }
+
+
+    /**
+     * Sets the scale of our object
+     * @param scale {THREE.Vector3}
+     */
+    set scale(scale) {
+        this._threeObject.scale.copy(scale);
+    }
+
+    /**
+     * Gets the scale of our object
+     * @return {THREE.Vector3}
+     */
+    get scale() {
+        return this._threeObject.scale;
+    }
+
+    /**
+     * Sets the scale of our object with respect to scene (global)
+     * @param scale {THREE.Vector3}
+     */
+    set globalScale(scale) {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix.compose(initialPosition, initialRotation, scale);
+    }
+
+    /**
+     * Gets the scale of our object with respect to scene (global)
+     * @return {THREE.Vector3}
+     */
+    get globalScale() {
+        const initialPosition = null;
+        const initialRotation = null;
+        const initialScale = null;
+
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        return initialScale;
+    }
+
+    /**
+     * Sets the matrix of out object with respect to its parent (local)
+     * @param matrix {THREE.Matrix4}
+     */
+    set matrix(matrix) {
+        this._threeObject.matrix = matrix;
     }
 
     /**
@@ -145,17 +240,39 @@ export class Sculpt extends EventEmitter {
      * @return {THREE.Matrix4} [recursive=true]
      */
     get matrix() {
-        //todo: check if this is updated
+        this._threeObject.updateMatrix(true);
         return this._threeObject.matrix;
+    }
+
+    /**
+     * Set the matrix of out object with respect to the scene it is in (global)
+     * if our object doesn't have a parent same as .matrix
+     * @param matrix {THREE.Matrix4}
+     */
+    set globalMatrix(matrix) {
+        if (!this.parent) {
+            this.matrix = matrix;
+            return;
+        }
+
+        let inverseParentMatrix = new THREE.Matrix4();
+        let newGlobalMatrix = matrix.clone();
+
+        inverseParentMatrix.getInverse(this.parent.globalMatrix);
+        newGlobalMatrix.multiplyMatrices(inverseParentMatrix, newGlobalMatrix);
+
+        this._threeObject.matrixAutoUpdate = false;
+        this._threeObject.matrix = newGlobalMatrix;
+        this._threeObject.updateMatrixWorld(true);
     }
 
     /**
      * Gets the matrix of our object with respect to the scene it is in (global)
      * if our object doesn't have a parent same as .matrix
-     * @return {THREE.Matrix4} [recursive=true]
+     * @return {THREE.Matrix4}
      */
     get globalMatrix() {
-        //todo: check if this is updated
+        this._threeObject.updateMatrixWorld(true);
         return this._threeObject.matrixWorld;
     }
 
@@ -170,7 +287,13 @@ export class Sculpt extends EventEmitter {
         }
 
         this.name = sculpt.name;
-        this._threeObject = sculpt._threeObject.clone();
+        this._threeObject = sculpt._threeObject.clone(recursive);
+
+        if(recursive) {
+            for (let i = 0; i < sculpt._children.length; i++) {
+                sculpt._children[i].clone(recursive).parent = this;
+            }
+        }
 
         return this;
     }
@@ -186,26 +309,42 @@ export class Sculpt extends EventEmitter {
     /**
      * Add object(s) to this object.
      * Call with multiple arguments of Sculpt objects
+     * Not available for user
      */
-    add() {
-        for(let i = 0; i < arguments.length; i++) {
-            if(!arguments[i].isSculpt) {
+    add(e) {
+        if(e !== enforce) {
+            throw new ErrorProtectedMethodCall('add');
+        }
+
+        for (let i = 1; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
             }
 
-            //todo: stugel hankarc urish sculpt chlini vor et object@ add a arac
-            this.children.push(arguments[i]);
+            let globalMatrix = arguments[i].globalMatrix;
+            let currParent = arguments[i].parent;
+            currParent && currParent.remove(enforce, arguments[i]);
+
+            arguments[i]._parent = this;
             this._threeObject.add(arguments[i]._threeObject);
+            this.children.push(arguments[i]);
+
+            arguments[i].globalMatrix = globalMatrix;
         }
     }
 
     /**
      * Remove object(s) from
      * Call with multiple arguments of Sculpt objects
+     * Not available for user
      */
-    remove() {
-        for(let i = 0; i < arguments.length; i++) {
-            if(!arguments[i].isSculpt) {
+    remove(e) {
+        if(e !== enforce) {
+            throw new ErrorProtectedMethodCall('remove');
+        }
+
+        for (let i = 1; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
             }
 
