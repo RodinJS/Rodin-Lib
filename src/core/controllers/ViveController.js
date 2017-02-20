@@ -3,6 +3,8 @@ import {ErrorNoValueProvided, ErrorViveControllerAlreadyExists} from "../error";
 import {Sculpt} from '../sculpt/Sculpt';
 import {Scene} from '../scene';
 import {ModelLoader} from '../sculpt/ModelLoader';
+import {messenger} from '../messenger';
+import * as CONST from '../constants';
 
 let leftHandControllerCreated = false;
 let rightHandControllerCreated = false;
@@ -39,7 +41,11 @@ export class ViveController extends GamePad {
          */
         this.raycastingLine = null;
 
-        // this.standingMatrix = Scene.active._controls.getStandingMatrix();
+        this.standingMatrix = Scene.active._controls.getStandingMatrix();
+
+        messenger.on(CONST.ACTIVE_SCENE, () => {
+            this.standingMatrix = Scene.active._controls.getStandingMatrix();
+        });
     }
 
     /**
@@ -121,5 +127,3 @@ export class ViveController extends GamePad {
         this.raycastingLine = new Sculpt(targetLine);
     }
 }
-
-
