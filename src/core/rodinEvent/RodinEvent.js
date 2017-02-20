@@ -1,6 +1,7 @@
 import {Time} from '../time';
 
 export class RodinEvent {
+    //TODO: we also need key value in params, for examplefor touch event on vive controller we need coordinates as well.
     /**
      * Event Class
      * @param {Sculpt} target
@@ -30,6 +31,8 @@ export class RodinEvent {
         this.propagation = true;
     }
 
+
+    //TODO: not clear what this function does. getKey is not the best name for this function, maybe hasKey or byKey ???
     /**
      * getKey function.
      * @param keyCode {number}

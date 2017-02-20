@@ -10,7 +10,7 @@ function enforce() {
 }
 
 let activeScene = null;
-let shouldRender = true;
+let doRender = true;
 let renderRequested = false;
 
 const preRenderFunctions = new Set();
@@ -93,7 +93,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds function that will called each time before renderer will render this scene
+     * Adds a function to a set that will be called every time before rendering this scene
      * @param callback {Function}
      */
     preRender(callback) {
@@ -101,7 +101,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds function that will called each time after renderer will render this scene
+     * Adds a function to a set that will be called every time after rendering this scene
      * @param callback {Function}
      */
     postRender(callback) {
@@ -120,7 +120,7 @@ export class Scene extends EventEmitter {
      * Starts render active scene.
      */
     static start() {
-        shouldRender = true;
+        doRender = true;
         if (!renderRequested) {
             Scene.requestFrame(enforce);
         }
@@ -130,7 +130,7 @@ export class Scene extends EventEmitter {
      * Stops render active scene.
      */
     static stop() {
-        shouldRender = false;
+        doRender = false;
     }
 
     /**
@@ -240,7 +240,7 @@ export class Scene extends EventEmitter {
     static requestFrame(e) {
         // renderRequested becomes false every time
         // render() calls requestFrame(), event if
-        // shouldRender is false
+        // doRender is false
 
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('requestFrame');
@@ -248,7 +248,7 @@ export class Scene extends EventEmitter {
 
         renderRequested = false;
 
-        if (!shouldRender) {
+        if (!doRender) {
             return;
         }
 

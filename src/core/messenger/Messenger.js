@@ -11,9 +11,9 @@ export class Messenger {
     }
 
     /**
-     * Post message to channel
-     * @param channel {string} channel to post message
-     * @param body {*} body to post
+     * Post a message to a channel
+     * @param channel {string} channel to post a message
+     * @param body {*} body of the message to post
      */
     post(channel, body) {
         if (!this.channels[channel]) {
@@ -26,7 +26,7 @@ export class Messenger {
     /**
      * Receive messages from channel.
      * @param channel {string} channel
-     * @param callback {Function} calls this function each time when someone posts message to this channel
+     * @param callback {Function} calls this function each time when someone posts a message to this channel
      */
     on(channel, callback) {
         if (!this.channels[channel]) {
@@ -37,9 +37,9 @@ export class Messenger {
     }
 
     /**
-     * Receive messages from channel.
+     * Receive messages from channel and execute the callback function only once. After execution, this listener will remove itself
      * @param channel {string} channel
-     * @param callback {Function} calls this function only once when someone posts message to this channel
+     * @param callback {Function} calls this function only once when someone posts a message to this channel
      */
     once(channel, callback) {
         const tmp = () => {
