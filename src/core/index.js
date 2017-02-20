@@ -10,6 +10,9 @@ export * from './scene';
 export * from './initializer';
 export * from './sculpt';
 
+export * from './controllers';
+export * from './animation';
+
 export {CONST};
 
 export let v = '0.0.2';

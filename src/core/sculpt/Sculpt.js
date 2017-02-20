@@ -4,12 +4,17 @@ import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONSTANTS from '../constants';
+import {Raycastables} from '../controllers/objects';
+import {Animator} from '../animation/Animator';
 
 function enforce() {
 }
 
 function normalizeArguments(args) {
     switch (true) {
+        case !args:
+            args = {threeObject: new THREE.Object3D()};
+            break;
         case args.isSculpt:
             //if we get a Sculpt object
             //copy it into us
@@ -74,16 +79,18 @@ export class Sculpt extends EventEmitter {
          */
         this.name = args.name;
 
+        this.animator = new Animator(this);
+
         // process arguments
         switch (true) {
             case !!args.sculpt:
                 this.copy(args.sculpt);
-                this.emitAsync(CONSTANTS.READY, new RodinEvent(this));
+                this.emitAsync(CONSTANTS.READY, new RodinEvent(this, {}));
                 break;
 
             case !!args.threeObject:
                 this._threeObject = args.threeObject;
-                this.emitAsync(CONSTANTS.READY, new RodinEvent(this));
+                this.emitAsync(CONSTANTS.READY, new RodinEvent(this, {}));
                 break;
         }
 
@@ -108,7 +115,8 @@ export class Sculpt extends EventEmitter {
 
         this.on('ready', () => {
             this._ready = true;
-        })
+            this._threeObject.Sculpt = this;
+        });
     }
 
     /**
@@ -142,6 +150,21 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
+     * Set raycastable parameter
+     * @param value
+     */
+    set raycastable(value) {
+        if(value)
+            Raycastables.push(this._threeObject);
+        else {
+            const index = Raycastables.indexOf(this._threeObject);
+            if(index !== -1) {
+                Raycastables.splice(index, 1);
+            }
+        }
+    }
+
+    /**
      * Sets the position of our object with respect to its parent (local)
      * @param position {THREE.Vector3}
      */
@@ -163,9 +186,9 @@ export class Sculpt extends EventEmitter {
      * @param position {THREE.Vector3}
      */
     set globalPosition(position) {
-        const initialPosition = null;
-        const initialRotation = null;
-        const initialScale = null;
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         this.globalMatrix.compose(position, initialRotation, initialScale);
@@ -176,9 +199,9 @@ export class Sculpt extends EventEmitter {
      * @return {THREE.Vector3}
      */
     get globalPosition() {
-        const initialPosition = null;
-        const initialRotation = null;
-        const initialScale = null;
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         return initialPosition;
@@ -206,12 +229,16 @@ export class Sculpt extends EventEmitter {
      * @param scale {THREE.Vector3}
      */
     set globalScale(scale) {
-        const initialPosition = null;
-        const initialRotation = null;
-        const initialScale = null;
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         this.globalMatrix.compose(initialPosition, initialRotation, scale);
+
+        // todo: think this through
+        this.matrix.decompose( this._threeObject.position, this._threeObject.quaternion, this._threeObject.scale );
+
     }
 
     /**
@@ -219,9 +246,9 @@ export class Sculpt extends EventEmitter {
      * @return {THREE.Vector3}
      */
     get globalScale() {
-        const initialPosition = null;
-        const initialRotation = null;
-        const initialScale = null;
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         return initialScale;
@@ -259,11 +286,20 @@ export class Sculpt extends EventEmitter {
         let newGlobalMatrix = matrix.clone();
 
         inverseParentMatrix.getInverse(this.parent.globalMatrix);
-        newGlobalMatrix.multiplyMatrices(inverseParentMatrix, newGlobalMatrix);
+        newGlobalMatrix.multiplyMatrices(inverseParentMatrix, newGlobalMatrix.clone());
 
+        //this._threeObject.matrixAutoUpdate = false;
+        //newGlobalMatrix.decompose(this._threeObject.position, this._threeObject.quaternion, this._threeObject.scale);
+        //this._threeObject.matrix = newGlobalMatrix;
+
+        //this._threeObject.matrixWorld = matrix;
+        //this._threeObject.matrixWorldNeedsUpdate = false;
+
+        // todo: figure out why decompose or compose works wrong
         this._threeObject.matrixAutoUpdate = false;
         this._threeObject.matrix = newGlobalMatrix;
         this._threeObject.updateMatrixWorld(true);
+        this._threeObject.matrixAutoUpdate = true;
     }
 
     /**
@@ -321,7 +357,7 @@ export class Sculpt extends EventEmitter {
                 throw new ErrorBadValueParameter('Sculpt');
             }
 
-            let globalMatrix = arguments[i].globalMatrix;
+            let globalMatrix = arguments[i].globalMatrix.clone();
             let currParent = arguments[i].parent;
             currParent && currParent.remove(enforce, arguments[i]);
 

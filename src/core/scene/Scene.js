@@ -54,8 +54,8 @@ export class Scene extends EventEmitter {
      * Call with multiple arguments of Sculpt objects
      */
     add() {
-        for(let i = 0; i < arguments.length; i++) {
-            if(!arguments[i].isSculpt) {
+        for (let i = 0; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
             }
 
@@ -69,8 +69,8 @@ export class Scene extends EventEmitter {
      * Call with multiple arguments of Sculpt objects
      */
     remove() {
-        for(let i = 0; i < arguments.length; i++) {
-            if(!arguments[i].isSculpt) {
+        for (let i = 0; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
             }
 
@@ -217,7 +217,7 @@ export class Scene extends EventEmitter {
         Scene.active._preRenderFunctions.map(fn => fn());
 
         Scene.active.children.map(child => {
-            if(child.isReady) {
+            if (child.isReady) {
                 child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
         });
