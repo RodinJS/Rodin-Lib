@@ -180,6 +180,20 @@ export class Sculpt extends EventEmitter {
         return this._threeObject.position;
     }
 
+    /**
+     * Sets the position of our object with respect to its parent (local)
+     */
+    set rotation(rotation) {
+        this._threeObject.rotation.copy(rotation);
+    }
+
+    /**
+     * Gets the position of our object with respect to its parent (local)
+     */
+    get rotation() {
+        return this._threeObject.rotation;
+    }
+
 
     /**
      * Sets the position of our object with respect to scene (global)
