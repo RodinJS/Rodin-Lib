@@ -224,6 +224,15 @@ export class GamePad extends THREE.Object3D {
                     if (controller.hand && controller.hand.match(new RegExp(hand, 'gi'))) {
                         return controller;
                     }
+
+                    const controllerIndexMap = {
+                        right: 1,
+                        left: 1
+                    };
+
+                    if(controller.index === controllerIndexMap[hand]) {
+                        return controller;
+                    }
                 }
             }
         }
