@@ -33,6 +33,12 @@ export class Raycaster extends THREE.Raycaster {
             });
         }
 
+        ret.push({
+            sculpt: Scene.active,
+            uv: null,
+            distance: Infinity
+        });
+
         return ret;
     }
 }
