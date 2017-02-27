@@ -17,7 +17,8 @@ const geometryScheme = new Scheme({
 		x: 1,
 		y: 2,
 		z: 3,
-		a: 34
+		a: 34,
+		b: 12
 	}
 });
 
@@ -32,13 +33,4 @@ let g = geometryScheme.prepare(3, 76, 4, 12);
 
 let i = meshScheme.prepare(5, 112);
 let j = geometryScheme.prepare(5, 112);
-
-console.log(a);
-console.log(b);
-console.log(c);
-console.log(d);
-console.log(e);
-console.log(g);
-console.log(i);
-console.log(j);
 ```
