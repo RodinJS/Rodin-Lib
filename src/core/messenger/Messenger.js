@@ -23,6 +23,17 @@ export class Messenger {
         this.channels[channel].map(cb => cb(body));
     }
 
+    postAsync(channel, body) {
+        if (!this.channels[channel]) {
+            return;
+        }
+
+        // todo: implement this with out timer
+        setTimeout(() => {
+            this.post(channel, body);
+        }, 0);
+    }
+
     /**
      * Receive messages from channel.
      * @param channel {string} channel
@@ -47,7 +58,7 @@ export class Messenger {
             this.channels[channel].splice(this.channels[channel].indexOf(callback), 1);
         };
 
-        this.on(channel, callback);
+        this.on(channel, tmp);
     }
 }
 

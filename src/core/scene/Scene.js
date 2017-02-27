@@ -39,6 +39,8 @@ export class Scene extends EventEmitter {
         instances.push(this);
 
         this.children = new Set();
+
+        this._scene.add(new THREE.AmbientLight());
     }
 
     /**
@@ -282,14 +284,11 @@ if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) 
     this.onResize();
 }
 
+messenger.on(CONSTANTS.REQUEST_ACTIVE_SCENE, () => {
+    messenger.postAsync(CONSTANTS.ACTIVE_SCENE, activeScene);
+});
 
-// TODO: fix this after fixing webVRManager
-if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    Scene.webVRmanager.vrCallback = () => {
-        Scene.webVRmanager.enterVRMode_();
-        Scene.webVRmanager.hmd.resetPose();
-    };
-}
+messenger.post(CONSTANTS.REQUEST_RODIN_STARTED);
 
 messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
     Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
@@ -297,4 +296,12 @@ messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
     const mainScene = new Scene('Main');
     Scene.go(mainScene);
     Scene.start();
+
+    // TODO: fix this after fixing webVRManager
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        Scene.webVRmanager.vrCallback = () => {
+            Scene.webVRmanager.enterVRMode_();
+            Scene.webVRmanager.hmd.resetPose();
+        };
+    }
 });
