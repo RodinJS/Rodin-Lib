@@ -4,7 +4,9 @@ export class EnumGenerator {
     }
 
     next() {
-        this.value <<= 1;
+        // todo: fix this
+        this.value += 1;
+        // this.value <<= 1;
         return this.value;
     }
 }

@@ -13,8 +13,10 @@ function enforce() {
 let buttonsPressed = new Set();
 let buttonsDown = new Set();
 let buttonsUp = new Set();
+let buttonsChanged = new Set();
 
 messenger.on(CONST.RENDER_START, () => {
+    buttonsChanged = new Set();
     buttonsDown = new Set();
     buttonsUp = new Set();
 });
@@ -123,31 +125,34 @@ export class GamePad extends EventEmitter {
             return;
         }
 
+        this.emit(CONST.UPDATE, new RodinEvent(this, {gamePad: this}));
+
         this.intersectObjects();
 
         let buttonDownDetected = false;
         let valueChangeDetected = false;
         let buttonUpDetected = false;
 
-        for (let i = 0; i < this.navigatorGamePad.buttons.length; i++) {
+        let buttonsToCheck = this.navigatorGamePad.buttons.concat(this.navigatorGamePad.polyfilledButtons || []);
+        for (let i = 0; i < buttonsToCheck.length; i++) {
             if(!this.buttons[i]) continue;
 
-            if (this.buttons[i].pressed !== this.navigatorGamePad.buttons[i].pressed) {
-                this.buttons[i].pressed = this.navigatorGamePad.buttons[i].pressed;
+            if (this.buttons[i].pressed !== buttonsToCheck[i].pressed) {
+                this.buttons[i].pressed = buttonsToCheck[i].pressed;
                 this.buttons[i].pressed ? this.buttonDown(this.buttons[i]) : this.buttonUp(this.buttons[i]);
                 this.buttons[i].pressed ? buttonDownDetected = true : buttonUpDetected = true;
 
                 buttonsPressed.push(this.buttons[i]);
             }
 
-            if (this.buttons[i].value !== this.navigatorGamePad.buttons[i].value) {
+            if (this.buttons[i].value !== buttonsToCheck[i].value) {
                 this.valueChange(this.buttons[i]);
-                this.buttons[i].value = this.navigatorGamePad.buttons[i].value;
+                this.buttons[i].value = buttonsToCheck[i].value;
                 valueChangeDetected = true;
             }
 
-            if (this.buttons[i].touched !== this.navigatorGamePad.buttons[i].touched) {
-                this.buttons[i].touched = this.navigatorGamePad.buttons[i].touched;
+            if (this.buttons[i].touched !== buttonsToCheck[i].touched) {
+                this.buttons[i].touched = buttonsToCheck[i].touched;
                 this.buttons[i].touched ? this.touchStart(this.buttons[i]) : this.touchEnd(this.buttons[i]);
             }
         }
@@ -155,7 +160,6 @@ export class GamePad extends EventEmitter {
         buttonDownDetected && this.emit(CONST.GAMEPAD_BUTTON_DOWN, new RodinEvent(this));
         valueChangeDetected && this.emit(CONST.GAMEPAD_BUTTON_CHANGE, new RodinEvent(this));
         buttonUpDetected && this.emit(CONST.GAMEPAD_BUTTON_UP, new RodinEvent(this));
-
     }
 
     intersectObjects() {
@@ -231,7 +235,7 @@ export class GamePad extends EventEmitter {
         let currentEvent = null;
         let i = 0;
         do {
-            currentEvent = new RodinEvent(objects[i].sculpt, {domEvent: DOMEvent, button: button, controller: this});
+            currentEvent = new RodinEvent(objects[i].sculpt, {domEvent: DOMEvent, button: button, gamePad: this});
             currentEvent.distance = objects[i].distance;
             currentEvent.uv = objects[i].uv;
             objects[i].sculpt.emit(eventName, currentEvent);
@@ -264,6 +268,7 @@ export class GamePad extends EventEmitter {
     }
 
     valueChange(button) {
+        buttonsChanged.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_CHANGE, null, button, this);
     }
 
@@ -277,5 +282,9 @@ export class GamePad extends EventEmitter {
 
     static getButton(btn) {
         return buttonsPressed.indexOf(btn) !== -1;
+    }
+
+    static getButtonChanged(btn) {
+        return buttonsChanged.indexOf(btn) !== -1;
     }
 }
