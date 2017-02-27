@@ -16,3 +16,8 @@ export const VIVE_RIGHT_TRACKPAD = KeyCodes.next();
 export const VIVE_RIGHT_MENU = KeyCodes.next();
 export const VIVE_RIGHT_TRIGGER = KeyCodes.next();
 export const VIVE_RIGHT_GRIP = KeyCodes.next();
+
+export const OCULUS_TOUCH_X = KeyCodes.next();
+export const OCULUS_TOUCH_Y = KeyCodes.next();
+export const OCULUS_TOUCH_A = KeyCodes.next();
+export const OCULUS_TOUCH_B = KeyCodes.next();
