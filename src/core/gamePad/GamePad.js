@@ -13,8 +13,10 @@ function enforce() {
 let buttonsPressed = new Set();
 let buttonsDown = new Set();
 let buttonsUp = new Set();
+let buttonsChanged = new Set();
 
 messenger.on(CONST.RENDER_START, () => {
+    buttonsChanged = new Set();
     buttonsDown = new Set();
     buttonsUp = new Set();
 });
@@ -266,6 +268,7 @@ export class GamePad extends EventEmitter {
     }
 
     valueChange(button) {
+        buttonsChanged.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_CHANGE, null, button, this);
     }
 
@@ -279,5 +282,9 @@ export class GamePad extends EventEmitter {
 
     static getButton(btn) {
         return buttonsPressed.indexOf(btn) !== -1;
+    }
+
+    static getButtonChanged(btn) {
+        return buttonsChanged.indexOf(btn) !== -1;
     }
 }
