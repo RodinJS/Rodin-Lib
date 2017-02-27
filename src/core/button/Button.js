@@ -1,10 +1,11 @@
 export class Button {
-    constructor(keyCode = 0) {
+    constructor(keyCode = 0, navigatorButtonId = 0) {
         this.keyCode = keyCode;
-    }
+        this.navigatorButtonId = navigatorButtonId;
 
-    //todo: make singleton base class or singleton function
-    static get instance() {
-        return new Button();
+        this.pressed = false;
+        this.touched = false;
+
+        this.value = 0;
     }
 }

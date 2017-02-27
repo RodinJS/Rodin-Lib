@@ -3,12 +3,12 @@ import {Set} from '../set';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
-import * as CONSTANTS from '../constants';
+import * as CONST from '../constants';
 
 function enforce() {
 }
 
-function normalizeArguments(args) {
+function normalizeArguments(args = {}) {
     switch (true) {
         case args.isSculpt:
             //if we get a Sculpt object
@@ -78,12 +78,12 @@ export class Sculpt extends EventEmitter {
         switch (true) {
             case !!args.sculpt:
                 this.copy(args.sculpt);
-                this.emitAsync(CONSTANTS.READY, new RodinEvent(this));
+                this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
             case !!args.threeObject:
                 this._threeObject = args.threeObject;
-                this.emitAsync(CONSTANTS.READY, new RodinEvent(this));
+                this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
         }
 
@@ -106,8 +106,9 @@ export class Sculpt extends EventEmitter {
          */
         this._ready = false;
 
-        this.on('ready', () => {
+        this.on(CONST.READY, () => {
             this._ready = true;
+            this._threeObject.Sculpt = this;
         })
     }
 

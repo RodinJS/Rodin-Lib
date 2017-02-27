@@ -47,7 +47,7 @@ export class Messenger {
             this.channels[channel].splice(this.channels[channel].indexOf(callback), 1);
         };
 
-        this.on(channel, callback);
+        this.on(channel, tmp);
     }
 }
 
