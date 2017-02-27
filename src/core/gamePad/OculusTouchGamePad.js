@@ -16,10 +16,26 @@ export class OculusTouchGamePad extends GamePad {
         super('oculus', hand, CONST.VR);
 
         if (hand === CONST.LEFT) {
-            this.buttons = [Buttons.oculusTouchLeftThumbstick, Buttons.oculusTouchX, Buttons.oculusTouchY];
+            this.buttons = [Buttons.oculusTouchLeftThumbstick, Buttons.oculusTouchX, Buttons.oculusTouchY, Buttons.oculusTouchLeftGrip, Buttons.oculusTouchLeftTrigger];
         } else {
-            this.buttons = [Buttons.oculusTouchRightThumbstick, Buttons.oculusTouchA, Buttons.oculusTouchB];
+            this.buttons = [Buttons.oculusTouchRightThumbstick, Buttons.oculusTouchA, Buttons.oculusTouchB, Buttons.oculusTouchRightGrip, Buttons.oculusTouchRightTrigger];
         }
+
+        this.on(CONST.UPDATE, () => {
+            if(!this.navigatorGamePad) {
+                return;
+            }
+
+            if(!this.navigatorGamePad.polyfilledButtons) {
+                this.navigatorGamePad.polyfilledButtons = [{value: 0, pressed: false}, {value: 0, pressed: false}];
+            }
+
+            this.navigatorGamePad.polyfilledButtons[0].value = this.navigatorGamePad.axes[2];
+            this.navigatorGamePad.polyfilledButtons[0].pressed = this.navigatorGamePad.polyfilledButtons[0].value > .9;
+
+            this.navigatorGamePad.polyfilledButtons[1].value = this.navigatorGamePad.axes[3];
+            this.navigatorGamePad.polyfilledButtons[1].pressed = this.navigatorGamePad.polyfilledButtons[1].value > .9;
+        });
 
         this.initControllerModel();
         this.initRaycastingLine();

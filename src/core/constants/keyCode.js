@@ -20,7 +20,11 @@ export const VIVE_RIGHT_GRIP = KeyCodes.next();
 export const OCULUS_TOUCH_X = KeyCodes.next();
 export const OCULUS_TOUCH_Y = KeyCodes.next();
 export const OCULUS_TOUCH_LEFT_THUMBSTICK = KeyCodes.next();
+export const OCULUS_TOUCH_LEFT_GRIP = KeyCodes.next();
+export const OCULUS_TOUCH_LEFT_TRIGGER = KeyCodes.next();
 
 export const OCULUS_TOUCH_A = KeyCodes.next();
 export const OCULUS_TOUCH_B = KeyCodes.next();
 export const OCULUS_TOUCH_RIGHT_THUMBSTICK = KeyCodes.next();
+export const OCULUS_TOUCH_RIGHT_GRIP = KeyCodes.next();
+export const OCULUS_TOUCH_RIGHT_TRIGGER = KeyCodes.next();
