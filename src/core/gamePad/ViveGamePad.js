@@ -47,7 +47,6 @@ export class ViveController extends GamePad {
 
     /**
      * Set Controller model
-     * @param model
      */
     initControllerModel() {
         this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v1/model.obj');

@@ -1,7 +1,7 @@
 import {EventEmitter} from '../eventEmitter';
 import {messenger} from '../messenger';
 import * as CONST from '../constants';
-import {Sculpt, Box} from '../sculpt';
+import {Sculpt} from '../sculpt';
 import {Set} from '../set';
 import {RodinEvent} from '../rodinEvent';
 import {Raycaster} from '../raycaster';
@@ -9,6 +9,15 @@ import {Scene} from '../scene';
 
 function enforce() {
 }
+
+let buttonsPressed = new Set();
+let buttonsDown = new Set();
+let buttonsUp = new Set();
+
+messenger.on(CONST.RENDER_START, () => {
+    buttonsDown = new Set();
+    buttonsUp = new Set();
+});
 
 export class GamePad extends EventEmitter {
     constructor(navigatorGamePadId = "", hand = null, type = CONST.BOTH) {
@@ -129,6 +138,8 @@ export class GamePad extends EventEmitter {
                 this.buttons[i].pressed = this.navigatorGamePad.buttons[i].pressed;
                 this.buttons[i].pressed ? this.buttonDown(this.buttons[i]) : this.buttonUp(this.buttons[i]);
                 this.buttons[i].pressed ? buttonDownDetected = true : buttonUpDetected = true;
+
+                buttonsPressed.push(this.buttons[i]);
             }
 
             if (this.buttons[i].value !== this.navigatorGamePad.buttons[i].value) {
@@ -146,6 +157,7 @@ export class GamePad extends EventEmitter {
         buttonDownDetected && this.emit(CONST.GAMEPAD_BUTTON_DOWN, new RodinEvent(this));
         valueChangeDetected && this.emit(CONST.GAMEPAD_BUTTON_CHANGE, new RodinEvent(this));
         buttonUpDetected && this.emit(CONST.GAMEPAD_BUTTON_UP, new RodinEvent(this));
+
     }
 
     intersectObjects() {
@@ -234,10 +246,13 @@ export class GamePad extends EventEmitter {
     }
 
     buttonDown(button) {
+        buttonsDown.push(button);
+        buttonsPressed.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_DOWN, null, button, this);
     }
 
     buttonUp(button) {
+        buttonsUp.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_UP, null, button, this);
     }
 
@@ -252,5 +267,17 @@ export class GamePad extends EventEmitter {
 
     valueChange(button) {
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_CHANGE, null, button, this);
+    }
+
+    static getButtonDown(btn) {
+        return buttonsDown.indexOf(btn) !== -1;
+    }
+
+    static getButtonUp(btn) {
+        return buttonsUp.indexOf(btn) !== -1;
+    }
+
+    static getButton(btn) {
+        return buttonsPressed.indexOf(btn) !== -1;
     }
 }
