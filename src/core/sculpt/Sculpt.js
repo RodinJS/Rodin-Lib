@@ -4,11 +4,12 @@ import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
+import {loadOBJ} from '../utils';
 
 function enforce() {
 }
 
-function normalizeArguments(args = {}) {
+function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     switch (true) {
         case args.isSculpt:
             //if we get a Sculpt object
@@ -25,10 +26,6 @@ function normalizeArguments(args = {}) {
             //todo: handle loading model from a url
             args = {url: args};
             break;
-        case typeof args == 'object':
-            break;
-        default:
-            args = {threeObject: new THREE.Object3D()};
     }
 
     return Object.assign({
@@ -85,6 +82,13 @@ export class Sculpt extends EventEmitter {
                 this._threeObject = args.threeObject;
                 this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
+
+            case !!args.url:
+                loadOBJ(args.url, (mesh) => {
+                    this._threeObject = mesh;
+                    this.emitAsync(CONST.READY, new RodinEvent(this));
+                });
+                break;
         }
 
         /**
@@ -110,6 +114,17 @@ export class Sculpt extends EventEmitter {
             this._ready = true;
             this._threeObject.Sculpt = this;
         })
+    }
+
+    get visible() {
+        return this._threeObject.visible;
+    }
+
+    set visible(value) {
+        this._threeObject.visible = value;
+        for(let i = 0; i < this.children.length; i ++) {
+            this.children[i].visible = value;
+        }
     }
 
     /**
@@ -158,6 +173,13 @@ export class Sculpt extends EventEmitter {
         return this._threeObject.position;
     }
 
+    set quaternion(quaternion) {
+        this._threeObject.quaternion.copy(quaternion);
+    }
+
+    get quaternion() {
+        return this._threeObject.quaternion;
+    }
 
     /**
      * Sets the position of our object with respect to scene (global)

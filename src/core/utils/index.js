@@ -7,3 +7,5 @@ export {
     object,
     Enum
 }
+
+export * from './OBJLoader';

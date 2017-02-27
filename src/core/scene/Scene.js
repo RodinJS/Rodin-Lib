@@ -39,6 +39,8 @@ export class Scene extends EventEmitter {
         instances.push(this);
 
         this.children = new Set();
+
+        this._scene.add(new THREE.AmbientLight());
     }
 
     /**
@@ -282,6 +284,9 @@ if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) 
     this.onResize();
 }
 
+messenger.on(CONSTANTS.REQUEST_ACTIVE_SCENE, () => {
+    messenger.postAsync(CONSTANTS.ACTIVE_SCENE, activeScene);
+});
 
 messenger.post(CONSTANTS.REQUEST_RODIN_STARTED);
 
