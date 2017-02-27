@@ -37,10 +37,8 @@ export class GamePad extends EventEmitter {
 
         this.raycaster = new Raycaster();
 
-        // todo: use button pressed and touched methods
         this.buttons = [];
 
-        // todo: replace with sculpt
         this.sculpt = new Sculpt();
 
         this.standingMatrix = new THREE.Matrix4().identity();
