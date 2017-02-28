@@ -4,9 +4,6 @@ import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
 
-function enforce() {
-}
-
 /**
  * A controller class for describing HTC Vive controllers event handlers.
  * @param {string} hand Required - "left" or "right".
@@ -14,24 +11,35 @@ function enforce() {
  * @param {THREE.PerspectiveCamera} camera Required - the camera where the controller will be used.
  * @param {number} raycastLayers - the number of objects that can be reycasted by the same ray.
  */
-export class ViveController extends GamePad {
+export class OculusTouchGamePad extends GamePad {
     constructor(hand) {
-        super('openvr', hand, CONST.VR);
+        super('oculus', hand, CONST.VR);
 
         if (hand === CONST.LEFT) {
-            this.buttons = [Buttons.viveLeftTrackpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
+            this.buttons = [Buttons.oculusTouchLeftThumbstick, Buttons.oculusTouchX, Buttons.oculusTouchY, Buttons.oculusTouchLeftGrip, Buttons.oculusTouchLeftTrigger];
         } else {
-            this.buttons = [Buttons.viveRightTrackpad, Buttons.viveRightTrigger, Buttons.viverightGrip, Buttons.viverightMenu];
+            this.buttons = [Buttons.oculusTouchRightThumbstick, Buttons.oculusTouchA, Buttons.oculusTouchB, Buttons.oculusTouchRightGrip, Buttons.oculusTouchRightTrigger];
         }
+
+        this.on(CONST.UPDATE, () => {
+            if(!this.navigatorGamePad) {
+                return;
+            }
+
+            if(!this.navigatorGamePad.polyfilledButtons) {
+                this.navigatorGamePad.polyfilledButtons = [{value: 0, pressed: false}, {value: 0, pressed: false}];
+            }
+
+            this.navigatorGamePad.polyfilledButtons[0].value = this.navigatorGamePad.axes[2];
+            this.navigatorGamePad.polyfilledButtons[0].pressed = this.navigatorGamePad.polyfilledButtons[0].value > .9;
+
+            this.navigatorGamePad.polyfilledButtons[1].value = this.navigatorGamePad.axes[3];
+            this.navigatorGamePad.polyfilledButtons[1].pressed = this.navigatorGamePad.polyfilledButtons[1].value > .9;
+        });
 
         this.initControllerModel();
         this.initRaycastingLine();
-
-        messenger.post(CONST.REQUEST_ACTIVE_SCENE);
-
-        messenger.on(CONST.ACTIVE_SCENE, (scene) => {
-            this.standingMatrix = scene._controls.getStandingMatrix();
-        });
+        this.standingMatrix = new THREE.Matrix4().setPosition(new THREE.Vector3(0, 1.6, 0));
     }
 
     /**
@@ -49,12 +57,9 @@ export class ViveController extends GamePad {
      * Set Controller model
      */
     initControllerModel() {
-        this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v1/model.obj');
+        this.controllerModel = new Sculpt(`https://cdn.rodin.io/resources/models/OculusTouchController_v2/${this.hand}_oculus_controller.obj`);
 
         this.controllerModel.on(CONST.READY, () => {
-            const loader = new THREE.TextureLoader();
-            this.controllerModel._threeObject.children[0].material.map = loader.load('https://cdn.rodin.io/resources/models/ViveController_v1/texture.png');
-            this.controllerModel._threeObject.children[0].material.specularMap = loader.load('https://cdn.rodin.io/resources/models/ViveController_v1/spcular.png');
             this.controllerModel.parent = this.sculpt;
         });
     }
@@ -85,6 +90,6 @@ export class ViveController extends GamePad {
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
 messenger.once(CONST.RODIN_STARTED, () => {
-    GamePad.viveLeft = new ViveController(CONST.LEFT);
-    GamePad.viveRight = new ViveController(CONST.RIGHT);
+    GamePad.oculusTouchLeft = new OculusTouchGamePad(CONST.LEFT);
+    GamePad.oculusTouchRight = new OculusTouchGamePad(CONST.RIGHT);
 });
