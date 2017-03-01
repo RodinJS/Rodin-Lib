@@ -36,7 +36,7 @@ export function WrappedVector3(...args) {
 	};
 
 	this.valueOf = () => {
-		return {x: privates.x, y: privates.y, z: privates.y};
+		return {x: privates.x, y: privates.y, z: privates.z};
 	}
 }
 
