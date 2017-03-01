@@ -4,8 +4,7 @@
 		"dictionaries": ["jsdoc"]
 	},
 	"source": {
-		"include": ["src/rodin"],
-		"exclude": ["src/rodin/mobile"],
+		"include": ["src/core"],
 		"includePattern": ".js$",
 		"excludePattern": "(node_modules/|docs)"
 	},
@@ -22,6 +21,6 @@
 		"encoding": "utf8",
 		"private": true,
 		"recurse": true,
-		"template": "./resources/docTemplate/minami"
+		"template": "./res/docTemplate/minami"
 	}
 }
