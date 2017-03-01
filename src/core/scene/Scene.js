@@ -10,7 +10,7 @@ function enforce() {
 }
 
 let activeScene = null;
-let shouldRender = true;
+let doRender = true;
 let renderRequested = false;
 
 const preRenderFunctions = new Set();
@@ -39,6 +39,8 @@ export class Scene extends EventEmitter {
         instances.push(this);
 
         this.children = new Set();
+
+        this._scene.add(new THREE.AmbientLight());
     }
 
     /**
@@ -93,7 +95,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds function that will called each time before renderer will render this scene
+     * Adds a function to a set that will be called every time before rendering this scene
      * @param callback {Function}
      */
     preRender(callback) {
@@ -101,7 +103,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds function that will called each time after renderer will render this scene
+     * Adds a function to a set that will be called every time after rendering this scene
      * @param callback {Function}
      */
     postRender(callback) {
@@ -120,7 +122,7 @@ export class Scene extends EventEmitter {
      * Starts render active scene.
      */
     static start() {
-        shouldRender = true;
+        doRender = true;
         if (!renderRequested) {
             Scene.requestFrame(enforce);
         }
@@ -130,7 +132,7 @@ export class Scene extends EventEmitter {
      * Stops render active scene.
      */
     static stop() {
-        shouldRender = false;
+        doRender = false;
     }
 
     /**
@@ -240,7 +242,7 @@ export class Scene extends EventEmitter {
     static requestFrame(e) {
         // renderRequested becomes false every time
         // render() calls requestFrame(), event if
-        // shouldRender is false
+        // doRender is false
 
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('requestFrame');
@@ -248,7 +250,7 @@ export class Scene extends EventEmitter {
 
         renderRequested = false;
 
-        if (!shouldRender) {
+        if (!doRender) {
             return;
         }
 
@@ -282,14 +284,11 @@ if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) 
     this.onResize();
 }
 
+messenger.on(CONSTANTS.REQUEST_ACTIVE_SCENE, () => {
+    messenger.postAsync(CONSTANTS.ACTIVE_SCENE, activeScene);
+});
 
-// TODO: fix this after fixing webVRManager
-if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    Scene.webVRmanager.vrCallback = () => {
-        Scene.webVRmanager.enterVRMode_();
-        Scene.webVRmanager.hmd.resetPose();
-    };
-}
+messenger.post(CONSTANTS.REQUEST_RODIN_STARTED);
 
 messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
     Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
@@ -297,4 +296,12 @@ messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
     const mainScene = new Scene('Main');
     Scene.go(mainScene);
     Scene.start();
+
+    // TODO: fix this after fixing webVRManager
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        Scene.webVRmanager.vrCallback = () => {
+            Scene.webVRmanager.enterVRMode_();
+            Scene.webVRmanager.hmd.resetPose();
+        };
+    }
 });
