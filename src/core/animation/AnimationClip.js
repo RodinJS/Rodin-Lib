@@ -1,4 +1,4 @@
-import {TWEEN} from './TWEEN';
+import {TWEEN} from './tween';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {ErrorProtectedMethodCall} from '../error';
