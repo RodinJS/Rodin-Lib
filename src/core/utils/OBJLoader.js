@@ -4,7 +4,7 @@ export const loadOBJ = (URL, callback) => {
     let onProgress = function (xhr) {
         if (xhr.lengthComputable) {
             let percentComplete = xhr.loaded / xhr.total * 100;
-            console.log(Math.round(percentComplete, 2) + '% downloaded');
+            // console.log(Math.round(percentComplete, 2) + '% downloaded');
         }
     };
 

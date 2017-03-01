@@ -5,6 +5,7 @@ import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {loadOBJ} from '../utils';
+import {Animation} from '../animation';
 
 function enforce() {
 }
@@ -70,6 +71,8 @@ export class Sculpt extends EventEmitter {
          * name
          */
         this.name = args.name;
+
+        this.animation = new Animation(this);
 
         // process arguments
         switch (true) {
