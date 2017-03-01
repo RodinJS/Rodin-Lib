@@ -21,4 +21,8 @@ export class WrappedEuler extends THREE.Euler {
 		this._order = val.order;
 		return this;
 	}
+
+	valueOf() {
+		return {x: this._x, y: this._y, z: this._z, order: this._order};
+	}
 }
