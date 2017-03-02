@@ -5,7 +5,7 @@ import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {loadOBJ} from '../utils';
-import {WrappedVector3, WrappedEuler} from '../utils/threeWrappers';
+import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
 import {Animation} from '../animation';
 
 function enforce() {
@@ -89,6 +89,14 @@ export class Sculpt extends EventEmitter {
 		this._rotation = new WrappedEuler();
 		this._rotation.onChange((rotation) => {
 			this.rotation = rotation;
+		});
+
+		/**
+		 * Quaternion
+		 */
+		this._quaternion = new WrappedQuaternion();
+		this._quaternion.onChange((quaternion) => {
+			this.quaternion = quaternion;
 		});
 
 		/**
@@ -248,6 +256,24 @@ export class Sculpt extends EventEmitter {
 	get rotation() {
 		this._rotation.silentCopy(this._threeObject.rotation);
 		return this._rotation;
+	}
+
+	/**
+	 * Sets the quaternion of our object with respect to its parent (local)
+	 * @param quaternion {THREE.Quaternion}
+	 */
+	set quaternion(quaternion) {
+		this._threeObject.quaternion.copy(quaternion);
+		this._quaternion.silentCopy(this._threeObject.quaternion);
+	}
+
+	/**
+	 * Gets the quaternion of our object with respect to its parent (local)
+	 * @return {THREE.Quaternion}
+	 */
+	get quaternion() {
+		this._quaternion.silentCopy(this._threeObject.quaternion);
+		return this._quaternion;
 	}
 
 	/**
@@ -477,5 +503,6 @@ export class Sculpt extends EventEmitter {
 		this._position.silentCopy(this._threeObject.position);
 		this._rotation.silentCopy(this._threeObject.rotation);
 		this._scale.silentCopy(this._threeObject.scale);
+		this._quaternion.silentCopy(this._threeObject.quaternion);
 	}
 }
