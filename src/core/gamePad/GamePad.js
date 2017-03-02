@@ -235,7 +235,7 @@ export class GamePad extends EventEmitter {
         let currentEvent = null;
         let i = 0;
         do {
-            currentEvent = new RodinEvent(objects[i].sculpt, {domEvent: DOMEvent, button: button, gamePad: this});
+            currentEvent = new RodinEvent(objects[i].sculpt, {domEvent: DOMEvent, button: button, gamepad: this});
             currentEvent.distance = objects[i].distance;
             currentEvent.uv = objects[i].uv;
             objects[i].sculpt.emit(eventName, currentEvent);
