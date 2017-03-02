@@ -27,7 +27,8 @@
 		'core/initializer',
 		'core/constants',
 		'core/rodinEvent',
-		'core/sculpt'
+		'core/sculpt',
+		'core/animation'
 	];
 
 	function packIndex(moduleName) {
