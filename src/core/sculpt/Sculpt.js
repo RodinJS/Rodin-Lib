@@ -116,6 +116,22 @@ export class Sculpt extends EventEmitter {
 		});
 
 		/**
+		 * Global Rotation
+		 */
+		this._globalRotation = new WrappedEuler();
+		this._globalRotation.onChange((rotation) => {
+			this.globalRotation = rotation;
+		});
+
+		/**
+		 * Global Quaternion
+		 */
+		this._globalQuaternion = new WrappedQuaternion();
+		this._globalQuaternion.onChange((quaternion) => {
+			this.globalQuaternion = quaternion;
+		});
+
+		/**
 		 * Global Scale
 		 */
 		this._globalScale = new WrappedVector3();
@@ -277,6 +293,23 @@ export class Sculpt extends EventEmitter {
 	}
 
 	/**
+	 * Sets the scale of our object
+	 * @param scale {THREE.Vector3}
+	 */
+	set scale(scale) {
+		this._threeObject.scale.copy(scale);
+		this._scale.silentCopy(this._threeObject.scale);
+	}
+
+	/**
+	 * Gets the scale of our object
+	 * @return {THREE.Vector3}
+	 */
+	get scale() {
+		return this._scale;
+	}
+
+	/**
 	 * Sets the position of our object with respect to scene (global)
 	 * @param position {THREE.Vector3}
 	 */
@@ -313,22 +346,35 @@ export class Sculpt extends EventEmitter {
 		return this._globalPosition;
 	}
 
-
 	/**
-	 * Sets the scale of our object
-	 * @param scale {THREE.Vector3}
+	 * Sets the rotation of our object with respect to scene (global)
+	 * @param rotation {THREE.Euler}
 	 */
-	set scale(scale) {
-		this._threeObject.scale.copy(scale);
-		this._scale.silentCopy(this._threeObject.scale);
+	set globalRotation(rotation) {
+		const initialPosition = new THREE.Vector3();
+		const initialRotation = new THREE.Quaternion();
+		const initialScale = new THREE.Vector3();
+
+		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+		initialRotation.setFromEuler(rotation);
+		this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, initialScale);
+
+		this._globalScale.silentCopy(rotation);
 	}
 
 	/**
-	 * Gets the scale of our object
-	 * @return {THREE.Vector3}
+	 * Gets the scale of our object with respect to scene (global)
+	 * @return {THREE.Euler}
 	 */
-	get scale() {
-		return this._scale;
+	get globalRotation() {
+		const initialPosition = new THREE.Vector3();
+		const initialRotation = new THREE.Quaternion();
+		const initialScale = new THREE.Vector3();
+
+		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+		//create a new Euler in order to use silentCopy
+		this._globalRotation.silentCopy(new THREE.Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
+		return this._globalRotation;
 	}
 
 	/**
