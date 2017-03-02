@@ -184,7 +184,15 @@ export class Sculpt extends EventEmitter {
 		this.on(CONST.READY, () => {
 			this._ready = true;
 			this._threeObject.Sculpt = this;
-		})
+		});
+
+		this.on(CONST.UPDATE, () => {
+			this.children.map(child => {
+				if (child.isReady) {
+					child.emit(CONST.UPDATE, new RodinEvent(child, {}));
+				}
+			});
+		});
 	}
 
 	get visible() {
