@@ -15,7 +15,7 @@ export class RodinEvent {
      */
     constructor (target, params) {
         //todo: JOI
-        params = Object.assign({type: 'event', domEvent: null, button: null, hand: '', controller: null}, params);
+        params = Object.assign({type: 'event', domEvent: null, button: null, hand: '', gamepad: null}, params);
 
         this.target = target;
         this.domEvent = params.domEvent;
@@ -25,7 +25,7 @@ export class RodinEvent {
         }
 
         this.hand = params.hand;
-        this.controller = params.controller;
+        this.gamepad = params.gamepad;
         this.type = params.type;
 
         this.timestamp = Time.now;
