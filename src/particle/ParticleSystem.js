@@ -10,34 +10,34 @@ import {Particle} from './Particle';
  *
  * @param {Object} [ params ] - General parameters of particle system
  *
- * @param {Object} [ params.numberPerSecond ] - How many particles creating per second
+ * @param {Object} [ params.numberPerSecond ] - Set random number of particles, which creating per second.
  * @param {Number} [ params.numberPerSecond.value = 10 ]
  * @param {Number} [ params.numberPerSecond.randomness = 0 ]
  *
- * @param {Object} [ params.maxParticles ] - Maximum number of particles in scene
+ * @param {Object} [ params.maxParticles ] - Set maximum random number of particles in scene.
  * @param {Number} [ params.maxParticles.value = 1000 ]
  * @param {Number} [ params.maxParticles.randomness = 0 ]
  *
  * @param {Object} [ params.particleSize ] - Each particle size,
- *      if value or randomness is a number, it is automatically convert to a vector
- * @param {THREE.Vector3 | number} [ params.particleSize.value = new THREE.Vector3( 0.1, 0.1, 0.1 ) ]
- * @param {THREE.Vector3 | number} [ params.particleSize.randomness = new THREE.Vector3( 0, 0, 0 ) ]
+ *                                           if value or randomness is a number, it is scale symmetric
+ * @param {THREE.Vector3 | Number} [ params.particleSize.value = new THREE.Vector3(0.05, 0.05, 0.05) ]
+ * @param {THREE.Vector3 | Number} [ params.particleSize.randomness = new THREE.Vector3(0.01, 0.01, 0.01) ]
  *
- * @param {Object} [ params.startPositionRandomness ] - Set random position of each particle
- * @param {Number} [ params.startPositionRandomness.randomness = 0 ]
+ * @param {Object} [ params.startPositionRandomness ] - Set random start position of each particle
+ * @param {THREE.Vector3 | Number} [ params.startPositionRandomness.randomness = new THREE.Vector3(1, 1, 1) ]
  *
- * @param {Object} [ params.velocity ]Set particles moving trajectory by the path,
+ * @param {Object} [ params.velocity ] Set particles moving trajectory by the path,
  * @param {String} [ params.velocity.type = 'set' | 'add' ] - If type is a 'set' next position vector is setting to
- *                                                           particle current position, if type is a 'add'
- *                                                           next position vector is adding to particle current position
- * @param {THREE.Vector3 | function} [ params.velocity.velocityPath = new THREE.Vector3( 0, 5, 0 ) ]
+ *                                                            particle current position, if type is a 'add'
+ *                                                            next position vector is adding to particle current position
+ * @param {THREE.Vector3 | function} [ params.velocity.velocityPath = new THREE.Vector3( 0, 3, 0 ) ]
  *
  *
  * @param {Object} [ params.lifetime ] - A particle life time, it is starting when particle was born and finishing when was died
- * @param {Number} [ params.lifetime.value = 5000 ]
+ * @param {Number} [ params.lifetime.value = 1000 ]
  * @param {Number} [ params.lifetime.randomness = 100 ]
  *
- * @param {THREE.SpriteMaterial} [ params.particlesMaterial = new THREE.SpriteMaterial( { color: 0x00c0ff } )] - Material for each particle
+ * @param {THREE.SpriteMaterial} [ params.particlesMaterial = new THREE.SpriteMaterial()] - Material for each particle
  */
 
 export class ParticleSystem {
@@ -46,33 +46,24 @@ export class ParticleSystem {
             numberPerSecond: {value: 10,randomness: 0},
             maxParticles: {value: 1000, randomness: 0},
             particleSize: {value: new THREE.Vector3(0.05, 0.05, 0.05), randomness: new THREE.Vector3(0.01, 0.01, 0.01)},
-            startPositionRandomness: {randomness: 1},
+            // TODO: create start position with using shape (box, cone, cylinder, ect..)
+            startPositionRandomness: {randomness: new THREE.Vector3(1, 1, 1)},
+            // TODO: start not at begging (start time = -delay)
             velocity: {type: 'set', velocityPath: new THREE.Vector3(0, 3, 0)},
-            lifetime: {value: 1000, randomness: 100},
-            particlesMaterial: new THREE.SpriteMaterial({
-                // color: 0x00c0ff,
-                // TODO: inch kareliya anel erb map-e null-a?
-                map: new THREE.TextureLoader().load('../src/particle/textures/particle_default_map.png'),
-            })
+            lifetime: {value: 1000, randomness: 100}
         }, params);
+
+
+        // TODO: understand randomness for material, color randomness
+        if (params && (!params.particlesMaterial || Object.keys(params.particlesMaterial).length === 0)){
+            params.particlesMaterial = new THREE.SpriteMaterial({
+                map: new THREE.TextureLoader().load('../src/particle/textures/particle_default_map.png'),
+            });
+        }
 
         this.threeObject = new THREE.Group();
         this.particles = [];
         this.params = params;
-
-        const convertToVector = (r = null) => {
-            if (r == null) return new THREE.Vector3(0, 0, 0);
-            return r.isVector3 ? r : new THREE.Vector3(r, r, r);
-        };
-
-        for (let i in this.params) {
-            if (!this.params.hasOwnProperty(i)) continue;
-
-            if (['numberPerSecond', 'maxParticles', 'lifetime'].indexOf(i) === -1) {
-                this.params[i].randomness = convertToVector(this.params[i].randomness);
-                this.params[i].value = convertToVector(this.params[i].value);
-            }
-        }
     }
 
     update() {
@@ -122,7 +113,7 @@ export class ParticleSystem {
     createParticle() {
         let particle = new Particle(
             this.params.particlesMaterial,
-            this.params.lifetime.value,
+            this.params.lifetime,
             this.params.particleSize,
             this.params.startPositionRandomness
         );
@@ -162,7 +153,7 @@ function assignKey(to, from, key) {
     }
 
     if (hasOwnProperty.call(to, key)) {
-        if (to[key] === undefined /*|| to[key] === null*/) {
+        if (to[key] === undefined || to[key] === null) {
             throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
         }
     }
@@ -206,7 +197,6 @@ Object.deepAssign = function (target) {
     for (let s = 1; s < arguments.length; s++) {
         assign(target, arguments[s]);
     }
-
     return target;
 };
 /*
@@ -214,16 +204,24 @@ Object.deepAssign = function (target) {
  */
 
 const calcRandom = (initialParam, randomness) => {
-    if (!isNaN(initialParam) && typeof initialParam === 'number') {
+    if (!isNaN(initialParam) && typeof initialParam === 'number' && !isNaN(randomness) && typeof randomness === 'number') {
         return Math.random() * 2 * randomness - randomness + initialParam;
-    } else if (initialParam.isVector3) {
-        if (randomness.x === randomness.y ){
+    }
 
-        }
-        // TODO: check if (randomness.x === randomness.y === randomness.z) set the same random value
-        let x = Math.random() * 2 * randomness.x - randomness.x + initialParam.x;
-        let y = Math.random() * 2 * randomness.y - randomness.y + initialParam.y;
-        let z = Math.random() * 2 * randomness.z - randomness.z + initialParam.z;
+    let x;
+    let y;
+    let z;
+    if (initialParam.isVector3 && !isNaN(randomness) && typeof randomness === 'number') {
+        let randomValue = Math.random();
+        x = randomValue * 2 * randomness - randomness + initialParam.x;
+        y = randomValue * 2 * randomness - randomness + initialParam.y;
+        z = randomValue * 2 * randomness - randomness + initialParam.z;
+        return new THREE.Vector3(x, y, z);
+    }
+    if ((initialParam.isVector3 || (!isNaN(initialParam) && typeof initialParam === 'number')) && randomness.isVector3) {
+        x = Math.random() * 2 * randomness.x - randomness.x + initialParam.x;
+        y = Math.random() * 2 * randomness.y - randomness.y + initialParam.y;
+        z = Math.random() * 2 * randomness.z - randomness.z + initialParam.z;
         return new THREE.Vector3(x, y, z);
     }
 };
