@@ -135,6 +135,13 @@ export class Scene extends EventEmitter {
         doRender = false;
     }
 
+	/**
+     * get the camera that currently renders
+	 */
+	static get activeCamera() {
+        return activeScene._camera;
+    }
+
     /**
      * Change Scene and go to other scene.
      * If parameter is instance of Scene, go to this scene.
