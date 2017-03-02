@@ -378,6 +378,36 @@ export class Sculpt extends EventEmitter {
 	}
 
 	/**
+	 * Sets the quaternion of our object with respect to scene (global)
+	 * @param quaternion {THREE.Quaternion}
+	 */
+	set globalQuaternion(quaternion) {
+		const initialPosition = new THREE.Vector3();
+		const initialRotation = new THREE.Quaternion();
+		const initialScale = new THREE.Vector3();
+
+		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+		this.globalMatrix = this.globalMatrix.compose(initialPosition, quaternion, initialScale);
+
+		this._globalQuaternion.silentCopy(quaternion);
+	}
+
+	/**
+	 * Gets the quaternion of our object with respect to scene (global)
+	 * @return {THREE.Quaternion}
+	 */
+	get globalQuaternion() {
+		const initialPosition = new THREE.Vector3();
+		const initialRotation = new THREE.Quaternion();
+		const initialScale = new THREE.Vector3();
+
+		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+
+		this._globalQuaternion.silentCopy(initialRotation);
+		return this._globalQuaternion;
+	}
+
+	/**
 	 * Sets the scale of our object with respect to scene (global)
 	 * @param scale {THREE.Vector3}
 	 */
