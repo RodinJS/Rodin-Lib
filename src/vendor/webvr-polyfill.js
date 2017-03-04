@@ -1330,7 +1330,7 @@ CardboardUI.prototype.listen = function (optionsCallback, backCallback) {
 		// Check to see if the user clicked on (or around) the back icon
 
 		else
-		if (event.clientX > canvas.clientWidth - buttonSize && event.clientY < buttonSize) {
+		if (event.clientX > canvas.clientWidth - buttonSize*2 && event.clientY > canvas.clientHeight - buttonSize*2) {
 			backCallback(event);
 		}
 	};
@@ -1361,7 +1361,7 @@ CardboardUI.prototype.onResize = function () {
 			dps *= window.devicePixelRatio;
 		}
 
-		var lineWidth = kCenterLineThicknessDp * dps / 2;
+		var lineWidth = kCenterLineThicknessDp * dps/2;
 		var buttonSize = kButtonWidthDp * kTouchSlopFactor * dps;
 		var buttonScale = kButtonWidthDp * dps / 2;
 		var buttonBorder = ((kButtonWidthDp * kTouchSlopFactor) - kButtonWidthDp) * dps;
@@ -1406,7 +1406,7 @@ CardboardUI.prototype.onResize = function () {
 			//vertices.push(buttonBorder + x, buttonBorder + y);
 			var X = Math.cos(Math.PI / 4) * x - Math.sin(Math.PI / 4) * y;
 			var Y = Math.sin(Math.PI / 4) * x + Math.cos(Math.PI / 4) * y;
-			vertices.push(gl.drawingBufferWidth - buttonBorder * 2 - X, gl.drawingBufferHeight - buttonBorder * 2 - Y);
+			vertices.push(gl.drawingBufferWidth - buttonBorder * 2 - X, buttonBorder * 2 - Y);
 		}
 
 		function drawRectangle(x, y, w, h) {

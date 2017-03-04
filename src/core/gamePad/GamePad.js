@@ -20,29 +20,70 @@ messenger.on(CONST.RENDER_START, () => {
     buttonsDown = new Set();
     buttonsUp = new Set();
 });
-
+/**
+ * General GamePad class, custom controllers extend this class.
+ * @param {string} [navigatorGamePadId] - custom ID for the gamepad instance.
+ * @param {string} [hand] - gamepad holding hand (left/right).
+ * @param {string} [type] - VR or non-VR
+ */
 export class GamePad extends EventEmitter {
     constructor(navigatorGamePadId = "", hand = null, type = CONST.BOTH) {
         super();
-
+        /**
+         * Defines the type of the gamepad (CONST.VR, CONST.NON_VR, CONST.BOTH).
+         * @type {string}
+         */
         this.type = type;
-
+        /**
+         * The gamepad state (enabled/disabled).
+         * @type {boolean}
+         */
         this._enabled = false;
-
+        /**
+         * The id (name) of the gamePad of current instance.
+         * @type {string}
+         */
         this.navigatorGamePadId = navigatorGamePadId;
+
+        /**
+         * The name of the hand (left or right) of the gamePad of current instance.
+         * @type {string}
+         */
         this.hand = hand;
+        /**
+         * The actual gamePad object link from navigator.
+         * @type {object}
+         */
         this.navigatorGamePad = null;
 
         //todo: Why we need this ?
+        //todo: Because user may want to raycast on object or 3 in one line. The number of objects that can be reycasted by the same ray.
         this.raycastLayers = Infinity;
+
+        /**
+         * Objects currently intersected by this gamepad.
+         * @type {Set}
+         */
         this.intersected = new Set();
-
+        /**
+         * Raycaster object used to pick/select items with current controller.
+         * @type {Raycaster}
+         */
         this.raycaster = new Raycaster();
-
+        /**
+         * Buttons array from current navigatorGamePad.
+         * @type {Array}
+         */
         this.buttons = [];
-
+        /**
+         * The gamePad mesh model in the scene.
+         * @type {Sculpt}
+         */
         this.sculpt = new Sculpt();
-
+        /**
+         * Matrix used to correctly position the controller object (if any) in the scene.
+         * @type {THREE.Matrix4}
+         */
         this.standingMatrix = new THREE.Matrix4().identity();
 
         this.sculpt.on(CONST.READY, () => {
@@ -90,16 +131,25 @@ export class GamePad extends EventEmitter {
             }
         });
     }
-
+    /**
+     * enable gamepad
+     */
     enable() {
         this._enabled = true;
     }
-
+    /**
+     * disable gamepad
+     */
     disable() {
         this._enabled = false;
     }
-
-    static getControllerFromNavigator(id, hand) {
+    /**
+     * get controller from navigator
+     * @param {string} id
+     * @param {string} hand
+     * @returns {Object} controller or null
+     */
+    static getControllerFromNavigator(id, hand = null) {
         let controllers = [navigator.mouseGamePad, navigator.cardboardGamePad];
         try {
             controllers = controllers.concat(navigator.getGamepads());
@@ -117,7 +167,9 @@ export class GamePad extends EventEmitter {
 
         return null;
     }
-
+    /**
+     * Checks the gamepad state, calls the appropriate methods
+     */
     update() {
         this.navigatorGamePad = GamePad.getControllerFromNavigator(this.navigatorGamePadId, this.hand);
 
@@ -161,7 +213,9 @@ export class GamePad extends EventEmitter {
         valueChangeDetected && this.emit(CONST.GAMEPAD_BUTTON_CHANGE, new RodinEvent(this));
         buttonUpDetected && this.emit(CONST.GAMEPAD_BUTTON_UP, new RodinEvent(this));
     }
-
+    /**
+     * Checks all intersect and emits hover and hoverOut events.
+     */
     intersectObjects() {
         if (!this.getIntersections) {
             // todo: return all sculpts that are visible for controllers
@@ -209,7 +263,9 @@ export class GamePad extends EventEmitter {
 
         this.intersected = [...intersections];
     }
-
+    /**
+     * Update controller object in scene, update position and rotation.
+     */
     updateObject() {
         let pose = this.navigatorGamePad.pose;
 
@@ -246,13 +302,20 @@ export class GamePad extends EventEmitter {
     emitIntersected(e, eventName, DOMEvent, button) {
         this.emitAll(e, this.intersected, eventName, DOMEvent, button)
     }
-
+    /**
+     * The keyDown function emitter.
+     * @param {object} button
+     */
     buttonDown(button) {
         buttonsDown.push(button);
         buttonsPressed.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_DOWN, null, button, this);
     }
 
+    /**
+     * The keyUp function emitter.
+     * @param {object} button
+     */
     buttonUp(button) {
         buttonsUp.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_UP, null, button, this);
@@ -266,24 +329,43 @@ export class GamePad extends EventEmitter {
     touchEnd() {
 
     }
-
+    /**
+     * The button value change function emitter.
+     * @param {object} button
+     */
     valueChange(button) {
         buttonsChanged.push(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_CHANGE, null, button, this);
     }
 
+    /**
+     * Tells if the provided button is down or not.
+     * @returns {boolrean}
+     */
     static getButtonDown(btn) {
         return buttonsDown.indexOf(btn) !== -1;
     }
 
+    /**
+     * Tells if the provided button is up or not.
+     * @returns {boolrean}
+     */
     static getButtonUp(btn) {
         return buttonsUp.indexOf(btn) !== -1;
     }
 
+    /**
+     * Tells if the provided button is pressed or not.
+     * @returns {boolrean}
+     */
     static getButton(btn) {
         return buttonsPressed.indexOf(btn) !== -1;
     }
 
+    /**
+     * Tells if the provided button value is changed or not.
+     * @returns {boolrean}
+     */
     static getButtonChanged(btn) {
         return buttonsChanged.indexOf(btn) !== -1;
     }

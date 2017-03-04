@@ -11,6 +11,14 @@ import {Animation} from '../animation';
 function enforce() {
 }
 
+/*let canvas =  document.createElement('canvas');
+canvas.width = 2;
+canvas.height = 2;
+document.body.appendChild(canvas);
+let ctx = canvas.getContext("2d");
+ctx.fillStyle = 'white';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+let texture = new THREE.Texture(canvas);*/
 function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 	switch (true) {
 		case args.isSculpt:
@@ -21,6 +29,11 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 		case args.isObject3D:
 			//if we get a three object 3D
 			//use it as our base
+			/*if(args.material && args.material.map === null){
+				args.material.map = texture;
+				texture.needsUpdate = true;
+				args.material.needsUpdate = true;
+			}*/
 			args = {threeObject: args};
 			break;
 		case typeof args === 'string':

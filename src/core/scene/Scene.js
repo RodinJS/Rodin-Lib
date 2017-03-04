@@ -19,7 +19,7 @@ const postRenderFunctions = new Set();
 const instances = new Set();
 
 /**
- *
+ * A class where you build your experience.
  */
 export class Scene extends EventEmitter {
     constructor(name = utils.string.UID()) {
@@ -41,6 +41,13 @@ export class Scene extends EventEmitter {
         this.children = new Set();
 
         this._scene.add(new THREE.AmbientLight());
+
+        //TODO: get rid of this sh*t. this is to cover the bug with crash on vr exit on mobiles
+
+        let x = new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial());
+        this._camera.add(x);
+        x.position.set(0, 0, -99);
+
     }
 
     /**
@@ -147,7 +154,7 @@ export class Scene extends EventEmitter {
      * If parameter is instance of Scene, go to this scene.
      * If parameter is number, go to scene that created with this number
      * If parameter is strig, got to scene with this name
-     * @param scene {Scene, number, string}
+     * @param scene {(Object|number|string)}
      */
     static go(scene) {
         switch (true) {
@@ -228,6 +235,12 @@ export class Scene extends EventEmitter {
         Scene.active.children.map(child => {
             if(child.isReady) {
                 child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
+            }
+        });
+        //TODO: camera needs to be a sculpt object, to avoid sh*t like this
+        Scene.active._camera.children.map(child => {
+            if(child.Sculpt && child.Sculpt.isReady) {
+                child.Sculpt.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
         });
 

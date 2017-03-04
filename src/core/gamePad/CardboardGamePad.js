@@ -2,6 +2,7 @@ import {GamePad} from './GamePad';
 import {messenger} from '../messenger';
 import * as CONST from '../constants';
 import * as Buttons from '../button';
+import {GazePoint} from '../sculpt/GazePoint';
 
 // todo: implement with messenger
 import {Scene} from '../scene';
@@ -93,8 +94,42 @@ export class CardboardGamePad extends GamePad {
         // this.vrOnly = true;
 
         this.buttons = [Buttons.cardboardTrigger];
+        let gp = new GazePoint();
+        gp.Sculpt.on("ready", () => {
+            this.setGazePoint(gp);
+            this.disable();
+        });
     }
 
+    /**
+     * Set GazePoint
+     * @param {GazePoint} gazePoint object to add
+     */
+    setGazePoint(gazePoint) {
+        gazePoint.controller = this;
+        this.gazePoint = gazePoint;
+        if(Scene.active._camera) {
+            Scene.active._camera.add(this.gazePoint.Sculpt._threeObject);
+        }
+    }
+
+    enable() {
+        super.enable();
+        if(this.gazePoint){
+            if(Scene.active._camera) {
+                Scene.active._camera.add(this.gazePoint.Sculpt._threeObject);
+            }
+        }
+    }
+
+    disable() {
+        super.disable();
+        if(this.gazePoint){
+            if(Scene.active._camera) {
+                Scene.active._camera.remove(this.gazePoint.Sculpt._threeObject);
+            }
+        }
+    }
     /**
      * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are in camera's center.
      * @returns {Object[]}
