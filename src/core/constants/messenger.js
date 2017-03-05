@@ -1,45 +1,45 @@
 /**
- * RODIN STARTED
- * @type {string} "rodinstarted"
+ * RODIN STARTED "rodinstarted"
+ * @type {string}
  */
 export const RODIN_STARTED = 'rodinstarted';
 
 /**
- * REQUEST RODIN STARTED
- * @type {string} "requestrodinstarted"
+ * REQUEST RODIN STARTED "requestrodinstarted"
+ * @type {string}
  */
 export const REQUEST_RODIN_STARTED = 'requestrodinstarted';
 
 
 
 /**
- * RENDER START
- * @type {string} "renderstart"
+ * RENDER START "renderstart"
+ * @type {string}
  */
 export const RENDER_START = 'renderstart';
 
 /**
- * RENDER
- * @type {string} "render"
+ * RENDER "render"
+ * @type {string}
  */
 export const RENDER = 'render';
 
 /**
- * RENDER END
- * @type {string} "renderend"
+ * RENDER END "renderend"
+ * @type {string}
  */
 export const RENDER_END = 'renderend';
 
 
 
 /**
- * ACTIVE SCENE
- * @type {string} "activescene"
+ * ACTIVE SCENE "activescene"
+ * @type {string}
  */
 export const ACTIVE_SCENE = 'activescene';
 
 /**
- * REQUEST ACTIVE SCENE
- * @type {string} "requestactivescene"
+ * REQUEST ACTIVE SCENE "requestactivescene"
+ * @type {string}
  */
 export const REQUEST_ACTIVE_SCENE = 'requestactivescene';
