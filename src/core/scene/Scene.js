@@ -117,13 +117,6 @@ export class Scene extends EventEmitter {
         this._postRenderFunctions.push(callback);
     }
 
-    static renderer = new THREE.WebGLRenderer({
-        antialias: window.devicePixelRatio < 2
-    });
-
-    static effect = new THREE.VREffect(Scene.renderer);
-
-    static webVRmanager = null;
 
     /**
      * Starts render active scene.
@@ -290,6 +283,28 @@ export class Scene extends EventEmitter {
         return activeScene;
     }
 }
+/**
+ * renderer object
+ * @type {Object}
+ * @static
+ */
+Scene.renderer = new THREE.WebGLRenderer({
+    antialias: window.devicePixelRatio < 2
+});
+/**
+ * VREffect plugin from three.js
+ * @type {Object}
+ * @static
+ */
+
+Scene.effect = new THREE.VREffect(Scene.renderer);
+/**
+ * web VR Manager plugin
+ * @type {Object}
+ * @static
+ */
+
+Scene.webVRmanager = null;
 
 Scene.renderer.setPixelRatio(window.devicePixelRatio);
 Scene.effect.setSize(window.innerWidth, window.innerHeight);
