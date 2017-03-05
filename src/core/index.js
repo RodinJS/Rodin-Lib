@@ -12,6 +12,7 @@ export * from './initializer';
 export * from './sculpt';
 export * from './gamePad';
 export * from './animation';
+export * from './video';
 
 export {
     CONST,
