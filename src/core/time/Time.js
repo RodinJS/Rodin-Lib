@@ -112,6 +112,8 @@ export class Time {
     }
 }
 
+activeTime = new Time(enforce);
+
 messenger.post(CONSTANTS.REQUEST_ACTIVE_SCENE, {});
 
 messenger.on(CONSTANTS.ACTIVE_SCENE, (scene) => {

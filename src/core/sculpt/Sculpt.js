@@ -207,10 +207,10 @@ export class Sculpt extends EventEmitter {
 			});
 		});
 	}
-
-	emitReady = () => {
-		this.emitAsync(CONST.READY, new RodinEvent(this));
-	};
+    //
+	// emitReady = () => {
+	// 	this.emitAsync(CONST.READY, new RodinEvent(this));
+	// };
 
 	get visible() {
 		return this._threeObject.visible;
@@ -258,7 +258,12 @@ export class Sculpt extends EventEmitter {
 			this._parent = null;
 			return;
 		}
-		parent.add(enforce, this);
+		if (parent.isSculpt) {
+            parent.add(enforce, this);
+		} else {
+			parent.add(this);
+		}
+
 	}
 
 	/**
