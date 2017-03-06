@@ -55,7 +55,7 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
  * Sculpt
  */
 export class Sculpt extends EventEmitter {
-	constructor(args) {
+	constructor(args, deferReadyEvent) {
 		super();
 
 		args = normalizeArguments(args);
@@ -157,20 +157,20 @@ export class Sculpt extends EventEmitter {
 		switch (true) {
 			case !!args.sculpt:
 				this.copy(args.sculpt);
-				this.emitAsync(CONST.READY, new RodinEvent(this));
+				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.threeObject:
 				this._threeObject = args.threeObject;
 				this._syncWithThree();
-				this.emitAsync(CONST.READY, new RodinEvent(this));
+				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.url:
 				loadOBJ(args.url, (mesh) => {
 					this._threeObject = mesh;
 					this._syncWithThree();
-					this.emitAsync(CONST.READY, new RodinEvent(this));
+					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				});
 				break;
 		}
@@ -207,6 +207,10 @@ export class Sculpt extends EventEmitter {
 			});
 		});
 	}
+
+	emitReady = () => {
+		this.emitAsync(CONST.READY, new RodinEvent(this));
+	};
 
 	get visible() {
 		return this._threeObject.visible;

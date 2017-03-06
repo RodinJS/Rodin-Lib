@@ -1,6 +1,6 @@
 'use strict';
 
-import {RodinEvent} from '../../RodinEvent';
+import {RodinEvent} from '../../rodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
 /**
@@ -29,7 +29,8 @@ export class Text extends Sculpt {
         transparent = true,
         ppm = 500
         }) {
-        super(0);
+
+        super(new THREE.Object3D(), true);
         this.background = background;
         this.text = text;
         this.color = color;
@@ -40,15 +41,9 @@ export class Text extends Sculpt {
         this.ppm = ppm;
         this.texture = null;
         this.textMat = null;
-        this.textMesh = null;
         this.canvas = document.createElement("canvas");
         this.draw();
-        super.init(this.textMesh);
-        let timer = setTimeout(function(){ this.emit("ready", new RodinEvent(this)); }, 0);
-        clearTimeout(timer);
-        // timeout(() => {
-        //     this.emit("ready", new RodinEvent(this));
-        // }, 0);
+        this.emitReady();
     };
 
     draw() {
@@ -102,14 +97,14 @@ export class Text extends Sculpt {
 
         let geometry = new THREE.PlaneGeometry(1,1, 5, 5);
         geometry = utils3D.scaleGeometry(geometry, new THREE.Vector3(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1));
-        if(!this.textMesh){
-            this.textMesh = new THREE.Mesh(geometry, this.textMat);
+        if(!(this._threeObject instanceof THREE.Mesh)){
+            this._threeObject = new THREE.Mesh(geometry, this.textMat);
         }else{
-            this.textMesh.geometry.dispose();
-            this.textMesh.geometry = geometry;
+            this._threeObject.geometry.dispose();
+            this._threeObject.geometry = geometry;
         }
-        //this.textMesh.scale.set(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1);
-        //this.textMesh.geometry.center();
+        //this._threeObject.scale.set(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1);
+        //this._threeObject.geometry.center();
         this.texture.needsUpdate = true;
         delete this.canvas;
         inMemCanvas = null;
