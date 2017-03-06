@@ -3,6 +3,8 @@
 import {RodinEvent} from '../../rodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
+import * as CONST from '../../constants';
+
 /**
  * DynamicText Class, used to create flat text objects with wrapping capability, parameters have the following structure:
  * <p>{</p>
@@ -45,7 +47,7 @@ export class DynamicText extends Sculpt {
         this.textMat = null;
         this.canvas = document.createElement("canvas");
         this.draw();
-        this.emitReady();
+        this.emitAsync(CONST.READY, new RodinEvent(this));
     };
 
     draw() {

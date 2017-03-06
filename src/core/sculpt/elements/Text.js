@@ -3,6 +3,9 @@
 import {RodinEvent} from '../../rodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
+import * as CONST from '../../constants';
+
+
 /**
  * Text Class, used to create flat text objects, parameters have the following structure:
  * <p>{</p>
@@ -43,7 +46,7 @@ export class Text extends Sculpt {
         this.textMat = null;
         this.canvas = document.createElement("canvas");
         this.draw();
-        this.emitReady();
+        this.emitAsync(CONST.READY, new RodinEvent(this));
     };
 
     draw() {

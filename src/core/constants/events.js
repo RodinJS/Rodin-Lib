@@ -6,6 +6,7 @@ export const ANIMATION_COMPLETE = 'complete';
 
 export const GAMEPAD_HOVER = 'gamepadhover';
 export const GAMEPAD_HOVER_OUT = 'gamepadhoverout';
+export const GAMEPAD_MOVE = 'gamepadmove';
 
 export const GAMEPAD_BUTTON = 'gamepadbutton';
 export const GAMEPAD_BUTTON_DOWN = 'gamepadbuttondown';

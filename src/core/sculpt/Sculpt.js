@@ -38,7 +38,6 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 			break;
 		case typeof args === 'string':
 			//assume we got a url to a model
-			//todo: handle loading model from a url
 			args = {url: args};
 			break;
 	}
