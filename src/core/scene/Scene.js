@@ -76,6 +76,7 @@ export class Scene extends EventEmitter {
 
             this.children.push(arguments[i]);
             // this._sculpt.add(arguments[i]._threeObject);
+            //todo: figure out what sculpt.parent should actually return to avoid bugs
             arguments[i].parent = this._sculpt;
         }
     }
