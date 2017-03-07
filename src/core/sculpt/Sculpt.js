@@ -219,9 +219,9 @@ export class Sculpt extends EventEmitter {
 		// todo: we should'nt set visibility of children
 		// todo: renderer should handle not rendering children of hidden objects
 		this._threeObject.visible = value;
-		for (let i = 0; i < this.children.length; i++) {
-			this.children[i].visible = value;
-		}
+		//for (let i = 0; i < this.children.length; i++) {
+		//	this.children[i].visible = value;
+		//}
 	}
 
 	/**
@@ -252,6 +252,7 @@ export class Sculpt extends EventEmitter {
 	 */
 	set parent(parent) {
 		if (parent === null) {
+			this.savedMatrix = this.matrix;
 			if (this.parent)
 				this.parent.remove(enforce, this);
 			this._parent = null;
@@ -261,6 +262,11 @@ export class Sculpt extends EventEmitter {
             parent.add(enforce, this);
 		} else {
 			parent.add(this);
+		}
+
+		if(this.savedMatrix){
+			this.matrix = this.savedMatrix;
+			delete this.savedMatrix;
 		}
 
 	}
