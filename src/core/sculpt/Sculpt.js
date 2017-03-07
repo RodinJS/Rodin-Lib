@@ -12,13 +12,13 @@ function enforce() {
 }
 
 /*let canvas =  document.createElement('canvas');
-canvas.width = 2;
-canvas.height = 2;
-document.body.appendChild(canvas);
-let ctx = canvas.getContext("2d");
-ctx.fillStyle = 'white';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-let texture = new THREE.Texture(canvas);*/
+ canvas.width = 2;
+ canvas.height = 2;
+ document.body.appendChild(canvas);
+ let ctx = canvas.getContext("2d");
+ ctx.fillStyle = 'white';
+ ctx.fillRect(0, 0, canvas.width, canvas.height);
+ let texture = new THREE.Texture(canvas);*/
 function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 	switch (true) {
 		case args.isSculpt:
@@ -30,10 +30,10 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 			//if we get a three object 3D
 			//use it as our base
 			/*if(args.material && args.material.map === null){
-				args.material.map = texture;
-				texture.needsUpdate = true;
-				args.material.needsUpdate = true;
-			}*/
+			 args.material.map = texture;
+			 texture.needsUpdate = true;
+			 args.material.needsUpdate = true;
+			 }*/
 			args = {threeObject: args};
 			break;
 		case typeof args === 'string':
@@ -206,7 +206,8 @@ export class Sculpt extends EventEmitter {
 			});
 		});
 	}
-    //
+
+	//
 	// emitReady = () => {
 	// 	this.emitAsync(CONST.READY, new RodinEvent(this));
 	// };
@@ -259,12 +260,12 @@ export class Sculpt extends EventEmitter {
 			return;
 		}
 		if (parent.isSculpt) {
-            parent.add(enforce, this);
+			parent.add(enforce, this);
 		} else {
 			parent.add(this);
 		}
 
-		if(this.savedMatrix){
+		if (this.savedMatrix) {
 			this.matrix = this.savedMatrix;
 			delete this.savedMatrix;
 		}
@@ -349,13 +350,7 @@ export class Sculpt extends EventEmitter {
 	 * @param position {THREE.Vector3}
 	 */
 	set globalPosition(position) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this.globalMatrix = this.globalMatrix.compose(position, initialRotation, initialScale);
-
+		this._setGlobalMatrixElement(enforce, position, 'position');
 		// use copy to preserve type of _globalPosition, i.e. WrappedVector3
 		// dont use direct copy to prevent infinite recursion
 		// implement this with a separate function to prevent this
@@ -370,14 +365,7 @@ export class Sculpt extends EventEmitter {
 		// global get ers are very slow right now,
 		// we can sync this with position and matrix
 		// setters to make faster but will slow down those
-
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-
-		this._globalPosition.silentCopy(initialPosition);
+		this._globalPosition.silentCopy(this._getGlobalMatrixElements(enforce)['position']);
 		return this._globalPosition;
 	}
 
@@ -386,14 +374,7 @@ export class Sculpt extends EventEmitter {
 	 * @param rotation {THREE.Euler}
 	 */
 	set globalRotation(rotation) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		initialRotation.setFromEuler(rotation);
-		this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, initialScale);
-
+		this._setGlobalMatrixElement(enforce, new THREE.Quaternion().setFromEuler(rotation), 'quaternion')
 		this._globalScale.silentCopy(rotation);
 	}
 
@@ -402,13 +383,8 @@ export class Sculpt extends EventEmitter {
 	 * @return {THREE.Euler}
 	 */
 	get globalRotation() {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
 		//create a new Euler in order to use silentCopy
-		this._globalRotation.silentCopy(new THREE.Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
+		this._globalRotation.silentCopy(new THREE.Euler().setFromQuaternion(this._getGlobalMatrixElements(enforce)['quaternion'], this._globalRotation.order));
 		return this._globalRotation;
 	}
 
@@ -417,13 +393,7 @@ export class Sculpt extends EventEmitter {
 	 * @param quaternion {THREE.Quaternion}
 	 */
 	set globalQuaternion(quaternion) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this.globalMatrix = this.globalMatrix.compose(initialPosition, quaternion, initialScale);
-
+		this._setGlobalMatrixElement(enforce, quaternion, 'quaternion');
 		this._globalQuaternion.silentCopy(quaternion);
 	}
 
@@ -432,13 +402,7 @@ export class Sculpt extends EventEmitter {
 	 * @return {THREE.Quaternion}
 	 */
 	get globalQuaternion() {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-
-		this._globalQuaternion.silentCopy(initialRotation);
+		this._globalQuaternion.silentCopy(this._getGlobalMatrixElements(enforce)['quaternion']);
 		return this._globalQuaternion;
 	}
 
@@ -447,13 +411,7 @@ export class Sculpt extends EventEmitter {
 	 * @param scale {THREE.Vector3}
 	 */
 	set globalScale(scale) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, scale);
-
+		this._setGlobalMatrixElement(enforce, scale, 'scale');
 		this._globalScale.silentCopy(scale);
 	}
 
@@ -462,12 +420,7 @@ export class Sculpt extends EventEmitter {
 	 * @return {THREE.Vector3}
 	 */
 	get globalScale() {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
-
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this._globalScale.silentCopy(initialScale);
+		this._globalScale.silentCopy(this._getGlobalMatrixElements(enforce)['scale']);
 		return this._globalScale;
 	}
 
@@ -615,5 +568,28 @@ export class Sculpt extends EventEmitter {
 		this._rotation.silentCopy(this._threeObject.rotation);
 		this._scale.silentCopy(this._threeObject.scale);
 		this._quaternion.silentCopy(this._threeObject.quaternion);
+	}
+
+	_getGlobalMatrixElements(e) {
+		if (e !== enforce) {
+			throw new ErrorProtectedMethodCall('_getGlobalMatrixElements');
+		}
+		const initialPosition = new THREE.Vector3();
+		const initialRotation = new THREE.Quaternion();
+		const initialScale = new THREE.Vector3();
+
+		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+		// return [initialPosition, initialRotation, initialScale];
+		return {'position': initialPosition, 'quaternion': initialRotation, 'scale': initialScale};
+	}
+
+	_setGlobalMatrixElement(e, item, index) {
+		if (e !== enforce) {
+			throw new ErrorProtectedMethodCall('_getGlobalMatrixElements');
+		}
+		const elements = this._getGlobalMatrixElements(enforce);
+		elements[index] = item;
+
+		this.globalMatrix = this.globalMatrix.compose(elements['position'], elements['quaternion'], elements['scale']);
 	}
 }
