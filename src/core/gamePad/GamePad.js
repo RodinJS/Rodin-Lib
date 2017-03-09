@@ -92,9 +92,11 @@ export class GamePad extends EventEmitter {
             messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
             messenger.on(CONST.ACTIVE_SCENE, () => {
-                Scene.active.add(this.sculpt);
+                // Scene.active.add(this.sculpt);
+                this.sculpt.parent = Scene.active;
             });
         });
+
 
         this.sculpt.on(CONST.UPDATE, () => {
             // todo: use enable and disable functions of sculpt
@@ -231,21 +233,6 @@ export class GamePad extends EventEmitter {
         //     }
         // }
 
-        let hoveredOutSculpts = intersections.filter(intersect => {
-            for (let i = 0; i < this.intersected.length; i++) {
-                if (this.intersected[i].sculpt === intersect.sculpt) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
-
-        this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER, null);
-        if (hoveredOutSculpts.length > 0) {
-            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
-        }
-
         let hoveredSculpts = this.intersected.filter(intersect => {
             for (let i = 0; i < intersections.length; i++) {
                 if (intersections[i].sculpt === intersect.sculpt) {
@@ -259,6 +246,23 @@ export class GamePad extends EventEmitter {
         this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER_OUT, null);
         if(hoveredSculpts.length > 0) {
             this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
+        }
+
+        this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
+
+        let hoveredOutSculpts = intersections.filter(intersect => {
+            for (let i = 0; i < this.intersected.length; i++) {
+                if (this.intersected[i].sculpt === intersect.sculpt) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER, null);
+        if (hoveredOutSculpts.length > 0) {
+            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
         }
 
         this.intersected = [...intersections];
@@ -275,7 +279,7 @@ export class GamePad extends EventEmitter {
         if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
         if (pose.orientation !== null) this.sculpt.quaternion.fromArray(pose.orientation);
         this.sculpt.matrix.compose(this.sculpt._threeObject.position, this.sculpt.quaternion, this.sculpt.scale);
-        this.sculpt.matrix.multiplyMatrices(this.standingMatrix, this.sculpt._threeObject.matrix);
+        this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(this.standingMatrix, this.sculpt._threeObject.matrix);
         this.sculpt._threeObject.matrixWorldNeedsUpdate = true;
     }
 

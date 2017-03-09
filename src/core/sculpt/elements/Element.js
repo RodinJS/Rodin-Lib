@@ -1,6 +1,5 @@
 'use strict';
 
-import {RodinEvent} from '../../RodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
 
@@ -54,7 +53,7 @@ export class Element extends Sculpt {
         transparent = true,
         ppm = 500
         }) {
-        super(0);
+        super(new THREE.Object3D(), true);
         this.name = name;
         this.width = width;
         this.height = height;
@@ -264,13 +263,9 @@ export class Element extends Sculpt {
 
 
             // Finalizing
-            super.init(buttonMesh);
-            let timer = setTimeout(function(){ this.emit("ready", new RodinEvent(this)); }, 0);
-            clearTimeout(timer);
-            // timeout(() => {
-            //     this.emit("ready", new RodinEvent(this));
-            // }, 0);
-            // //console.log(this)
+            this._threeObject = buttonMesh;
+            this.emitReady();
+
         };
 
         draw();

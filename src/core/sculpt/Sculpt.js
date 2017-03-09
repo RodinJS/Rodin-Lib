@@ -38,7 +38,6 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 			break;
 		case typeof args === 'string':
 			//assume we got a url to a model
-			//todo: handle loading model from a url
 			args = {url: args};
 			break;
 	}
@@ -55,7 +54,7 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
  * Sculpt
  */
 export class Sculpt extends EventEmitter {
-	constructor(args) {
+	constructor(args, deferReadyEvent) {
 		super();
 
 		args = normalizeArguments(args);
@@ -157,20 +156,20 @@ export class Sculpt extends EventEmitter {
 		switch (true) {
 			case !!args.sculpt:
 				this.copy(args.sculpt);
-				this.emitAsync(CONST.READY, new RodinEvent(this));
+				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.threeObject:
 				this._threeObject = args.threeObject;
 				this._syncWithThree();
-				this.emitAsync(CONST.READY, new RodinEvent(this));
+				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.url:
 				loadOBJ(args.url, (mesh) => {
 					this._threeObject = mesh;
 					this._syncWithThree();
-					this.emitAsync(CONST.READY, new RodinEvent(this));
+					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				});
 				break;
 		}
@@ -208,6 +207,10 @@ export class Sculpt extends EventEmitter {
 		});
 	}
 
+	emitReady = () => {
+		this.emitAsync(CONST.READY, new RodinEvent(this));
+	};
+
 	get visible() {
 		return this._threeObject.visible;
 	}
@@ -216,9 +219,9 @@ export class Sculpt extends EventEmitter {
 		// todo: we should'nt set visibility of children
 		// todo: renderer should handle not rendering children of hidden objects
 		this._threeObject.visible = value;
-		for (let i = 0; i < this.children.length; i++) {
-			this.children[i].visible = value;
-		}
+		//for (let i = 0; i < this.children.length; i++) {
+		//	this.children[i].visible = value;
+		//}
 	}
 
 	/**
@@ -249,12 +252,23 @@ export class Sculpt extends EventEmitter {
 	 */
 	set parent(parent) {
 		if (parent === null) {
+			this.savedMatrix = this.matrix;
 			if (this.parent)
 				this.parent.remove(enforce, this);
 			this._parent = null;
 			return;
 		}
-		parent.add(enforce, this);
+		if (parent.isSculpt) {
+            parent.add(enforce, this);
+		} else {
+			parent.add(this);
+		}
+
+		if(this.savedMatrix){
+			this.matrix = this.savedMatrix;
+			delete this.savedMatrix;
+		}
+
 	}
 
 	/**
@@ -539,7 +553,6 @@ export class Sculpt extends EventEmitter {
 	clone(recursive = true) {
 		return new this.constructor().copy(this, recursive);
 	}
-
 	/**
 	 * Add object(s) to this object.
 	 * Call with multiple arguments of Sculpt objects
@@ -547,7 +560,18 @@ export class Sculpt extends EventEmitter {
 	 */
 	add(e) {
 		if (e !== enforce) {
-			throw new ErrorProtectedMethodCall('add');
+			//throw new ErrorProtectedMethodCall('add');
+			if (!e.isSculpt) {
+				throw new ErrorBadValueParameter('Sculpt');
+			}
+
+			let currParent = e.parent;
+			currParent && currParent.remove(enforce, e);
+
+			e._parent = this;
+			this._threeObject.add(e._threeObject);
+			this.children.push(e);
+			return;
 		}
 
 		for (let i = 1; i < arguments.length; i++) {
@@ -577,7 +601,13 @@ export class Sculpt extends EventEmitter {
 	 */
 	remove(e) {
 		if (e !== enforce) {
-			throw new ErrorProtectedMethodCall('remove');
+			//throw new ErrorProtectedMethodCall('remove');
+			if (!e.isSculpt) {
+				throw new ErrorBadValueParameter('Sculpt');
+			}
+			this.children.indexOf(e) > -1 && this.children.splice(this.children.indexOf(e), 1);
+			this._threeObject.remove(e._threeObject);
+			return;
 		}
 
 		for (let i = 1; i < arguments.length; i++) {
@@ -585,8 +615,7 @@ export class Sculpt extends EventEmitter {
 				throw new ErrorBadValueParameter('Sculpt');
 			}
 
-			//todo: stugel te et object@ et sculpti vra ka te che
-			this.children.splice(this.children.indexOf(arguments[i]), 1);
+			this.children.indexOf(arguments[i]) > -1 && this.children.splice(this.children.indexOf(arguments[i]), 1);
 			this._threeObject.remove(arguments[i]._threeObject);
 		}
 	}
