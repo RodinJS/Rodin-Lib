@@ -1,9 +1,7 @@
 'use strict';
 
-import {RodinEvent} from '../../rodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
-import * as CONST from '../../constants';
 
 
 /**
@@ -46,7 +44,7 @@ export class Text extends Sculpt {
         this.textMat = null;
         this.canvas = document.createElement("canvas");
         this.draw();
-        this.emitAsync(CONST.READY, new RodinEvent(this));
+        this.emitReady();
     };
 
     draw() {
