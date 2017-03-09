@@ -49,13 +49,9 @@ export class ViveController extends GamePad {
      * Set Controller model
      */
     initControllerModel() {
-        this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v1/model.obj');
+        this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj');
 
         this.controllerModel.on(CONST.READY, () => {
-            const loader = new THREE.TextureLoader();
-			loader.setCrossOrigin('anonymous');
-            this.controllerModel._threeObject.children[0].material.map = loader.load('https://cdn.rodin.io/resources/models/ViveController_v1/texture.png');
-            this.controllerModel._threeObject.children[0].material.specularMap = loader.load('https://cdn.rodin.io/resources/models/ViveController_v1/spcular.png');
             this.controllerModel.parent = this.sculpt;
         });
     }
