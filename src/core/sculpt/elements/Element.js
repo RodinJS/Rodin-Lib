@@ -1,9 +1,7 @@
 'use strict';
 
-import {RodinEvent} from '../../rodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
-import * as CONST from '../../constants';
 
 /**
  * Element Class, used to create flat objects, parameters have the following structure:
@@ -266,7 +264,7 @@ export class Element extends Sculpt {
 
             // Finalizing
             this._threeObject = buttonMesh;
-            this.emitAsync(CONST.READY, new RodinEvent(this));
+            this.emitReady();
 
         };
 

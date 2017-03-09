@@ -206,10 +206,10 @@ export class Sculpt extends EventEmitter {
 			});
 		});
 	}
-    //
-	// emitReady = () => {
-	// 	this.emitAsync(CONST.READY, new RodinEvent(this));
-	// };
+
+	emitReady = () => {
+		this.emitAsync(CONST.READY, new RodinEvent(this));
+	};
 
 	get visible() {
 		return this._threeObject.visible;
