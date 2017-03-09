@@ -88,7 +88,7 @@ export class AnimationClip {
             .delay(this._delay)
             .onStart(function () {
                 let evt = new RodinEvent(_this.sculpt);
-                evt.AnimationClip = _this.name;
+                evt.animation = _this.name;
                 _this.sculpt.emit(CONST.ANIMATION_START, evt);
             })
             .onUpdate(function () {
@@ -109,7 +109,7 @@ export class AnimationClip {
                 }
 
                 let evt = new RodinEvent(_this.sculpt);
-                evt.AnimationClip = _this.name;
+                evt.animation = _this.name;
                 _this.sculpt.emit(CONST.ANIMATION_COMPLETE, evt);
             });
     }

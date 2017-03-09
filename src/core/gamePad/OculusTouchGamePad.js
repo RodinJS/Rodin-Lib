@@ -42,6 +42,10 @@ export class OculusTouchGamePad extends GamePad {
         this.standingMatrix = new THREE.Matrix4().setPosition(new THREE.Vector3(0, 1.6, 0));
     }
 
+    get isOculusTouchGamePad() {
+        return true;
+    }
+
     /**
      * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
      * @returns [Object]
