@@ -553,7 +553,6 @@ export class Sculpt extends EventEmitter {
 	clone(recursive = true) {
 		return new this.constructor().copy(this, recursive);
 	}
-
 	/**
 	 * Add object(s) to this object.
 	 * Call with multiple arguments of Sculpt objects
@@ -561,7 +560,18 @@ export class Sculpt extends EventEmitter {
 	 */
 	add(e) {
 		if (e !== enforce) {
-			throw new ErrorProtectedMethodCall('add');
+			//throw new ErrorProtectedMethodCall('add');
+			if (!e.isSculpt) {
+				throw new ErrorBadValueParameter('Sculpt');
+			}
+
+			let currParent = e.parent;
+			currParent && currParent.remove(enforce, e);
+
+			e._parent = this;
+			this._threeObject.add(e._threeObject);
+			this.children.push(e);
+			return;
 		}
 
 		for (let i = 1; i < arguments.length; i++) {
@@ -591,7 +601,13 @@ export class Sculpt extends EventEmitter {
 	 */
 	remove(e) {
 		if (e !== enforce) {
-			throw new ErrorProtectedMethodCall('remove');
+			//throw new ErrorProtectedMethodCall('remove');
+			if (!e.isSculpt) {
+				throw new ErrorBadValueParameter('Sculpt');
+			}
+			this.children.indexOf(e) > -1 && this.children.splice(this.children.indexOf(e), 1);
+			this._threeObject.remove(e._threeObject);
+			return;
 		}
 
 		for (let i = 1; i < arguments.length; i++) {
@@ -599,8 +615,7 @@ export class Sculpt extends EventEmitter {
 				throw new ErrorBadValueParameter('Sculpt');
 			}
 
-			//todo: stugel te et object@ et sculpti vra ka te che
-			this.children.splice(this.children.indexOf(arguments[i]), 1);
+			this.children.indexOf(arguments[i]) > -1 && this.children.splice(this.children.indexOf(arguments[i]), 1);
 			this._threeObject.remove(arguments[i]._threeObject);
 		}
 	}
