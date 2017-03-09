@@ -58,7 +58,7 @@ export class OculusTouchGamePad extends GamePad {
     }
 
     /**
-     * Set Controller model
+     * Set Controller model to our RODIN Oculus touch controller model.
      */
     initControllerModel() {
         this.controllerModel = new Sculpt(`https://cdn.rodin.io/resources/models/OculusTouchController_v4/${this.hand}_oculus_controller.obj`);
@@ -68,6 +68,9 @@ export class OculusTouchGamePad extends GamePad {
         });
     }
 
+    /**
+     * Init raycasting line. Create red line for controller direction
+     */
     initRaycastingLine() {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(
