@@ -14,6 +14,7 @@ export const loadOBJ = (URL, callback) => {
 
     let objLoader = new THREE.OBJLoader();
     let mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setCrossOrigin('anonymous');
 
     objLoader.load(URL, mesh => {
         const mtlDir = URL.slice(0, URL.lastIndexOf("/") + 1);
@@ -29,6 +30,6 @@ export const loadOBJ = (URL, callback) => {
             }, onProgress, onError);
         });
 
-        console.log("OBJ file was loaded");
+        // console.log("OBJ file was loaded");
     }, onProgress, onError);
 };
