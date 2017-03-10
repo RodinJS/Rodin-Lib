@@ -6,7 +6,7 @@ import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {loadOBJ} from '../utils';
 import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
-import {Animation} from '../animation';
+import {AnimationPlugin} from '../animation';
 
 function enforce() {
 }
@@ -85,7 +85,8 @@ export class Sculpt extends EventEmitter {
 		 */
 		this.name = args.name;
 
-		this.animation = new Animation(this);
+		const animationPlugin = new AnimationPlugin();
+		animationPlugin.applyTo(this);
 
 		/**
 		 * Position

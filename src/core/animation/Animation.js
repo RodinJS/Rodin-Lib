@@ -1,5 +1,8 @@
 import {AnimationClip} from './AnimationClip';
+import {SculptPlugin} from '../plugin';
 import {Set} from '../set';
+import * as CONST from '../constants';
+import {object} from '../utils';
 
 /**
  * Class Animation
@@ -7,7 +10,7 @@ import {Set} from '../set';
  * @param {!Sculpt} sculpt - Sculpt object
  */
 export class Animation {
-    constructor (sculpt) {
+    constructor(sculpt = null) {
 
         /**
          * The host Sculpt object.
@@ -27,7 +30,7 @@ export class Animation {
      * @param {!*} key
      * @returns {Animation}
      */
-    getClip (key) {
+    getClip(key) {
         if (Number.isInteger(key)) {
             return this.clips[key];
         }
@@ -46,18 +49,12 @@ export class Animation {
      * @param {...Animation}
      * @returns {Animation}
      */
-    add () {
+    add() {
         for (let i = 0; i < arguments.length; i++) {
             let animation = arguments[i];
-            // todo: mardavari lucel es harc@
-            // if (!( animation instanceof Animation) && animation.constructor !== THREE.AnimationAction) {
-            //     throw new ErrorParameterTypeDontMatch('animation', 'Animation or THREE.AnimationAction');
-            // }
 
-            if(animation instanceof AnimationClip) {
+            if (animation instanceof AnimationClip) {
                 this.clips.push(animation.copy().setSculpt(this.sculpt));
-            } else {
-                this.clips.push(animation);
             }
         }
     }
@@ -66,10 +63,10 @@ export class Animation {
      * Remove animations from Animation
      * @params {...string}
      */
-    remove () {
-        for(let i = 0; i < arguments.length; i ++) {
+    remove() {
+        for (let i = 0; i < arguments.length; i++) {
             const animation = this.getClip(arguments[i]);
-            if(!animation) {
+            if (!animation) {
                 throw new Error(`AnimationClip with name ${arguments[i]} does not exist`);
             }
 
@@ -81,7 +78,7 @@ export class Animation {
      * Get all current clips
      * @returns {Set.<Animation>}
      */
-    getClips () {
+    getClips() {
         return this.clips;
     }
 
@@ -90,7 +87,7 @@ export class Animation {
      * @param {*} [key] -  check the state for a specific animation/clip
      * @returns {boolean}
      */
-    isPlaying (key = null) {
+    isPlaying(key = null) {
         if (key === null) {
             for (let i = 0; i < this.clips.length; i++) {
                 if (this.clips[i].isPlaying()) {
@@ -110,7 +107,7 @@ export class Animation {
      * @param {boolean} [forceStart] - kills this animation (if currently playing) and starts again
      * @returns {boolean}
      */
-    start (key, forceStart = false) {
+    start(key, forceStart = false) {
         let clip = this.getClip(key);
 
         if (!clip) {
@@ -126,7 +123,7 @@ export class Animation {
      * @param {boolean} [reset] - run animation.reset() method after stopping the animation.
      * @returns {boolean} - success
      */
-    stop (key, reset = true) {
+    stop(key, reset = true) {
         let clip = this.getClip(key);
 
         if (!clip) {
@@ -134,5 +131,36 @@ export class Animation {
         }
 
         return clip.stop(reset);
+    }
+}
+
+
+export class AnimationPlugin extends SculptPlugin {
+    constructor() {
+        super();
+        this.animation = new Animation();
+    }
+
+    update() {
+        if (!this.isEnabled) return;
+
+        this.animation.clips.map(clip => {
+            // todo: replace with get method
+            if (!clip.isPlaying()) return;
+
+            for (let i in clip.animatedValues) {
+                object.setProperty(this.sculpt._threeObject, i, clip.animatedValues[i]);
+            }
+        });
+    }
+
+    applyTo(sculpt) {
+        super.applyTo(sculpt);
+
+        this.animation.sculpt = sculpt;
+        sculpt.animation = this.animation;
+        sculpt.on(CONST.UPDATE, () => {
+            this.update();
+        });
     }
 }
