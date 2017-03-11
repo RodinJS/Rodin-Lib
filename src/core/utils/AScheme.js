@@ -2,6 +2,7 @@ import {ClassType} from './argumentScheme/ClassType';
 import {NumberType} from './argumentScheme/NumberType';
 import {StringType} from './argumentScheme/StringType';
 import {ArrayType} from './argumentScheme/ArrayType';
+import {AnyType} from './argumentScheme/AnyType';
 
 import {
     ErrorInstantiationFailed,
@@ -34,6 +35,10 @@ export class AScheme {
 
     static array(...args) {
         return new ArrayType(...args);
+    }
+
+    static any(...args) {
+        return new AnyType(...args);
     }
 
     /**
@@ -208,3 +213,4 @@ export class AScheme {
 
     }
 }
+window.AScheme = AScheme;
