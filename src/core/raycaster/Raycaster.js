@@ -1,9 +1,9 @@
 import {Scene} from '../scene';
 
-let allChilds = (obj) => {
+let allChildren = (obj) => {
     let currChilds = obj.children.map(i => i._threeObject);
     for(let i = 0; i < obj.children.length; i ++) {
-        currChilds = currChilds.concat(allChilds(obj.children[i]));
+        currChilds = currChilds.concat(allChildren(obj.children[i]));
     }
 
     return currChilds;
@@ -23,12 +23,12 @@ export class Raycaster extends THREE.Raycaster {
      * Raycast
      * @returns [Sculpt] all raycasted objects from the Raycastables array, that ar appended to the scene (directly or not).
      */
-    raycast() {
+    raycast(raycastLayers = Infinity, c = null) {
         let ret = [];
         // todo: implement raycastables logic with messenger
-        let intersects = this.intersectObjects(allChilds(Scene.active));
+        let intersects = this.intersectObjects(allChildren(Scene.active));
 
-        for (let i = 0; i < intersects.length; i++) {
+        for (let i = 0; i < intersects.length && ret.length < raycastLayers; i++) {
             let centerObj = intersects[i].object;
             if (!centerObj) continue;
 
@@ -42,7 +42,7 @@ export class Raycaster extends THREE.Raycaster {
                 distance: intersects[i].distance
             });
         }
-
+        //ret.length && console.log(ret.length, c);
         ret.push({
             sculpt: Scene.active,
             uv: null,

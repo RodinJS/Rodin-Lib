@@ -12,3 +12,10 @@ export const GAMEPAD_BUTTON = 'gamepadbutton';
 export const GAMEPAD_BUTTON_DOWN = 'gamepadbuttondown';
 export const GAMEPAD_BUTTON_UP = 'gamepadbuttonup';
 export const GAMEPAD_BUTTON_CHANGE = 'gamepadbuttonchange';
+
+
+export const EMIT_DEFERRED = 'deferred';
+export const EMIT_ASYNC = 'async';
+export const EMIT_SYNC = 'sync';
+
+

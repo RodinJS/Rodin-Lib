@@ -54,7 +54,7 @@ export class OculusTouchGamePad extends GamePad {
         const tempMatrix = new THREE.Matrix4().identity().extractRotation(this.sculpt.globalMatrix);
         this.raycaster.ray.origin.setFromMatrixPosition(this.sculpt.globalMatrix);
         this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers, "Oc " + this.hand);
     }
 
     /**

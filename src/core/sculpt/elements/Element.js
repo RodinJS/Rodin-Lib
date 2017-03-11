@@ -2,6 +2,7 @@
 
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
+import * as CONST from '../../constants';
 
 /**
  * Element Class, used to create flat objects, parameters have the following structure:
@@ -53,7 +54,7 @@ export class Element extends Sculpt {
         transparent = true,
         ppm = 500
         }) {
-        super(new THREE.Object3D(), true);
+        super(new THREE.Object3D(), CONST.EMIT_DEFERRED);
         this.name = name;
         this.width = width;
         this.height = height;

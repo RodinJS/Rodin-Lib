@@ -174,7 +174,7 @@ export class MouseGamePad extends GamePad {
     getIntersections() {
         // todo: use our custom camera later
         this.raycaster.setFromCamera(new THREE.Vector2(this.navigatorGamePad.axes[0], this.navigatorGamePad.axes[1]), Scene.active._camera);
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers, "M");
     }
 }
 

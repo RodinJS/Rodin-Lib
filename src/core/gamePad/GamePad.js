@@ -119,16 +119,20 @@ export class GamePad extends EventEmitter {
         }
 
         window.addEventListener('vrdisplaypresentchange', () => {
+            console.log("vrdisplaypresentchange", this.type);
             if(this.type === CONST.BOTH) return;
             let re = new RegExp(this.navigatorGamePadId, 'gi');
 
             const hmd = Scene.webVRmanager.hmd;
-            if (hmd && re.test(hmd.displayName)) {
-                hmd.isPresenting ? this.enable() : this.disable();
-                if(hmd.isPresenting && this.type === CONST.VR || !hmd.isPresenting && this.type === CONST.NON_VR) {
+
+            if (hmd /*&& */) {
+                //hmd.isPresenting ? this.enable() : this.disable();
+                if(hmd.isPresenting && this.type === CONST.VR && re.test(hmd.displayName) || !hmd.isPresenting && this.type === CONST.NON_VR) {
                     this.enable();
+                    console.log("enabled", this.type);
                 } else {
                     this.disable();
+                    console.log("disabled", this.type);
                 }
             }
         });
@@ -226,12 +230,12 @@ export class GamePad extends EventEmitter {
 
         let intersections = this.getIntersections();
 
-        // todo: why we need this ?
-        // if (intersections.length > 0) {
-        //     if (intersections.length > this.raycastLayers) {
-        //         intersections.splice(this.raycastLayers, (intersections.length - this.raycastLayers));
-        //     }
-        // }
+         //todo: why we need this ?
+         //if (intersections.length > 0) {
+         //    if (intersections.length > this.raycastLayers) {
+         //        intersections.splice(this.raycastLayers, (intersections.length - this.raycastLayers));
+         //    }
+         //}
 
         let hoveredSculpts = this.intersected.filter(intersect => {
             for (let i = 0; i < intersections.length; i++) {
@@ -239,12 +243,13 @@ export class GamePad extends EventEmitter {
                     return false;
                 }
             }
-
             return true;
         });
 
         this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER_OUT, null);
+
         if(hoveredSculpts.length > 0) {
+            console.log(hoveredSculpts);
             this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
         }
 

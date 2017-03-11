@@ -14,4 +14,3 @@ export {
     threeWrapper
 }
 
-export * from './OBJLoader';

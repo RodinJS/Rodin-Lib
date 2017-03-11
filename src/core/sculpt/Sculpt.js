@@ -4,7 +4,7 @@ import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {loadOBJ} from '../utils';
+import {ModelLoader} from '../loader';
 import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
 import {Animation} from '../animation';
 
@@ -54,7 +54,7 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
  * Sculpt
  */
 export class Sculpt extends EventEmitter {
-	constructor(args, deferReadyEvent) {
+	constructor(args, emitReady = CONST.EMIT_SYNC) {
 		super();
 
 		args = normalizeArguments(args);
@@ -156,20 +156,53 @@ export class Sculpt extends EventEmitter {
 		switch (true) {
 			case !!args.sculpt:
 				this.copy(args.sculpt);
-				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+				switch (emitReady){
+					case CONST.EMIT_SYNC:
+						this._ready = true;
+						this._threeObject.Sculpt = this;
+						this.emitAsync(CONST.READY, new RodinEvent(this));
+						break;
+					case CONST.EMIT_ASYNC:
+						this.emitAsync(CONST.READY, new RodinEvent(this));
+						break;
+					case CONST.EMIT_DEFERRED:
+						break;
+				}
 				break;
 
 			case !!args.threeObject:
 				this._threeObject = args.threeObject;
 				this._syncWithThree();
-				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+				switch (emitReady){
+					case CONST.EMIT_SYNC:
+						this._ready = true;
+						this._threeObject.Sculpt = this;
+						this.emitAsync(CONST.READY, new RodinEvent(this));
+						break;
+					case CONST.EMIT_ASYNC:
+						this.emitAsync(CONST.READY, new RodinEvent(this));
+						break;
+					case CONST.EMIT_DEFERRED:
+						break;
+				}
 				break;
 
 			case !!args.url:
-				loadOBJ(args.url, (mesh) => {
+				ModelLoader.loadOBJ(args.url, (mesh) => {
 					this._threeObject = mesh;
 					this._syncWithThree();
-					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+					switch (emitReady){
+						case CONST.EMIT_SYNC:
+							this._ready = true;
+							this._threeObject.Sculpt = this;
+							this.emitAsync(CONST.READY, new RodinEvent(this));
+							break;
+						case CONST.EMIT_ASYNC:
+							this.emitAsync(CONST.READY, new RodinEvent(this));
+							break;
+						case CONST.EMIT_DEFERRED:
+							break;
+					}
 				});
 				break;
 		}
@@ -194,8 +227,8 @@ export class Sculpt extends EventEmitter {
 		this._ready = false;
 
 		this.on(CONST.READY, () => {
-			this._ready = true;
-			this._threeObject.Sculpt = this;
+			if(!this._ready) this._ready = true;
+			if(this._threeObject.Sculpt !== this) this._threeObject.Sculpt = this;
 		});
 
 		this.on(CONST.UPDATE, () => {
