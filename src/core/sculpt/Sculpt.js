@@ -4,9 +4,9 @@ import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {loadOBJ} from '../utils';
 import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
 import {Animation} from '../animation';
+import {Loader} from '../loader';
 
 function enforce() {
 }
@@ -170,7 +170,7 @@ export class Sculpt extends EventEmitter {
 				break;
 
 			case !!args.url:
-				loadOBJ(args.url, (mesh) => {
+				Loader.loadModel(args.url, (mesh) => {
 					this._threeObject = mesh;
 					this._syncWithThree();
                     this._ready = true;
