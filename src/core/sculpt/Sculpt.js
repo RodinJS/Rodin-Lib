@@ -1,5 +1,4 @@
 import {ErrorBadValueParameter, ErrorProtectedMethodCall} from '../error';
-import {Set} from '../set';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
@@ -78,15 +77,14 @@ export class Sculpt extends EventEmitter {
 		 * @type {Set}
 		 * @private
 		 */
-		this._children = new Set();
+		this._children = [];
 
 		/**
 		 * name
 		 */
 		this.name = args.name;
 
-		const animationPlugin = new AnimationPlugin();
-		animationPlugin.applyTo(this);
+		this.plugins = new Set();
 
 		/**
 		 * Position
@@ -155,30 +153,25 @@ export class Sculpt extends EventEmitter {
 
 		// process arguments
 		switch (true) {
-			case !!args.sculpt:
-				this.copy(args.sculpt);
-				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
-				break;
+            case !!args.sculpt:
+                this.copy(args.sculpt);
+                !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+                break;
 
-			case !!args.threeObject:
-				this._threeObject = args.threeObject;
-				this._syncWithThree();
-				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
-				break;
+            case !!args.threeObject:
+                this._threeObject = args.threeObject;
+                this._syncWithThree();
+                !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+                break;
 
-			case !!args.url:
-				loadOBJ(args.url, (mesh) => {
-					this._threeObject = mesh;
-					this._syncWithThree();
-					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
-				});
-				break;
-		}
-
-		/**
-		 * @type {Set}
-		 */
-		this.children = new Set();
+            case !!args.url:
+                loadOBJ(args.url, (mesh) => {
+                    this._threeObject = mesh;
+                    this._syncWithThree();
+                    !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+                });
+                break;
+        }
 
 		/**
 		 * parent
@@ -554,6 +547,21 @@ export class Sculpt extends EventEmitter {
 	clone(recursive = true) {
 		return new this.constructor().copy(this, recursive);
 	}
+
+
+    install(plugin) {
+		let found = false;
+		plugin.multypleAdd && this.plugins.forEach(pluginInstance => {
+			if(pluginInstance.constructor === plugin) {
+				found = true;
+			}
+		});
+
+		pluginInstance = new plugin();
+        pluginInstance.applyTo(this);
+        this.plugins.add(pluginInstance);
+    }
+
 	/**
 	 * Add object(s) to this object.
 	 * Call with multiple arguments of Sculpt objects
