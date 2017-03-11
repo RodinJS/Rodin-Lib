@@ -118,7 +118,7 @@ export class AScheme {
             throw new ErrorArgumentLoop();
         }
         been.push(reference);
-        if (AScheme.isReference(e, scheme[reference]._default)) {
+        if (scheme[reference]._default && AScheme.isReference(e, scheme[reference]._default)) {
             res[reference] = AScheme.handleReferenceTree(e, res, scheme, AScheme.getReference(e, scheme[reference]._default), been);
         }
         if (res.hasOwnProperty(reference))
@@ -134,6 +134,16 @@ export class AScheme {
      */
     static validate(args, scheme) {
         const res = {};
+
+
+        // we need this because if user passes ...args to validate
+        // it will never be an object, always an array, this is 80% check
+        // if the first argument is an object, not a class, then we assume
+        // it to be an object constructor
+        // todo: not sure about this, maybe we should try to validate both ways
+        // todo: and get the one that did better?
+        if (args.constructor === Array && args.length === 1 && typeof args[0] === 'object' && args[0].constructor === Object)
+            args = args[0];
 
         if (args.constructor == Array) {
 
