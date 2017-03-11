@@ -156,12 +156,16 @@ export class Sculpt extends EventEmitter {
 		switch (true) {
 			case !!args.sculpt:
 				this.copy(args.sculpt);
+                this._ready = true;
+                this._threeObject.Sculpt = this;
 				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.threeObject:
 				this._threeObject = args.threeObject;
 				this._syncWithThree();
+                this._ready = true;
+                this._threeObject.Sculpt = this;
 				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
@@ -169,6 +173,8 @@ export class Sculpt extends EventEmitter {
 				loadOBJ(args.url, (mesh) => {
 					this._threeObject = mesh;
 					this._syncWithThree();
+                    this._ready = true;
+                    this._threeObject.Sculpt = this;
 					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				});
 				break;
@@ -216,12 +222,7 @@ export class Sculpt extends EventEmitter {
 	}
 
 	set visible(value) {
-		// todo: we should'nt set visibility of children
-		// todo: renderer should handle not rendering children of hidden objects
 		this._threeObject.visible = value;
-		//for (let i = 0; i < this.children.length; i++) {
-		//	this.children[i].visible = value;
-		//}
 	}
 
 	/**
