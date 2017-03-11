@@ -1,15 +1,28 @@
 export class Type {
-	constructor() {
-		// do not set this.default in case you want it to be null
-		//this._default
-	}
+    constructor() {
+        // do not set this.default in case you want it to be null
+        // this._default
+        this._properties = [];
+    }
 
-	default(val) {
-		this._default = val;
-		return this;
-	}
+    default(val) {
+        this._default = val;
+        return this;
+    }
 
-	validate(val) {
-		return true;
-	}
+    validate(val) {
+        if (this._properties.length && !val.hasOwnProperty)
+            return false;
+
+        for (let i = 0; i < this._properties.length; i++)
+            if (val[this._properties[i]] === undefined)
+                return false;
+
+        return true;
+    }
+
+    hasProperty(...args) {
+        this._properties = this._properties.concat(args);
+        return this;
+    }
 }

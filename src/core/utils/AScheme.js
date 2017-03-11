@@ -3,6 +3,7 @@ import {NumberType} from './argumentScheme/NumberType';
 import {StringType} from './argumentScheme/StringType';
 import {ArrayType} from './argumentScheme/ArrayType';
 import {AnyType} from './argumentScheme/AnyType';
+import {BoolType} from './argumentScheme/BoolType';
 
 import {
     ErrorInstantiationFailed,
@@ -37,9 +38,14 @@ export class AScheme {
         return new ArrayType(...args);
     }
 
+    static bool(...args) {
+        return new BoolType(...args);
+    }
+
     static any(...args) {
         return new AnyType(...args);
     }
+
 
     /**
      * Gets the default value, if it is a reference, looks for it
