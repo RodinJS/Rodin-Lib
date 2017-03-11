@@ -4,6 +4,7 @@ import {StringType} from './argumentScheme/StringType';
 import {ArrayType} from './argumentScheme/ArrayType';
 import {AnyType} from './argumentScheme/AnyType';
 import {BoolType} from './argumentScheme/BoolType';
+import {FunctionType} from './argumentScheme/FunctionType';
 
 import {
     ErrorInstantiationFailed,
@@ -41,6 +42,10 @@ export class AScheme {
     static bool(...args) {
         return new BoolType(...args);
     }
+
+	static function(...args) {
+		return new FunctionType(...args);
+	}
 
     static any(...args) {
         return new AnyType(...args);
@@ -229,3 +234,4 @@ export class AScheme {
 
     }
 }
+window.AScheme = AScheme;
