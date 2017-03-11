@@ -123,9 +123,9 @@ export class GamePad extends EventEmitter {
             let re = new RegExp(this.navigatorGamePadId, 'gi');
 
             const hmd = Scene.webVRmanager.hmd;
-            if (hmd && re.test(hmd.displayName)) {
-                hmd.isPresenting ? this.enable() : this.disable();
-                if(hmd.isPresenting && this.type === CONST.VR || !hmd.isPresenting && this.type === CONST.NON_VR) {
+
+            if (hmd) {
+                if(hmd.isPresenting && this.type === CONST.VR && re.test(hmd.displayName) || !hmd.isPresenting && this.type === CONST.NON_VR) {
                     this.enable();
                 } else {
                     this.disable();
