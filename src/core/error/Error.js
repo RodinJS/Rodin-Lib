@@ -146,3 +146,33 @@ export class ErrorProtectedClassInstance extends RodinError {
         super(`Cant create instance of class ${classname}`);
     }
 }
+
+export class ErrorArgumentLoop extends RodinError {
+    constructor () {
+        super(`Argument default value loop`);
+    }
+}
+
+export class ErrorNoDefaultValue extends RodinError {
+    constructor (argument) {
+        super(`No default value for argument ${argument}`);
+    }
+}
+
+export class ErrorArgumentType extends RodinError {
+    constructor (argument, type) {
+        super(`${JSON.stringify(argument)} is not ${argument.name}`);
+    }
+}
+
+export class ErrorUndefinedReference extends RodinError {
+    constructor (reference) {
+        super(`reference to ${reference} is not defined`);
+    }
+}
+
+export class ErrorPluginAlreadyInstalled extends RodinError {
+    constructor (plugin) {
+        super(`plugin ${plugin.name} was already installed on sculpt`);
+    }
+}
