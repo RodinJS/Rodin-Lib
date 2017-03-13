@@ -12,4 +12,8 @@ export class Sphere extends Sculpt {
         const threeSphere = new THREE.Mesh(new THREE.SphereGeometry(radius, widthSegments, heightSegments), material);
         super(threeSphere);
     }
+
+    get isSphere() {
+        return true
+    }
 }

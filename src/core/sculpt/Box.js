@@ -12,4 +12,8 @@ export class Box extends Sculpt {
         const threeBox = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
         super(threeBox);
     }
+
+    get isBox () {
+        return true
+    }
 }
