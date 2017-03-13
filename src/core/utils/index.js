@@ -12,5 +12,3 @@ export {
     utils3D,
     threeWrapper
 }
-
-export * from './OBJLoader';

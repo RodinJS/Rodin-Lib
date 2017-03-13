@@ -46,7 +46,7 @@ export class ViveController extends GamePad {
     }
 
     /**
-     * Set Controller model
+     * Set Controller model to our RODIN Vive controller model.
      */
     initControllerModel() {
         this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj');
@@ -56,6 +56,9 @@ export class ViveController extends GamePad {
         });
     }
 
+    /**
+     * Init raycasting line. Create red line for controller direction
+     */
     initRaycastingLine() {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(

@@ -14,6 +14,7 @@ export * from './gamePad';
 export * from './animation';
 export * from './video';
 export * from './rodinEvent';
+export * from './loader';
 
 export {
     CONST,

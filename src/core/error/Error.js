@@ -170,3 +170,9 @@ export class ErrorUndefinedReference extends RodinError {
         super(`reference to ${reference} is not defined`);
     }
 }
+
+export class ErrorPluginAlreadyInstalled extends RodinError {
+    constructor (plugin) {
+        super(`plugin ${plugin.name} was already installed on sculpt`);
+    }
+}

@@ -1,9 +1,10 @@
 import {Scene} from '../scene';
 
-let allChilds = (obj) => {
-    let currChilds = obj.children.map(i => i._threeObject);
+let allChildren = (obj) => {
+    // todo: fix this with one loop
+    let currChilds = obj.children.filter(i => i.isReady).map(i => i._threeObject);
     for(let i = 0; i < obj.children.length; i ++) {
-        currChilds = currChilds.concat(allChilds(obj.children[i]));
+        currChilds = currChilds.concat(allChildren(obj.children[i]));
     }
 
     return currChilds;
@@ -26,7 +27,7 @@ export class Raycaster extends THREE.Raycaster {
     raycast() {
         let ret = [];
         // todo: implement raycastables logic with messenger
-        let intersects = this.intersectObjects(allChilds(Scene.active));
+        let intersects = this.intersectObjects(allChildren(Scene.active));
 
         for (let i = 0; i < intersects.length; i++) {
             let centerObj = intersects[i].object;

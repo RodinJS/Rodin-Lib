@@ -1,12 +1,11 @@
-import {ErrorBadValueParameter, ErrorProtectedMethodCall} from '../error';
-import {Set} from '../set';
+import {ErrorBadValueParameter, ErrorProtectedMethodCall, ErrorPluginAlreadyInstalled} from '../error';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {loadOBJ} from '../utils';
 import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
-import {Animation} from '../animation';
+import {AnimationPlugin} from '../animation';
+import {Loader} from '../loader';
 
 function enforce() {
 }
@@ -78,14 +77,14 @@ export class Sculpt extends EventEmitter {
 		 * @type {Set}
 		 * @private
 		 */
-		this._children = new Set();
+		this._children = [];
 
 		/**
 		 * name
 		 */
 		this.name = args.name;
 
-		this.animation = new Animation(this);
+		this.plugins = [];
 
 		/**
 		 * Position
@@ -156,28 +155,29 @@ export class Sculpt extends EventEmitter {
 		switch (true) {
 			case !!args.sculpt:
 				this.copy(args.sculpt);
+                this._ready = true;
+                this._threeObject.Sculpt = this;
 				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.threeObject:
 				this._threeObject = args.threeObject;
 				this._syncWithThree();
+                this._ready = true;
+                this._threeObject.Sculpt = this;
 				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				break;
 
 			case !!args.url:
-				loadOBJ(args.url, (mesh) => {
+				Loader.loadModel(args.url, (mesh) => {
 					this._threeObject = mesh;
 					this._syncWithThree();
+                    this._ready = true;
+                    this._threeObject.Sculpt = this;
 					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
 				});
 				break;
 		}
-
-		/**
-		 * @type {Set}
-		 */
-		this.children = new Set();
 
 		/**
 		 * parent
@@ -205,6 +205,8 @@ export class Sculpt extends EventEmitter {
 				}
 			});
 		});
+
+		this.install(AnimationPlugin);
 	}
 
 	emitReady = () => {
@@ -216,12 +218,7 @@ export class Sculpt extends EventEmitter {
 	}
 
 	set visible(value) {
-		// todo: we should'nt set visibility of children
-		// todo: renderer should handle not rendering children of hidden objects
 		this._threeObject.visible = value;
-		//for (let i = 0; i < this.children.length; i++) {
-		//	this.children[i].visible = value;
-		//}
 	}
 
 	/**
@@ -524,6 +521,10 @@ export class Sculpt extends EventEmitter {
 		return this._threeObject.matrixWorld;
 	}
 
+	get children() {
+		return this._children;
+	}
+
 	/**
 	 * Copies obj into our object
 	 * @param {Sculpt} sculpt
@@ -592,6 +593,17 @@ export class Sculpt extends EventEmitter {
 
 			arguments[i].globalMatrix = globalMatrix;
 		}
+	}
+
+	install(plugin, ...args) {
+		let found = false;
+		if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
+			throw new ErrorPluginAlreadyInstalled(plugin);
+		}
+
+		const pluginInstance = new plugin(...args);
+		this.plugins.push(pluginInstance);
+		pluginInstance.applyTo(this);
 	}
 
 	/**
