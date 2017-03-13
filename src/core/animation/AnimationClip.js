@@ -55,7 +55,7 @@ export class AnimationClip extends EventEmitter {
      * Get a cloned AnimationClip object
      * @returns {AnimationClip}
      */
-    copy() {
+    clone() {
         let newAnimation = new AnimationClip(this.name, this.params);
         return newAnimation.duration(this.duration()).easing(this.easing()).delay(this.delay()).loop(this.loop());
     }
@@ -102,12 +102,12 @@ export class AnimationClip extends EventEmitter {
             .easing(this._easing)
             .start()
             .onComplete(function () {
+                _this.playing = false;
+
                 if (_this._loop) {
-                    _this.playing = false;
                     _this.reset();
                     _this.start();
                 } else {
-                    _this.playing = false;
                     delete this.tween;
                 }
 

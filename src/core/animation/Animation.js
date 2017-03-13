@@ -50,11 +50,14 @@ export class Animation {
      * @returns {Animation}
      */
     add() {
+        const ret = [];
         for (let i = 0; i < arguments.length; i++) {
             let animation = arguments[i];
 
             if (animation instanceof AnimationClip) {
-                this.clips.push(animation.copy().setSculpt(this.sculpt));
+                const tmp = animation.clone().setSculpt(this.sculpt);
+                this.clips.push(tmp);
+                ret.push(tmp);
             }
         }
     }
@@ -104,10 +107,9 @@ export class Animation {
     /**
      * Start animation by name or id
      * @param {!*} key - Animation name or id
-     * @param {boolean} [forceStart] - kills this animation (if currently playing) and starts again
      * @returns {boolean}
      */
-    start(key, forceStart = false) {
+    start(key) {
         let clip = this.getClip(key);
 
         if (!clip) {
@@ -135,12 +137,18 @@ export class Animation {
 }
 
 
+/**
+ * Plugin for animation
+ */
 export class AnimationPlugin extends SculptPlugin {
     constructor() {
         super();
         this.animation = new Animation();
     }
 
+    /**
+     * Update function
+     */
     update() {
         if (!this.isEnabled) return;
 
@@ -154,6 +162,10 @@ export class AnimationPlugin extends SculptPlugin {
         });
     }
 
+    /**
+     * Apply to sculpt.
+     * @param sculpt
+     */
     applyTo(sculpt) {
         super.applyTo(sculpt);
 
