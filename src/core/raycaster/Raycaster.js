@@ -24,7 +24,7 @@ export class Raycaster extends THREE.Raycaster {
      * Raycast
      * @returns [Sculpt] all raycasted objects from the Raycastables array, that ar appended to the scene (directly or not).
      */
-    raycast() {
+    raycast(depth) {
         let ret = [];
         // todo: implement raycastables logic with messenger
         let intersects = this.intersectObjects(allChildren(Scene.active));
@@ -37,11 +37,13 @@ export class Raycaster extends THREE.Raycaster {
                 centerObj = centerObj.parent;
             }
 
-            ret.push({
-                sculpt: centerObj.Sculpt,
-                uv: intersects[i].uv,
-                distance: intersects[i].distance
-            });
+            if(centerObj.Sculpt.globalVisible && centerObj.Sculpt.raycastable){
+                ret.push({
+                    sculpt: centerObj.Sculpt,
+                    uv: intersects[i].uv,
+                    distance: intersects[i].distance
+                });
+            }
         }
 
         ret.push({
@@ -49,6 +51,7 @@ export class Raycaster extends THREE.Raycaster {
             uv: null,
             distance: Infinity
         });
+        if(ret.length > depth)  ret.splice(depth,ret.length-1-depth);
 
         return ret;
     }

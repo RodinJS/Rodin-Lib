@@ -233,7 +233,8 @@ export class GamePad extends EventEmitter {
         //     }
         // }
 
-        let hoveredSculpts = this.intersected.filter(intersect => {
+
+        let hoveredOutSculpts = this.intersected.filter(intersect => {
             for (let i = 0; i < intersections.length; i++) {
                 if (intersections[i].sculpt === intersect.sculpt) {
                     return false;
@@ -243,14 +244,17 @@ export class GamePad extends EventEmitter {
             return true;
         });
 
-        this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER_OUT, null);
-        if(hoveredSculpts.length > 0) {
-            this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
-        }
+
+
+        this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER_OUT, null);
+        //if(hoveredOutSculpts.length > 0) {
+        //    this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
+        //}
 
         this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
 
-        let hoveredOutSculpts = intersections.filter(intersect => {
+
+        let hoveredSculpts = intersections.filter(intersect => {
             for (let i = 0; i < this.intersected.length; i++) {
                 if (this.intersected[i].sculpt === intersect.sculpt) {
                     return false;
@@ -260,10 +264,13 @@ export class GamePad extends EventEmitter {
             return true;
         });
 
-        this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER, null);
-        if (hoveredOutSculpts.length > 0) {
-            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
-        }
+
+
+
+        this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER, null);
+        //if (hoveredSculpts.length > 0) {
+        //    this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
+        //}
 
         this.intersected = [...intersections];
     }
@@ -292,15 +299,15 @@ export class GamePad extends EventEmitter {
         if (objects.length === 0)
             return;
 
-        let currentEvent = null;
+        let currentEvent = new RodinEvent(objects[0].sculpt, {domEvent: DOMEvent, button: button, gamepad: this});;
         let i = 0;
         do {
-            currentEvent = new RodinEvent(objects[i].sculpt, {domEvent: DOMEvent, button: button, gamepad: this});
+            currentEvent.target = objects[i].sculpt;
             currentEvent.distance = objects[i].distance;
             currentEvent.uv = objects[i].uv;
             objects[i].sculpt.emit(eventName, currentEvent);
-            i ++;
-        } while (currentEvent.propagation === true && i < objects.length);
+            i++;
+        } while (currentEvent.propagation && i < objects.length);
     }
 
     emitIntersected(e, eventName, DOMEvent, button) {

@@ -72,6 +72,12 @@ export class Sculpt extends EventEmitter {
 		 * @private
 		 */
 		this._parent = null;
+		/**
+		 * Is this object raycastable
+		 * @type {boolean}
+		 * @private
+		 */
+		this._raycastable = true;
 
 		/**
 		 * Object's children
@@ -220,6 +226,13 @@ export class Sculpt extends EventEmitter {
 	get visible() {
 		return this._threeObject.visible;
 	}
+	get globalVisible() {
+		if(!this.visible) return false;
+		if(this._parent && this._parent.isSculpt){
+			return this._parent.globalVisible;
+		}
+		return true;
+	}
 
 	set visible(value) {
 		this._threeObject.visible = value;
@@ -279,6 +292,21 @@ export class Sculpt extends EventEmitter {
 	set position(position) {
 		this._threeObject.position.copy(position);
 		this._position.silentCopy(this._threeObject.position);
+	}
+
+	/**
+	 * Check if this sculpt is raycastable
+	 * @return {boolean}
+	 */
+	get raycastable() {
+		return this._raycastable;
+	}
+	/**
+	 * Sets if this sculpt raycastable or not raycastable
+	 * @param value {boolean}
+	 */
+	set raycastable(value) {
+		this._raycastable = !!value;
 	}
 
 	/**
