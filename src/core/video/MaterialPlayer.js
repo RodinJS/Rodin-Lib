@@ -229,9 +229,12 @@ export class MaterialPlayer {
         let _rodinVideoTrigger = function (e) {
             video.play();
             video.pause();
+            window.removeEventListener("touchstart", _rodinVideoTrigger);
             window.removeEventListener("mousedown", _rodinVideoTrigger);
         };
 
+        window.addEventListener("touchstart", _rodinVideoTrigger);
         window.addEventListener("mousedown", _rodinVideoTrigger);
+
     }
 }

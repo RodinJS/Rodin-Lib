@@ -1,202 +1,202 @@
-import {ErrorBadValueParameter, ErrorProtectedMethodCall} from '../error';
-import {Set} from '../set';
+import {ErrorBadValueParameter, ErrorProtectedMethodCall, ErrorPluginAlreadyInstalled} from '../error';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {loadOBJ} from '../utils';
 import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
-import {Animation} from '../animation';
+import {AnimationPlugin} from '../animation';
+import {Loader} from '../loader';
 
 function enforce() {
 }
 
-/*let canvas =  document.createElement('canvas');
-canvas.width = 2;
-canvas.height = 2;
-document.body.appendChild(canvas);
-let ctx = canvas.getContext("2d");
-ctx.fillStyle = 'white';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-let texture = new THREE.Texture(canvas);*/
-function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
-	switch (true) {
-		case args.isSculpt:
-			//if we get a Sculpt object
-			//copy it into us
-			args = {sculpt: args};
-			break;
-		case args.isObject3D:
-			//if we get a three object 3D
-			//use it as our base
-			/*if(args.material && args.material.map === null){
-				args.material.map = texture;
-				texture.needsUpdate = true;
-				args.material.needsUpdate = true;
-			}*/
-			args = {threeObject: args};
-			break;
-		case typeof args === 'string':
-			//assume we got a url to a model
-			args = {url: args};
-			break;
-	}
 
-	return Object.assign({
-		name: undefined,
-		url: undefined,
-		threeObject: undefined,
-		sculpt: undefined
-	}, args);
+function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
+    switch (true) {
+        case args.isSculpt:
+            //if we get a Sculpt object
+            //copy it into us
+            args = {sculpt: args};
+            break;
+        case args.isObject3D:
+            //if we get a three object 3D
+            //use it as our base
+            /*if(args.material && args.material.map === null){
+             args.material.map = texture;
+             texture.needsUpdate = true;
+             args.material.needsUpdate = true;
+             }*/
+            args = {threeObject: args};
+            break;
+        case typeof args === 'string':
+            //assume we got a url to a model
+            args = {url: args};
+            break;
+    }
+
+    return Object.assign({
+        name: undefined,
+        url: undefined,
+        threeObject: undefined,
+        sculpt: undefined
+    }, args);
 }
 
 /**
  * Sculpt
  */
 export class Sculpt extends EventEmitter {
-	constructor(args, deferReadyEvent) {
-		super();
+    constructor(args, deferReadyEvent) {
+        super();
 
-		args = normalizeArguments(args);
+        args = normalizeArguments(args);
 
-		/**
-		 * Three object
-		 * @type {null}
-		 * @private
-		 */
-		this._threeObject = null;
+        /**
+         * Three object
+         * @type {null}
+         * @private
+         */
+        this._threeObject = null;
 
-		/**
-		 * Parent Sculpt
-		 * @type {null}
-		 * @private
-		 */
-		this._parent = null;
+        /**
+         * Parent Sculpt
+         * @type {null}
+         * @private
+         */
+        this._parent = null;
+
+        /**
+         * Is this object gamepadVisible
+         * @type {boolean}
+         * @private
+         */
+        this._gamepadVisible = true;
 
 		/**
 		 * Object's children
 		 * @type {Set}
 		 * @private
 		 */
-		this._children = new Set();
+		this._children = [];
 
-		/**
-		 * name
-		 */
-		this.name = args.name;
+        /**
+         * name
+         */
+        this.name = args.name;
 
-		this.animation = new Animation(this);
+		this.plugins = [];
 
-		/**
-		 * Position
-		 */
-		this._position = new WrappedVector3();
-		this._position.onChange((position) => {
-			this.position = position;
-		});
+        /**
+         * Position
+         */
+        this._position = new WrappedVector3();
+        this._position.onChange((position) => {
+            this.position = position;
+        });
 
-		/**
-		 * Rotation
-		 */
-		this._rotation = new WrappedEuler();
-		this._rotation.onChange((rotation) => {
-			this.rotation = rotation;
-		});
+        /**
+         * Rotation
+         */
+        this._rotation = new WrappedEuler();
+        this._rotation.onChange((rotation) => {
+            this.rotation = rotation;
+        });
 
-		/**
-		 * Quaternion
-		 */
-		this._quaternion = new WrappedQuaternion();
-		this._quaternion.onChange((quaternion) => {
-			this.quaternion = quaternion;
-		});
+        /**
+         * Quaternion
+         */
+        this._quaternion = new WrappedQuaternion();
+        this._quaternion.onChange((quaternion) => {
+            this.quaternion = quaternion;
+        });
 
-		/**
-		 * Scale
-		 */
-		this._scale = new WrappedVector3();
-		this._scale.onChange((scale) => {
-			this.scale = scale;
-		});
+        /**
+         * Scale
+         */
+        this._scale = new WrappedVector3();
+        this._scale.onChange((scale) => {
+            this.scale = scale;
+        });
 
-		/**
-		 * Global Position
-		 */
-		this._globalPosition = new WrappedVector3();
-		this._globalPosition.onChange((globalPosition) => {
-			this.globalPosition = globalPosition;
-		});
+        /**
+         * Global Position
+         */
+        this._globalPosition = new WrappedVector3();
+        this._globalPosition.onChange((globalPosition) => {
+            this.globalPosition = globalPosition;
+        });
 
-		/**
-		 * Global Rotation
-		 */
-		this._globalRotation = new WrappedEuler();
-		this._globalRotation.onChange((rotation) => {
-			this.globalRotation = rotation;
-		});
+        /**
+         * Global Rotation
+         */
+        this._globalRotation = new WrappedEuler();
+        this._globalRotation.onChange((rotation) => {
+            this.globalRotation = rotation;
+        });
 
-		/**
-		 * Global Quaternion
-		 */
-		this._globalQuaternion = new WrappedQuaternion();
-		this._globalQuaternion.onChange((quaternion) => {
-			this.globalQuaternion = quaternion;
-		});
+        /**
+         * Global Quaternion
+         */
+        this._globalQuaternion = new WrappedQuaternion();
+        this._globalQuaternion.onChange((quaternion) => {
+            this.globalQuaternion = quaternion;
+        });
 
-		/**
-		 * Global Scale
-		 */
-		this._globalScale = new WrappedVector3();
-		this._globalScale.onChange((globalScale) => {
-			this.globalScale = globalScale;
-		});
+        /**
+         * Global Scale
+         */
+        this._globalScale = new WrappedVector3();
+        this._globalScale.onChange((globalScale) => {
+            this.globalScale = globalScale;
+        });
 
 
-		// process arguments
-		switch (true) {
-			case !!args.sculpt:
-				this.copy(args.sculpt);
-				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
-				break;
+        // process arguments
+        switch (true) {
+            case !!args.sculpt:
+                this.copy(args.sculpt);
+                this._ready = true;
+                this._threeObject.Sculpt = this;
+                !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+                break;
 
-			case !!args.threeObject:
-				this._threeObject = args.threeObject;
-				this._syncWithThree();
-				!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
-				break;
+            case !!args.threeObject:
+                this._threeObject = args.threeObject;
+                this._syncWithThree();
+                this._ready = true;
+                this._threeObject.Sculpt = this;
+                !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+                break;
 
-			case !!args.url:
-				loadOBJ(args.url, (mesh) => {
-					this._threeObject = mesh;
-					this._syncWithThree();
-					!deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
-				});
-				break;
-		}
+            case !!args.url:
+                Loader.loadModel(args.url, (mesh) => {
+                    this._threeObject = mesh;
+                    this._syncWithThree();
+                    this._ready = true;
+                    this._threeObject.Sculpt = this;
+                    !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
+                });
+                break;
+        }
 
-		/**
-		 * @type {Set}
-		 */
-		this.children = new Set();
+        /**
+         * parent
+         * @type {Sculpt}
+         * @private
+         */
+        this._parent = null;
 
-		/**
-		 * parent
-		 * @type {Sculpt}
-		 * @private
-		 */
-		this._parent = null;
+        /**
+         * check if sculpt is ready
+         * @type {boolean}
+         * @private
+         */
+        this._ready = false;
 
-		/**
-		 * check if sculpt is ready
-		 * @type {boolean}
-		 * @private
-		 */
-		this._ready = false;
-
-		this.on(CONST.READY, () => {
-			this._ready = true;
-			this._threeObject.Sculpt = this;
-		});
+        this.on(CONST.READY, () => {
+            this._ready = true;
+            this._threeObject.Sculpt = this;
+        });
 
 		this.on(CONST.UPDATE, () => {
 			this.children.map(child => {
@@ -205,323 +205,358 @@ export class Sculpt extends EventEmitter {
 				}
 			});
 		});
+
+		this.install(AnimationPlugin);
 	}
 
-	emitReady = () => {
-		this.emitAsync(CONST.READY, new RodinEvent(this));
-	};
+    emitReady = () => {
+        this.emitAsync(CONST.READY, new RodinEvent(this));
+    };
 
-	get visible() {
-		return this._threeObject.visible;
-	}
+    /**
+     * gets visibility of object
+     */
+    get visible() {
+        return this._threeObject.visible;
+    }
 
-	set visible(value) {
-		// todo: we should'nt set visibility of children
-		// todo: renderer should handle not rendering children of hidden objects
-		this._threeObject.visible = value;
-		//for (let i = 0; i < this.children.length; i++) {
-		//	this.children[i].visible = value;
-		//}
-	}
+    /**
+     * set visibility of object
+     */
+    set visible(value) {
+        this._threeObject.visible = value;
+    }
 
-	/**
-	 * to check if an object is of sculpt type
-	 * @returns {boolean} true
-	 */
-	get isSculpt() {
-		return true;
-	}
+    /**
+     * gets global visibility of sculpt
+     * returns false, if one of parents is invisible, otherwise returns true
+     * @return {boolean}
+     */
+    get globalVisible() {
+        if (!this.visible) return false;
+        if (this._parent && this._parent.isSculpt) {
+            return this._parent.globalVisible;
+        }
+        return true;
+    }
 
-	/**
-	 * to check if our sculpt is ready
-	 * @returns {boolean}
-	 */
-	get isReady() {
-		return this._ready
-	}
+    /**
+     * to check if an object is of sculpt type
+     * @returns {boolean} true
+     */
+    get isSculpt() {
+        return true;
+    }
 
-	/**
-	 * gets our parent
-	 */
-	get parent() {
-		return this._parent;
-	}
+    /**
+     * to check if our sculpt is ready
+     * @returns {boolean}
+     */
+    get isReady() {
+        return this._ready
+    }
 
-	/**
-	 * Set new parent
-	 */
-	set parent(parent) {
-		if (parent === null) {
-			this.savedMatrix = this.matrix;
-			if (this.parent)
-				this.parent.remove(enforce, this);
-			this._parent = null;
-			return;
-		}
-		if (parent.isSculpt) {
+    /**
+     * gets our parent
+     */
+    get parent() {
+        return this._parent;
+    }
+
+    /**
+     * Set new parent
+     */
+    set parent(parent) {
+        if (parent === null) {
+            this.savedMatrix = this.matrix;
+            if (this.parent)
+                this.parent.remove(enforce, this);
+            this._parent = null;
+            return;
+        }
+        if (parent.isSculpt) {
             parent.add(enforce, this);
-		} else {
-			parent.add(this);
-		}
+        } else {
+            parent.add(this);
+        }
 
-		if(this.savedMatrix){
-			this.matrix = this.savedMatrix;
-			delete this.savedMatrix;
-		}
+        if (this.savedMatrix) {
+            this.matrix = this.savedMatrix;
+            delete this.savedMatrix;
+        }
+    }
 
-	}
+    /**
+     * Sets the position of our object with respect to its parent (local)
+     * @param position {THREE.Vector3}
+     */
+    set position(position) {
+        this._threeObject.position.copy(position);
+        this._position.silentCopy(this._threeObject.position);
+    }
 
-	/**
-	 * Sets the position of our object with respect to its parent (local)
-	 * @param position {THREE.Vector3}
-	 */
-	set position(position) {
-		this._threeObject.position.copy(position);
-		this._position.silentCopy(this._threeObject.position);
-	}
+    /**
+     * Check if this sculpt is gamepadVisible
+     * @return {boolean}
+     */
+    get gamepadVisible() {
+        return this._gamepadVisible;
+    }
 
-	/**
-	 * Gets the position of our object with respect to its parent (local)
-	 * @return {THREE.Vector3}
-	 */
-	get position() {
-		// not sure if we should copy threeObject.position to our position
-		// this will sync us with threeobject but make things 2x slow
-		this._position.silentCopy(this._threeObject.position);
-		return this._position;
-	}
+    /**
+     * Sets if this sculpt gamepadVisible or not gamepadVisible
+     * @param value {boolean}
+     */
+    set gamepadVisible(value) {
+        this._gamepadVisible = !!value;
+    }
 
-	/**
-	 * Sets the rotation of our object with respect to its parent (local)
-	 * @param rotation {THREE.Vector3}
-	 */
-	set rotation(rotation) {
-		this._threeObject.rotation.copy(rotation);
-		this._rotation.silentCopy(this._threeObject.rotation);
-	}
+    /**
+     * Gets the position of our object with respect to its parent (local)
+     * @return {THREE.Vector3}
+     */
+    get position() {
+        // not sure if we should copy threeObject.position to our position
+        // this will sync us with threeobject but make things 2x slow
+        this._position.silentCopy(this._threeObject.position);
+        return this._position;
+    }
 
-	/**
-	 * Gets the rotation of our object with respect to its parent (local)
-	 * @return {THREE.Vector3}
-	 */
-	get rotation() {
-		this._rotation.silentCopy(this._threeObject.rotation);
-		return this._rotation;
-	}
+    /**
+     * Sets the rotation of our object with respect to its parent (local)
+     * @param rotation {THREE.Vector3}
+     */
+    set rotation(rotation) {
+        this._threeObject.rotation.copy(rotation);
+        this._rotation.silentCopy(this._threeObject.rotation);
+    }
 
-	/**
-	 * Sets the quaternion of our object with respect to its parent (local)
-	 * @param quaternion {THREE.Quaternion}
-	 */
-	set quaternion(quaternion) {
-		this._threeObject.quaternion.copy(quaternion);
-		this._quaternion.silentCopy(this._threeObject.quaternion);
-	}
+    /**
+     * Gets the rotation of our object with respect to its parent (local)
+     * @return {THREE.Vector3}
+     */
+    get rotation() {
+        this._rotation.silentCopy(this._threeObject.rotation);
+        return this._rotation;
+    }
 
-	/**
-	 * Gets the quaternion of our object with respect to its parent (local)
-	 * @return {THREE.Quaternion}
-	 */
-	get quaternion() {
-		this._quaternion.silentCopy(this._threeObject.quaternion);
-		return this._quaternion;
-	}
+    /**
+     * Sets the quaternion of our object with respect to its parent (local)
+     * @param quaternion {THREE.Quaternion}
+     */
+    set quaternion(quaternion) {
+        this._threeObject.quaternion.copy(quaternion);
+        this._quaternion.silentCopy(this._threeObject.quaternion);
+    }
 
-	/**
-	 * Sets the scale of our object
-	 * @param scale {THREE.Vector3}
-	 */
-	set scale(scale) {
-		this._threeObject.scale.copy(scale);
-		this._scale.silentCopy(this._threeObject.scale);
-	}
+    /**
+     * Gets the quaternion of our object with respect to its parent (local)
+     * @return {THREE.Quaternion}
+     */
+    get quaternion() {
+        this._quaternion.silentCopy(this._threeObject.quaternion);
+        return this._quaternion;
+    }
 
-	/**
-	 * Gets the scale of our object
-	 * @return {THREE.Vector3}
-	 */
-	get scale() {
-		return this._scale;
-	}
+    /**
+     * Sets the scale of our object
+     * @param scale {THREE.Vector3}
+     */
+    set scale(scale) {
+        this._threeObject.scale.copy(scale);
+        this._scale.silentCopy(this._threeObject.scale);
+    }
 
-	/**
-	 * Sets the position of our object with respect to scene (global)
-	 * @param position {THREE.Vector3}
-	 */
-	set globalPosition(position) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+    /**
+     * Gets the scale of our object
+     * @return {THREE.Vector3}
+     */
+    get scale() {
+        return this._scale;
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this.globalMatrix = this.globalMatrix.compose(position, initialRotation, initialScale);
+    /**
+     * Sets the position of our object with respect to scene (global)
+     * @param position {THREE.Vector3}
+     */
+    set globalPosition(position) {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-		// use copy to preserve type of _globalPosition, i.e. WrappedVector3
-		// dont use direct copy to prevent infinite recursion
-		// implement this with a separate function to prevent this
-		this._globalPosition.silentCopy(position);
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix = this.globalMatrix.compose(position, initialRotation, initialScale);
 
-	/**
-	 * Gets the position of our object with respect to scene (global)
-	 * @return {THREE.Vector3}
-	 */
-	get globalPosition() {
-		// global get ers are very slow right now,
-		// we can sync this with position and matrix
-		// setters to make faster but will slow down those
+        // use copy to preserve type of _globalPosition, i.e. WrappedVector3
+        // dont use direct copy to prevent infinite recursion
+        // implement this with a separate function to prevent this
+        this._globalPosition.silentCopy(position);
+    }
 
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+    /**
+     * Gets the position of our object with respect to scene (global)
+     * @return {THREE.Vector3}
+     */
+    get globalPosition() {
+        // global get ers are very slow right now,
+        // we can sync this with position and matrix
+        // setters to make faster but will slow down those
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-		this._globalPosition.silentCopy(initialPosition);
-		return this._globalPosition;
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
 
-	/**
-	 * Sets the rotation of our object with respect to scene (global)
-	 * @param rotation {THREE.Euler}
-	 */
-	set globalRotation(rotation) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+        this._globalPosition.silentCopy(initialPosition);
+        return this._globalPosition;
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		initialRotation.setFromEuler(rotation);
-		this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, initialScale);
+    /**
+     * Sets the rotation of our object with respect to scene (global)
+     * @param rotation {THREE.Euler}
+     */
+    set globalRotation(rotation) {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-		this._globalScale.silentCopy(rotation);
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        initialRotation.setFromEuler(rotation);
+        this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, initialScale);
 
-	/**
-	 * Gets the scale of our object with respect to scene (global)
-	 * @return {THREE.Euler}
-	 */
-	get globalRotation() {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+        this._globalScale.silentCopy(rotation);
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		//create a new Euler in order to use silentCopy
-		this._globalRotation.silentCopy(new THREE.Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
-		return this._globalRotation;
-	}
+    /**
+     * Gets the scale of our object with respect to scene (global)
+     * @return {THREE.Euler}
+     */
+    get globalRotation() {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-	/**
-	 * Sets the quaternion of our object with respect to scene (global)
-	 * @param quaternion {THREE.Quaternion}
-	 */
-	set globalQuaternion(quaternion) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        //create a new Euler in order to use silentCopy
+        this._globalRotation.silentCopy(new THREE.Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
+        return this._globalRotation;
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this.globalMatrix = this.globalMatrix.compose(initialPosition, quaternion, initialScale);
+    /**
+     * Sets the quaternion of our object with respect to scene (global)
+     * @param quaternion {THREE.Quaternion}
+     */
+    set globalQuaternion(quaternion) {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-		this._globalQuaternion.silentCopy(quaternion);
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix = this.globalMatrix.compose(initialPosition, quaternion, initialScale);
 
-	/**
-	 * Gets the quaternion of our object with respect to scene (global)
-	 * @return {THREE.Quaternion}
-	 */
-	get globalQuaternion() {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+        this._globalQuaternion.silentCopy(quaternion);
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+    /**
+     * Gets the quaternion of our object with respect to scene (global)
+     * @return {THREE.Quaternion}
+     */
+    get globalQuaternion() {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-		this._globalQuaternion.silentCopy(initialRotation);
-		return this._globalQuaternion;
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
 
-	/**
-	 * Sets the scale of our object with respect to scene (global)
-	 * @param scale {THREE.Vector3}
-	 */
-	set globalScale(scale) {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+        this._globalQuaternion.silentCopy(initialRotation);
+        return this._globalQuaternion;
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, scale);
+    /**
+     * Sets the scale of our object with respect to scene (global)
+     * @param scale {THREE.Vector3}
+     */
+    set globalScale(scale) {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-		this._globalScale.silentCopy(scale);
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, scale);
 
-	/**
-	 * Gets the scale of our object with respect to scene (global)
-	 * @return {THREE.Vector3}
-	 */
-	get globalScale() {
-		const initialPosition = new THREE.Vector3();
-		const initialRotation = new THREE.Quaternion();
-		const initialScale = new THREE.Vector3();
+        this._globalScale.silentCopy(scale);
+    }
 
-		this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
-		this._globalScale.silentCopy(initialScale);
-		return this._globalScale;
-	}
+    /**
+     * Gets the scale of our object with respect to scene (global)
+     * @return {THREE.Vector3}
+     */
+    get globalScale() {
+        const initialPosition = new THREE.Vector3();
+        const initialRotation = new THREE.Quaternion();
+        const initialScale = new THREE.Vector3();
 
-	/**
-	 * Sets the matrix of out object with respect to its parent (local)
-	 * @param matrix {THREE.Matrix4}
-	 */
-	set matrix(matrix) {
-		this._threeObject.matrix = matrix;
-		matrix.decompose(this._threeObject.position, this._threeObject.quaternion, this._threeObject.scale);
-		this._syncWithThree();
-	}
+        this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
+        this._globalScale.silentCopy(initialScale);
+        return this._globalScale;
+    }
 
-	/**
-	 * Gets the matrix of our object with respect to its parent (local)
-	 * @return {THREE.Matrix4} [recursive=true]
-	 */
-	get matrix() {
-		//this._threeObject.updateMatrix(true);
-		return this._threeObject.matrix;
-	}
+    /**
+     * Sets the matrix of out object with respect to its parent (local)
+     * @param matrix {THREE.Matrix4}
+     */
+    set matrix(matrix) {
+        this._threeObject.matrix = matrix;
+        matrix.decompose(this._threeObject.position, this._threeObject.quaternion, this._threeObject.scale);
+        this._syncWithThree();
+    }
 
-	/**
-	 * Set the matrix of out object with respect to the scene it is in (global)
-	 * if our object doesn't have a parent same as .matrix
-	 * @param matrix {THREE.Matrix4}
-	 */
-	set globalMatrix(matrix) {
-		if (!this.parent) {
-			this.matrix = matrix;
-			return;
-		}
+    /**
+     * Gets the matrix of our object with respect to its parent (local)
+     * @return {THREE.Matrix4} [recursive=true]
+     */
+    get matrix() {
+        //this._threeObject.updateMatrix(true);
+        return this._threeObject.matrix;
+    }
 
-		let inverseParentMatrix = new THREE.Matrix4();
-		let newLocalMatrix = matrix.clone();
+    /**
+     * Set the matrix of out object with respect to the scene it is in (global)
+     * if our object doesn't have a parent same as .matrix
+     * @param matrix {THREE.Matrix4}
+     */
+    set globalMatrix(matrix) {
+        if (!this.parent) {
+            this.matrix = matrix;
+            return;
+        }
 
-		inverseParentMatrix.getInverse(this.parent.globalMatrix);
-		newLocalMatrix.multiplyMatrices(inverseParentMatrix, newLocalMatrix);
+        let inverseParentMatrix = new THREE.Matrix4();
+        let newLocalMatrix = matrix.clone();
 
-		this._threeObject.matrixAutoUpdate = false;
-		//do this on sculpt.matrix not _threeObject.matrix to update position,rotation,scale
-		this.matrix = newLocalMatrix;
-		this._threeObject.updateMatrixWorld(true);
-		this._threeObject.matrixAutoUpdate = true;
-	}
+        inverseParentMatrix.getInverse(this.parent.globalMatrix);
+        newLocalMatrix.multiplyMatrices(inverseParentMatrix, newLocalMatrix);
 
-	/**
-	 * Gets the matrix of our object with respect to the scene it is in (global)
-	 * if our object doesn't have a parent same as .matrix
-	 * @return {THREE.Matrix4}
-	 */
-	get globalMatrix() {
-		this._threeObject.updateMatrixWorld(true);
-		return this._threeObject.matrixWorld;
+        this._threeObject.matrixAutoUpdate = false;
+        //do this on sculpt.matrix not _threeObject.matrix to update position,rotation,scale
+        this.matrix = newLocalMatrix;
+        this._threeObject.updateMatrixWorld(true);
+        this._threeObject.matrixAutoUpdate = true;
+    }
+
+    /**
+     * Gets the matrix of our object with respect to the scene it is in (global)
+     * if our object doesn't have a parent same as .matrix
+     * @return {THREE.Matrix4}
+     */
+    get globalMatrix() {
+        this._threeObject.updateMatrixWorld(true);
+        return this._threeObject.matrixWorld;
+    }
+
+	get children() {
+		return this._children;
 	}
 
 	/**
@@ -534,101 +569,113 @@ export class Sculpt extends EventEmitter {
 			throw new ErrorBadValueParameter('Sculpt');
 		}
 
-		this.name = sculpt.name;
-		this._threeObject = sculpt._threeObject.clone(recursive);
-		this._syncWithThree();
-		if (recursive) {
-			for (let i = 0; i < sculpt._children.length; i++) {
-				sculpt._children[i].clone(recursive).parent = this;
-			}
-		}
+        this.name = sculpt.name;
+        this._threeObject = sculpt._threeObject.clone(recursive);
+        this._syncWithThree();
+        if (recursive) {
+            for (let i = 0; i < sculpt._children.length; i++) {
+                sculpt._children[i].clone(recursive).parent = this;
+            }
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	/**
-	 * Creates a new sculpt object that is a clone of our object
-	 * @param {boolean} [recursive=true]
-	 */
-	clone(recursive = true) {
-		return new this.constructor().copy(this, recursive);
-	}
-	/**
-	 * Add object(s) to this object.
-	 * Call with multiple arguments of Sculpt objects
-	 * Not available for user
-	 */
-	add(e) {
-		if (e !== enforce) {
-			//throw new ErrorProtectedMethodCall('add');
-			if (!e.isSculpt) {
-				throw new ErrorBadValueParameter('Sculpt');
-			}
+    /**
+     * Creates a new sculpt object that is a clone of our object
+     * @param {boolean} [recursive=true]
+     */
+    clone(recursive = true) {
+        return new this.constructor().copy(this, recursive);
+    }
 
-			let currParent = e.parent;
-			currParent && currParent.remove(enforce, e);
+    /**
+     * Add object(s) to this object.
+     * Call with multiple arguments of Sculpt objects
+     * Not available for user
+     */
+    add(e) {
+        if (e !== enforce) {
+            //throw new ErrorProtectedMethodCall('add');
+            if (!e.isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+            }
 
-			e._parent = this;
-			this._threeObject.add(e._threeObject);
-			this.children.push(e);
-			return;
-		}
+            let currParent = e.parent;
+            currParent && currParent.remove(enforce, e);
 
-		for (let i = 1; i < arguments.length; i++) {
-			if (!arguments[i].isSculpt) {
-				throw new ErrorBadValueParameter('Sculpt');
-			}
+            e._parent = this;
+            this._threeObject.add(e._threeObject);
+            this.children.push(e);
+            return;
+        }
 
-			let globalMatrix = arguments[i].globalMatrix;
-			// this is a workaround because cant figure out whats not working
-			let oldScale = arguments[i].globalScale.clone();
+        for (let i = 1; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+            }
 
-			let currParent = arguments[i].parent;
-			currParent && currParent.remove(enforce, arguments[i]);
+            let globalMatrix = arguments[i].globalMatrix;
+            // this is a workaround because cant figure out whats not working
+            let oldScale = arguments[i].globalScale.clone();
 
-			arguments[i]._parent = this;
-			this._threeObject.add(arguments[i]._threeObject);
-			this.children.push(arguments[i]);
+            let currParent = arguments[i].parent;
+            currParent && currParent.remove(enforce, arguments[i]);
 
-			arguments[i].globalMatrix = globalMatrix;
-		}
-	}
+            arguments[i]._parent = this;
+            this._threeObject.add(arguments[i]._threeObject);
+            this.children.push(arguments[i]);
 
-	/**
-	 * Remove object(s) from
-	 * Call with multiple arguments of Sculpt objects
-	 * Not available for user
-	 */
-	remove(e) {
-		if (e !== enforce) {
-			//throw new ErrorProtectedMethodCall('remove');
-			if (!e.isSculpt) {
-				throw new ErrorBadValueParameter('Sculpt');
-			}
-			this.children.indexOf(e) > -1 && this.children.splice(this.children.indexOf(e), 1);
-			this._threeObject.remove(e._threeObject);
-			return;
-		}
+            arguments[i].globalMatrix = globalMatrix;
+        }
+    }
 
-		for (let i = 1; i < arguments.length; i++) {
-			if (!arguments[i].isSculpt) {
-				throw new ErrorBadValueParameter('Sculpt');
-			}
+    install(plugin, ...args) {
+        let found = false;
+        if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
+            throw new ErrorPluginAlreadyInstalled(plugin);
+        }
 
-			this.children.indexOf(arguments[i]) > -1 && this.children.splice(this.children.indexOf(arguments[i]), 1);
-			this._threeObject.remove(arguments[i]._threeObject);
-		}
-	}
+        const pluginInstance = new plugin(...args);
+        this.plugins.push(pluginInstance);
+        pluginInstance.applyTo(this);
+    }
 
-	/**
-	 * Syncs sculpts parameters with _threeObject parameters
-	 * call this in case you modify _threeObject
-	 * Note. this does not work if you added or removed children from _threeObject
-	 */
-	_syncWithThree() {
-		this._position.silentCopy(this._threeObject.position);
-		this._rotation.silentCopy(this._threeObject.rotation);
-		this._scale.silentCopy(this._threeObject.scale);
-		this._quaternion.silentCopy(this._threeObject.quaternion);
-	}
+    /**
+     * Remove object(s) from
+     * Call with multiple arguments of Sculpt objects
+     * Not available for user
+     */
+    remove(e) {
+        if (e !== enforce) {
+            //throw new ErrorProtectedMethodCall('remove');
+            if (!e.isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+            }
+            this.children.indexOf(e) > -1 && this.children.splice(this.children.indexOf(e), 1);
+            this._threeObject.remove(e._threeObject);
+            return;
+        }
+
+        for (let i = 1; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+            }
+
+            this.children.indexOf(arguments[i]) > -1 && this.children.splice(this.children.indexOf(arguments[i]), 1);
+            this._threeObject.remove(arguments[i]._threeObject);
+        }
+    }
+
+    /**
+     * Syncs sculpts parameters with _threeObject parameters
+     * call this in case you modify _threeObject
+     * Note. this does not work if you added or removed children from _threeObject
+     */
+    _syncWithThree() {
+        this._position.silentCopy(this._threeObject.position);
+        this._rotation.silentCopy(this._threeObject.rotation);
+        this._scale.silentCopy(this._threeObject.scale);
+        this._quaternion.silentCopy(this._threeObject.quaternion);
+    }
 }

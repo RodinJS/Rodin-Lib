@@ -1,5 +1,10 @@
 THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
 
+/**
+ * Load obj file with material (.mtl) and textures (if exist on material)
+ * @param URL {string} absolute or relative path for .obj file
+ * @param callback {Function} callback function that receives mesh as param.
+ */
 export const loadOBJ = (URL, callback) => {
     let onProgress = function (xhr) {
         if (xhr.lengthComputable) {
