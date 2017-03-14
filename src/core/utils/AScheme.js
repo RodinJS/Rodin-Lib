@@ -234,4 +234,3 @@ export class AScheme {
 
     }
 }
-window.AScheme = AScheme;
