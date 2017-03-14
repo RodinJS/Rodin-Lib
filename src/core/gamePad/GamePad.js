@@ -20,6 +20,7 @@ messenger.on(CONST.RENDER_START, () => {
     buttonsDown = new Set();
     buttonsUp = new Set();
 });
+
 /**
  * General GamePad class, custom controllers extend this class.
  * @param {string} [navigatorGamePadId] - custom ID for the gamepad instance.
@@ -29,16 +30,19 @@ messenger.on(CONST.RENDER_START, () => {
 export class GamePad extends EventEmitter {
     constructor(navigatorGamePadId = "", hand = null, type = CONST.BOTH) {
         super();
+
         /**
          * Defines the type of the gamepad (CONST.VR, CONST.NON_VR, CONST.BOTH).
          * @type {string}
          */
         this.type = type;
+
         /**
          * The gamepad state (enabled/disabled).
          * @type {boolean}
          */
         this._enabled = false;
+
         /**
          * The id (name) of the gamePad of current instance.
          * @type {string}
@@ -50,6 +54,7 @@ export class GamePad extends EventEmitter {
          * @type {string}
          */
         this.hand = hand;
+
         /**
          * The actual gamePad object link from navigator.
          * @type {object}
@@ -133,18 +138,21 @@ export class GamePad extends EventEmitter {
             }
         });
     }
+
     /**
      * enable gamepad
      */
     enable() {
         this._enabled = true;
     }
+
     /**
      * disable gamepad
      */
     disable() {
         this._enabled = false;
     }
+
     /**
      * get controller from navigator
      * @param {string} id
@@ -169,6 +177,7 @@ export class GamePad extends EventEmitter {
 
         return null;
     }
+
     /**
      * Checks the gamepad state, calls the appropriate methods
      */
@@ -215,6 +224,7 @@ export class GamePad extends EventEmitter {
         valueChangeDetected && this.emit(CONST.GAMEPAD_BUTTON_CHANGE, new RodinEvent(this));
         buttonUpDetected && this.emit(CONST.GAMEPAD_BUTTON_UP, new RodinEvent(this));
     }
+
     /**
      * Checks all intersect and emits hover and hoverOut events.
      */
@@ -225,14 +235,6 @@ export class GamePad extends EventEmitter {
         }
 
         let intersections = this.getIntersections();
-
-        // todo: why we need this ?
-        // if (intersections.length > 0) {
-        //     if (intersections.length > this.raycastLayers) {
-        //         intersections.splice(this.raycastLayers, (intersections.length - this.raycastLayers));
-        //     }
-        // }
-
 
         let hoveredOutSculpts = this.intersected.filter(intersect => {
             for (let i = 0; i < intersections.length; i++) {
@@ -247,12 +249,11 @@ export class GamePad extends EventEmitter {
 
 
         this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER_OUT, null);
-        //if(hoveredOutSculpts.length > 0) {
-        //    this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
-        //}
+        if(hoveredOutSculpts.length > 0) {
+           this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
+        }
 
         this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
-
 
         let hoveredSculpts = intersections.filter(intersect => {
             for (let i = 0; i < this.intersected.length; i++) {
@@ -265,12 +266,10 @@ export class GamePad extends EventEmitter {
         });
 
 
-
-
         this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER, null);
-        //if (hoveredSculpts.length > 0) {
-        //    this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
-        //}
+        if (hoveredSculpts.length > 0) {
+           this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
+        }
 
         this.intersected = [...intersections];
     }
@@ -313,6 +312,7 @@ export class GamePad extends EventEmitter {
     emitIntersected(e, eventName, DOMEvent, button) {
         this.emitAll(e, this.intersected, eventName, DOMEvent, button)
     }
+
     /**
      * The keyDown function emitter.
      * @param {object} button
@@ -340,6 +340,7 @@ export class GamePad extends EventEmitter {
     touchEnd() {
 
     }
+
     /**
      * The button value change function emitter.
      * @param {object} button

@@ -69,7 +69,7 @@ export class ViveController extends GamePad {
         let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: 0xff0000}));
         targetLine.geometry.vertices[1].z = -10000;
         this.raycastingLine = new Sculpt(targetLine);
-        this.raycastingLine.raycastable = false;
+        this.raycastingLine.gamepadVisible = false;
         this.raycastingLine.parent = this.sculpt;
     }
 }
