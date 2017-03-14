@@ -137,7 +137,7 @@ export class CardboardGamePad extends GamePad {
     getIntersections() {
         // todo: use our custom camera later
         this.raycaster.set(Scene.active._camera.getWorldPosition(), Scene.active._camera.getWorldDirection());
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers);
     }
 }
 

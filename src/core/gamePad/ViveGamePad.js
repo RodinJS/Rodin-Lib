@@ -42,7 +42,7 @@ export class ViveController extends GamePad {
         const tempMatrix = new THREE.Matrix4().identity().extractRotation(this.sculpt.globalMatrix);
         this.raycaster.ray.origin.setFromMatrixPosition(this.sculpt.globalMatrix);
         this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers);
     }
 
     /**
@@ -69,16 +69,8 @@ export class ViveController extends GamePad {
         let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: 0xff0000}));
         targetLine.geometry.vertices[1].z = -10000;
         this.raycastingLine = new Sculpt(targetLine);
-
-        this.raycastingLine.on(CONST.READY, () => {
-            if (this.sculpt.isReady) {
-                this.raycastingLine.parent = this.sculpt;
-            } else {
-                this.sculpt.on(CONST.READY, () => {
-                    this.raycastingLine.parent = this.sculpt;
-                })
-            }
-        });
+        this.raycastingLine.gamepadVisible = false;
+        this.raycastingLine.parent = this.sculpt;
     }
 }
 
