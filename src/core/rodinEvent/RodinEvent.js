@@ -20,6 +20,7 @@ export class RodinEvent {
         this.target = target;
         this.domEvent = params.domEvent;
         this.button = params.button;
+
         if(this.button) {
             this.keyCode = this.button.keyCode;
         }

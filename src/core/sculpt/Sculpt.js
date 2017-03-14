@@ -1,24 +1,16 @@
-import {ErrorBadValueParameter, ErrorProtectedMethodCall} from '../error';
-import {Set} from '../set';
+import {ErrorBadValueParameter, ErrorProtectedMethodCall, ErrorPluginAlreadyInstalled} from '../error';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
-import {Animation} from '../animation';
+import {AnimationPlugin} from '../animation';
 import {Loader} from '../loader';
 
 function enforce() {
 }
 
-/*let canvas =  document.createElement('canvas');
- canvas.width = 2;
- canvas.height = 2;
- document.body.appendChild(canvas);
- let ctx = canvas.getContext("2d");
- ctx.fillStyle = 'white';
- ctx.fillRect(0, 0, canvas.width, canvas.height);
- let texture = new THREE.Texture(canvas);*/
+
 function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     switch (true) {
         case args.isSculpt:
@@ -80,19 +72,19 @@ export class Sculpt extends EventEmitter {
          */
         this._gamepadVisible = true;
 
-        /**
-         * Object's children
-         * @type {Set}
-         * @private
-         */
-        this._children = new Set();
+		/**
+		 * Object's children
+		 * @type {Set}
+		 * @private
+		 */
+		this._children = [];
 
         /**
          * name
          */
         this.name = args.name;
 
-        this.animation = new Animation(this);
+		this.plugins = [];
 
         /**
          * Position
@@ -188,11 +180,6 @@ export class Sculpt extends EventEmitter {
         }
 
         /**
-         * @type {Set}
-         */
-        this.children = new Set();
-
-        /**
          * parent
          * @type {Sculpt}
          * @private
@@ -211,14 +198,16 @@ export class Sculpt extends EventEmitter {
             this._threeObject.Sculpt = this;
         });
 
-        this.on(CONST.UPDATE, () => {
-            this.children.map(child => {
-                if (child.isReady) {
-                    child.emit(CONST.UPDATE, new RodinEvent(child, {}));
-                }
-            });
-        });
-    }
+		this.on(CONST.UPDATE, () => {
+			this.children.map(child => {
+				if (child.isReady) {
+					child.emit(CONST.UPDATE, new RodinEvent(child, {}));
+				}
+			});
+		});
+
+		this.install(AnimationPlugin);
+	}
 
     emitReady = () => {
         this.emitAsync(CONST.READY, new RodinEvent(this));
@@ -566,15 +555,19 @@ export class Sculpt extends EventEmitter {
         return this._threeObject.matrixWorld;
     }
 
-    /**
-     * Copies obj into our object
-     * @param {Sculpt} sculpt
-     * @param {boolean} [recursive=true]
-     */
-    copy(sculpt, recursive = true) {
-        if (!sculpt.isSculpt) {
-            throw new ErrorBadValueParameter('Sculpt');
-        }
+	get children() {
+		return this._children;
+	}
+
+	/**
+	 * Copies obj into our object
+	 * @param {Sculpt} sculpt
+	 * @param {boolean} [recursive=true]
+	 */
+	copy(sculpt, recursive = true) {
+		if (!sculpt.isSculpt) {
+			throw new ErrorBadValueParameter('Sculpt');
+		}
 
         this.name = sculpt.name;
         this._threeObject = sculpt._threeObject.clone(recursive);
@@ -635,6 +628,17 @@ export class Sculpt extends EventEmitter {
 
             arguments[i].globalMatrix = globalMatrix;
         }
+    }
+
+    install(plugin, ...args) {
+        let found = false;
+        if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
+            throw new ErrorPluginAlreadyInstalled(plugin);
+        }
+
+        const pluginInstance = new plugin(...args);
+        this.plugins.push(pluginInstance);
+        pluginInstance.applyTo(this);
     }
 
     /**
