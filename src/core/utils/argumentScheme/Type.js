@@ -31,4 +31,8 @@ export class Type {
         this._properties = this._properties.concat(args);
         return this;
     }
+
+    get hasDefault() {
+        return this.hasOwnProperty('_default');
+    }
 }

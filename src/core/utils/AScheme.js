@@ -123,7 +123,7 @@ export class AScheme {
             throw new ErrorArgumentLoop();
         }
         been.push(reference);
-        if (scheme[reference]._default && AScheme.isReference(e, scheme[reference].default())) {
+        if (scheme[reference].hasDefault && AScheme.isReference(e, scheme[reference].default())) {
             res[reference] = AScheme.handleReferenceTree(e, res, scheme, AScheme.getReference(e, scheme[reference].default()), been);
         }
         if (res.hasOwnProperty(reference))
@@ -160,7 +160,7 @@ export class AScheme {
                 // if argument is undefined or doesn't pass validation
                 // try to get the default value for it.
                 if (curArg === undefined || !scheme[i].validate(curArg)) {
-                    if (scheme[i]._default) {
+                    if (scheme[i].hasDefault) {
                         res[i] = AScheme.handleDefault(enforce, res, scheme[i].default());
                     }
                     else {
@@ -204,7 +204,7 @@ export class AScheme {
                         continue;
                     }
 
-                    if (scheme[i]._default) {
+                    if (scheme[i].hasDefault) {
                         res[i] = AScheme.handleDefault(enforce, res, scheme[i].default());
                     }
                     else {

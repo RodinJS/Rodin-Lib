@@ -10,7 +10,7 @@ import {AScheme} from '../utils';
  */
 
 const constructorScheme = {
-    width: AScheme.number().default(.5),
+    width: AScheme.number().default(.4),
     height: AScheme.number().default('$width'),
     depth: AScheme.number().default('$width'),
     material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
