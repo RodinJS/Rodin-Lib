@@ -25,7 +25,7 @@ messenger.on(CONST.RENDER_START, () => {
  * General GamePad class, custom controllers extend this class.
  * @param {string} [navigatorGamePadId] - custom ID for the gamepad instance.
  * @param {string} [hand] - gamepad holding hand (left/right).
- * @param {string} [type] - VR or non-VR
+ * @param {string} [type] - VR or NON-VR
  */
 export class GamePad extends EventEmitter {
     constructor(navigatorGamePadId = "", hand = null, type = CONST.BOTH) {
@@ -351,7 +351,8 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * Tells if the provided button is down or not.
+     * Shows if the provided button was pressed
+     * between previous and current frames
      * @returns {boolrean}
      */
     static getButtonDown(btn) {
@@ -359,7 +360,8 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * Tells if the provided button is up or not.
+     * Shows if the provided button was released
+     * between previous and current frames
      * @returns {boolrean}
      */
     static getButtonUp(btn) {
@@ -367,7 +369,7 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * Tells if the provided button is pressed or not.
+     * Shows if the provided button is currently pressed
      * @returns {boolrean}
      */
     static getButton(btn) {
@@ -375,7 +377,8 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * Tells if the provided button value is changed or not.
+     * Shows if the state of provided button has changed
+     * between previous and current frames.
      * @returns {boolrean}
      */
     static getButtonChanged(btn) {
