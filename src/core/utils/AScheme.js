@@ -135,9 +135,9 @@ export class AScheme {
      * Validates function arguments with a given scheme
      * @param {Array|Object} args - arguments from a function ...args
      * @param {Object} scheme - scheme object to define default values and references
-     * @returns {{}} - an object with keys from scheme and values from args
+     * @returns {{}|Array} - an object with keys from scheme and values from args
      */
-    static validate(args, scheme) {
+    static validate(args, scheme, returnArray = false) {
         const res = {};
 
 
@@ -228,6 +228,16 @@ export class AScheme {
                     continue;
                 res[references[i]] = AScheme.handleReferenceTree(enforce, res, scheme, references[i], []);
             }
+        }
+
+        if (returnArray) {
+            const arrayRes = [];
+            for (let i in scheme) {
+                if (!scheme.hasOwnProperty(i))
+                    continue;
+                arrayRes.push(res[i]);
+            }
+            return arrayRes;
         }
 
         return res;
