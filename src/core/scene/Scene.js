@@ -5,6 +5,7 @@ import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
 import * as utils from '../utils';
 import * as CONSTANTS from '../constants';
 import {RodinEvent} from '../rodinEvent';
+import {Sculpt} from '../sculpt';
 
 function enforce() {
 }
@@ -19,7 +20,7 @@ const postRenderFunctions = new Set();
 const instances = new Set();
 
 /**
- *
+ * A class where you build your experience.
  */
 export class Scene extends EventEmitter {
     constructor(name = utils.string.UID()) {
@@ -40,7 +41,19 @@ export class Scene extends EventEmitter {
 
         this.children = new Set();
 
+        this._sculpt = new Sculpt();
+        this._sculpt.on(CONSTANTS.READY, () => {
+            this._scene.add(this._sculpt._threeObject);
+        });
+
         this._scene.add(new THREE.AmbientLight());
+
+        //TODO: get rid of this sh*t. this is to cover the bug with crash on vr exit on mobiles
+
+        let x = new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial());
+        this._camera.add(x);
+        x.position.set(0, 0, -99);
+
     }
 
     /**
@@ -62,7 +75,9 @@ export class Scene extends EventEmitter {
             }
 
             this.children.push(arguments[i]);
-            this._scene.add(arguments[i]._threeObject);
+            // this._sculpt.add(arguments[i]._threeObject);
+            //todo: figure out what sculpt.parent should actually return to avoid bugs
+            arguments[i].parent = this._sculpt;
         }
     }
 
@@ -77,7 +92,8 @@ export class Scene extends EventEmitter {
             }
 
             this.children.splice(this.children.indexOf(arguments[i]), 1);
-            this._scene.remove(arguments[i]._threeObject);
+            // this._sculpt.remove(arguments[i]._threeObject);
+            arguments[i].parent = null;
         }
     }
 
@@ -110,13 +126,6 @@ export class Scene extends EventEmitter {
         this._postRenderFunctions.push(callback);
     }
 
-    static renderer = new THREE.WebGLRenderer({
-        antialias: window.devicePixelRatio < 2
-    });
-
-    static effect = new THREE.VREffect(Scene.renderer);
-
-    static webVRmanager = null;
 
     /**
      * Starts render active scene.
@@ -135,12 +144,19 @@ export class Scene extends EventEmitter {
         doRender = false;
     }
 
+	/**
+     * get the camera that currently renders
+	 */
+	static get activeCamera() {
+        return activeScene._camera;
+    }
+
     /**
      * Change Scene and go to other scene.
      * If parameter is instance of Scene, go to this scene.
      * If parameter is number, go to scene that created with this number
      * If parameter is strig, got to scene with this name
-     * @param scene {Scene, number, string}
+     * @param scene {(Object|number|string)}
      */
     static go(scene) {
         switch (true) {
@@ -161,6 +177,7 @@ export class Scene extends EventEmitter {
         }
 
         messenger.post(CONSTANTS.ACTIVE_SCENE, activeScene);
+
         Scene.onResize();
     }
 
@@ -223,6 +240,12 @@ export class Scene extends EventEmitter {
                 child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
         });
+        //TODO: camera needs to be a sculpt object, to avoid sh*t like this
+        Scene.active._camera.children.map(child => {
+            if(child.Sculpt && child.Sculpt.isReady) {
+                child.Sculpt.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
+            }
+        });
 
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
         Scene.active._postRenderFunctions.map(fn => fn());
@@ -270,6 +293,28 @@ export class Scene extends EventEmitter {
         return activeScene;
     }
 }
+/**
+ * renderer object
+ * @type {Object}
+ * @static
+ */
+Scene.renderer = new THREE.WebGLRenderer({
+    antialias: window.devicePixelRatio < 2
+});
+/**
+ * VREffect plugin from three.js
+ * @type {Object}
+ * @static
+ */
+
+Scene.effect = new THREE.VREffect(Scene.renderer);
+/**
+ * web VR Manager plugin
+ * @type {Object}
+ * @static
+ */
+
+Scene.webVRmanager = null;
 
 Scene.renderer.setPixelRatio(window.devicePixelRatio);
 Scene.effect.setSize(window.innerWidth, window.innerHeight);

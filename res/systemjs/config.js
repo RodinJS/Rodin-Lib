@@ -28,7 +28,8 @@
 		'core/constants',
 		'core/rodinEvent',
 		'core/sculpt',
-		'core/animation'
+		'core/animation',
+		'core/loader'
 	];
 
 	function packIndex(moduleName) {

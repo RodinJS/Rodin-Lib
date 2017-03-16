@@ -3,19 +3,22 @@ import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {ErrorProtectedMethodCall} from '../error';
 import {Sculpt} from '../sculpt/Sculpt';
+import {EventEmitter} from '../eventEmitter';
 
 import {object} from '../utils';
-function enforce () {
+function enforce() {
 }
-//TODO: Gor jan, mi hat nkaragri inch parametra astanum u inchi hamar
 
 /**
  * AnimationClip Class, used to create animations on Sculpt objects
  * @param {!String} name
  * @param {Object} params
  */
-export class AnimationClip {
-    constructor (name, params) {
+export class AnimationClip extends EventEmitter {
+    constructor(name, params) {
+        super();
+
+
         this._loop = false;
         /**
          * The host Sculpt object.
@@ -28,6 +31,8 @@ export class AnimationClip {
          * @type {Object}
          */
         this.params = object.clone(params);
+
+        this.animatedValues = object.clone(params);
 
         /**
          * AnimationClip name.
@@ -50,7 +55,7 @@ export class AnimationClip {
      * Get a cloned AnimationClip object
      * @returns {AnimationClip}
      */
-    copy () {
+    clone() {
         let newAnimation = new AnimationClip(this.name, this.params);
         return newAnimation.duration(this.duration()).easing(this.easing()).delay(this.delay()).loop(this.loop());
     }
@@ -61,7 +66,7 @@ export class AnimationClip {
      * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
-    start (forceStart = false) {
+    start(forceStart = false) {
         if (!this.sculpt instanceof Sculpt) {
             return console.warn('AnimationClip cannot be played without adding in object');
         }
@@ -80,36 +85,34 @@ export class AnimationClip {
         let startValues = normalizedParams.from;
         let endValues = normalizedParams.to;
 
-        this.playing = true;
         this.initialProps = object.clone(startValues);
         let _this = this;
         this.tween = new TWEEN.Tween(startValues)
             .to(endValues, this._duration)
             .delay(this._delay)
             .onStart(function () {
+                _this.playing = true;
                 let evt = new RodinEvent(_this.sculpt);
-                evt.AnimationClip = _this.name;
+                evt.animation = _this.name;
                 _this.sculpt.emit(CONST.ANIMATION_START, evt);
             })
             .onUpdate(function () {
-                for (let i in this) {
-                    object.setProperty(_this.sculpt._threeObject, i, this[i]);
-                }
+                _this.animatedValues = this;
             })
             .easing(this._easing)
             .start()
             .onComplete(function () {
+                _this.playing = false;
+
                 if (_this._loop) {
-                    _this.playing = false;
                     _this.reset();
                     _this.start();
                 } else {
-                    _this.playing = false;
                     delete this.tween;
                 }
 
                 let evt = new RodinEvent(_this.sculpt);
-                evt.AnimationClip = _this.name;
+                evt.animation = _this.name;
                 _this.sculpt.emit(CONST.ANIMATION_COMPLETE, evt);
             });
     }
@@ -119,7 +122,7 @@ export class AnimationClip {
      * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
-    play (forceStart = false) {
+    play(forceStart = false) {
         return this.start(forceStart);
     }
 
@@ -128,7 +131,7 @@ export class AnimationClip {
      * @param {boolean} [reset] - run reset() method after stopping the AnimationClip.
      * @returns {boolean} - success
      */
-    stop (reset = true) {
+    stop(reset = false) {
         if (this.isPlaying()) {
             this.tween.stop();
             delete this.tween;
@@ -151,17 +154,15 @@ export class AnimationClip {
      * Reset all to initial values.
      * <p>This function reverts all affected values to "before AnimationClip" state</p>
      */
-    reset () {
-        for (let i in this.initialProps) {
-            object.setProperty(this.sculpt._threeObject, i, this.initialProps[i]);
-        }
+    reset() {
+        this.animatedValues = object.clone(this.initialProps);
     }
 
     /**
      * Check AnimationClip playing status
      * @returns {boolean}
      */
-    isPlaying () {
+    isPlaying() {
         return this.playing;
     }
 
@@ -171,7 +172,7 @@ export class AnimationClip {
      * @param [loop]
      * @returns {AnimationClip}
      */
-    loop (loop = null) {
+    loop(loop = null) {
         if (loop === null) {
             return this._loop;
         }
@@ -186,7 +187,7 @@ export class AnimationClip {
      * @param {number} [duration]
      * @returns {AnimationClip}
      */
-    duration (duration = null) {
+    duration(duration = null) {
         if (duration === null) {
             return this._duration;
         }
@@ -201,7 +202,7 @@ export class AnimationClip {
      * @param {number} [delay]
      * @returns {AnimationClip}
      */
-    delay (delay = null) {
+    delay(delay = null) {
         if (delay === null) {
             return this._delay;
         }
@@ -215,7 +216,7 @@ export class AnimationClip {
      * @param {TWEEN.Easing} [easing]
      * @returns {AnimationClip}
      */
-    easing (easing = null) {
+    easing(easing = null) {
         if (easing === null) {
             return this._easing;
         }
@@ -230,7 +231,7 @@ export class AnimationClip {
      * @param {!Sculpt}  sculpt
      * @returns {AnimationClip}
      */
-    setSculpt (sculpt) {
+    setSculpt(sculpt) {
         this.initialProps = {};
         this.sculpt = sculpt;
         return this;
@@ -244,15 +245,15 @@ export class AnimationClip {
      * @param {Sculpt} obj
      * @returns {Object} normalized params
      */
-    static normalizeParams (e, params, obj) {
+    static normalizeParams(e, params, obj) {
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('normalizeParams');
         }
 
         let _params = object.joinParams(params, ['from', 'to']);
-        let res = { from: {}, to: {} };
+        let res = {from: {}, to: {}};
         for (let i in _params) {
-            if(!_params.hasOwnProperty(i))
+            if (!_params.hasOwnProperty(i))
                 continue;
 
             if (_params[i].hasOwnProperty('from')) {

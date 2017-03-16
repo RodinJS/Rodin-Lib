@@ -42,24 +42,23 @@ export class ViveController extends GamePad {
         const tempMatrix = new THREE.Matrix4().identity().extractRotation(this.sculpt.globalMatrix);
         this.raycaster.ray.origin.setFromMatrixPosition(this.sculpt.globalMatrix);
         this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers);
     }
 
     /**
-     * Set Controller model
+     * Set Controller model to our RODIN Vive controller model.
      */
     initControllerModel() {
-        this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v1/model.obj');
+        this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj');
 
         this.controllerModel.on(CONST.READY, () => {
-            const loader = new THREE.TextureLoader();
-			loader.setCrossOrigin('anonymous');
-            this.controllerModel._threeObject.children[0].material.map = loader.load('https://cdn.rodin.io/resources/models/ViveController_v1/texture.png');
-            this.controllerModel._threeObject.children[0].material.specularMap = loader.load('https://cdn.rodin.io/resources/models/ViveController_v1/spcular.png');
             this.controllerModel.parent = this.sculpt;
         });
     }
 
+    /**
+     * Init raycasting line. Create red line for controller direction
+     */
     initRaycastingLine() {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(
@@ -70,16 +69,8 @@ export class ViveController extends GamePad {
         let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: 0xff0000}));
         targetLine.geometry.vertices[1].z = -10000;
         this.raycastingLine = new Sculpt(targetLine);
-
-        this.raycastingLine.on(CONST.READY, () => {
-            if (this.sculpt.isReady) {
-                this.raycastingLine.parent = this.sculpt;
-            } else {
-                this.sculpt.on(CONST.READY, () => {
-                    this.raycastingLine.parent = this.sculpt;
-                })
-            }
-        });
+        this.raycastingLine.gamepadVisible = false;
+        this.raycastingLine.parent = this.sculpt;
     }
 }
 

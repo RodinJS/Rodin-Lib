@@ -42,6 +42,10 @@ export class OculusTouchGamePad extends GamePad {
         this.standingMatrix = new THREE.Matrix4().setPosition(new THREE.Vector3(0, 1.6, 0));
     }
 
+    get isOculusTouchGamePad() {
+        return true;
+    }
+
     /**
      * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
      * @returns [Object]
@@ -50,20 +54,23 @@ export class OculusTouchGamePad extends GamePad {
         const tempMatrix = new THREE.Matrix4().identity().extractRotation(this.sculpt.globalMatrix);
         this.raycaster.ray.origin.setFromMatrixPosition(this.sculpt.globalMatrix);
         this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers);
     }
 
     /**
-     * Set Controller model
+     * Set Controller model to our RODIN Oculus touch controller model.
      */
     initControllerModel() {
-        this.controllerModel = new Sculpt(`https://cdn.rodin.io/resources/models/OculusTouchController_v2/${this.hand}_oculus_controller.obj`);
+        this.controllerModel = new Sculpt(`https://cdn.rodin.io/resources/models/OculusTouchController_v4/${this.hand}_oculus_controller.obj`);
 
         this.controllerModel.on(CONST.READY, () => {
             this.controllerModel.parent = this.sculpt;
         });
     }
 
+    /**
+     * Init raycasting line. Create red line for controller direction
+     */
     initRaycastingLine() {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(

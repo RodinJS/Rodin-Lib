@@ -12,6 +12,10 @@ export * from './initializer';
 export * from './sculpt';
 export * from './gamePad';
 export * from './animation';
+export * from './video';
+export * from './rodinEvent';
+export * from './loader';
+export * from './plugin';
 
 export {
     CONST,

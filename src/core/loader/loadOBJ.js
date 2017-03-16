@@ -1,5 +1,10 @@
 THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
 
+/**
+ * Load obj file with material (.mtl) and textures (if exist on material)
+ * @param URL {string} absolute or relative path for .obj file
+ * @param callback {Function} callback function that receives mesh as param.
+ */
 export const loadOBJ = (URL, callback) => {
     let onProgress = function (xhr) {
         if (xhr.lengthComputable) {
@@ -14,6 +19,7 @@ export const loadOBJ = (URL, callback) => {
 
     let objLoader = new THREE.OBJLoader();
     let mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setCrossOrigin('anonymous');
 
     objLoader.load(URL, mesh => {
         const mtlDir = URL.slice(0, URL.lastIndexOf("/") + 1);
@@ -29,6 +35,6 @@ export const loadOBJ = (URL, callback) => {
             }, onProgress, onError);
         });
 
-        console.log("OBJ file was loaded");
+        // console.log("OBJ file was loaded");
     }, onProgress, onError);
 };
