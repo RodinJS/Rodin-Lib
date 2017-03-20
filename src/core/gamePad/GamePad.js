@@ -22,9 +22,9 @@ messenger.on(CONST.RENDER_START, () => {
 });
 
 /**
- * General GamePad class, custom controllers extend this class.
+ * General GamePad class, custom gamepads should extend this class.
  * @param {string} [navigatorGamePadId] - custom ID for the gamepad instance.
- * @param {string} [hand] - gamepad holding hand (left/right).
+ * @param {string} [hand] - gamepad hand (left/right).
  * @param {string} [type] - VR or NON-VR
  */
 export class GamePad extends EventEmitter {

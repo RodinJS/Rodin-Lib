@@ -13,8 +13,8 @@ let instances = {};
 
 /**
  * Time
- * Manage Time in scenes. There are one Time instance for each scene.
- * You can only access to active scene time using static methods
+ * Manages Time in scenes. There is a Time instance for each scene.
+ * You can only access the active scene time using static methods
  */
 export class Time {
     constructor (e) {

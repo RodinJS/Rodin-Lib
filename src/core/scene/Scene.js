@@ -20,7 +20,11 @@ const postRenderFunctions = new Set();
 const instances = new Set();
 
 /**
- * A class where you build your experience.
+ * Scene class
+ * A scene is an object which can contain many 3d objects, virtual cameras, lights...
+ * Anything that can be rendered or viewed must be in a scene
+ * You can have multiple scenes in a single experience, for example to represent
+ * different levels of a game.
  */
 export class Scene extends EventEmitter {
     constructor(name = utils.string.UID()) {
@@ -57,7 +61,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Check if your instance is scene
+     * Checks if your instance is a scene
      * @returns {boolean} always true
      */
     get isScene() {
@@ -65,8 +69,8 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Add object to scene.
-     * Call with multiple arguments of Sculpt objects
+     * Adds object(s) to scene.
+     * Call with a single or multiple arguments of Sculpt objects
      */
     add() {
         for(let i = 0; i < arguments.length; i++) {
@@ -82,8 +86,8 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Remove object from scene
-     * Call with multiple arguments of Sculpt objects
+     * Removes object(s) from scene
+     * Call with a single or multiple arguments of Sculpt objects
      */
     remove() {
         for(let i = 0; i < arguments.length; i++) {
@@ -98,10 +102,10 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Reset effect size.
-     * Reset camera aspect.
-     * Update camera projection matrix
-     * Reset renderer pixel ratio
+     * Resets effect size.
+     * Resets camera aspect.
+     * Updates camera projection matrix
+     * Resets renderer pixel ratio
      */
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
@@ -111,7 +115,9 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds a function to a set that will be called every time before rendering this scene
+     * Adds a function to an array of functions
+     * which will be called every time right
+     * before rendering this scene
      * @param callback {Function}
      */
     preRender(callback) {
@@ -119,7 +125,8 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds a function to a set that will be called every time after rendering this scene
+     * Adds a function to an array of functions
+     * which will be called every time after rendering this scene
      * @param callback {Function}
      */
     postRender(callback) {
@@ -128,7 +135,7 @@ export class Scene extends EventEmitter {
 
 
     /**
-     * Starts render active scene.
+     * Starts rendering the current active scene.
      */
     static start() {
         doRender = true;
@@ -138,14 +145,14 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Stops render active scene.
+     * Stops rendering the current active scene.
      */
     static stop() {
         doRender = false;
     }
 
 	/**
-     * get the camera that currently renders
+     * Gets the main camera that currently renders
 	 */
 	static get activeCamera() {
         return activeScene._camera;
@@ -182,30 +189,32 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Add object to active scene.
-     * Call with multiple arguments of Sculpt objects
+     * Adds object(s) to the active scene.
+     * Call with a signle or multiple arguments of Sculpt objects
      */
     static add() {
         Scene.active.add(...arguments);
     }
 
     /**
-     * Remove object from active scene.
-     * Call with multiple arguments of Sculpt objects
+     * Removes object(s) from active scene.
+     * Call with a single or multiple arguments of Sculpt objects
      */
     static remove() {
         Scene.active.remove(...arguments);
     }
 
     /**
-     * Call active scene onResize method
+     * Calls active scene onResize method
      */
     static onResize() {
         Scene.active.onResize();
     }
 
     /**
-     * Adds function that will called each time before renderer will render any scene
+     * Adds a function to an array of functions
+     * which will be called every time right
+     * before rendering <b>the active</b> scene
      * @param callback {Function}
      */
     static preRender(callback) {
@@ -213,7 +222,9 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds function that will called each time after renderer will render any scene
+     * Adds a function to an array of functions
+     * which will be called every time right
+     * after rendering <b>the active</b> scene
      * @param callback {Function}
      */
     static postRender(callback) {
@@ -225,6 +236,7 @@ export class Scene extends EventEmitter {
      * Not available for user
      * @param timestamp {number}
      */
+    //todo: maybe add an enforce argument? @Gor
     static render(timestamp) {
 
         messenger.post(CONSTANTS.RENDER_START, {});
@@ -258,7 +270,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Request render function
+     * Requests render function
      * Not available for user
      * @param e {Function} Enforce function
      */
@@ -323,7 +335,7 @@ window.addEventListener('resize', Scene.onResize, false);
 window.addEventListener('vrdisplaypresentchange', Scene.onResize, false);
 
 
-// TODO: fix this when webkit fixes growing canvas
+// TODO: fix this when webkit fixes growing canvas bug
 if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)) {
     this.renderer.domElement.style.position = 'fixed';
     this.onResize();

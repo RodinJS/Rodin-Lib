@@ -3,7 +3,7 @@ import * as CONST from '../constants';
 
 /**
  * Call this method before setting up anything.
- * THis will create renderer, domElement and VR buttons
+ * This will create renderer, domElement and VR buttons
  * @param params
  */
 

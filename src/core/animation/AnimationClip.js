@@ -10,7 +10,8 @@ function enforce() {
 }
 
 /**
- * AnimationClip Class, used to create animations on Sculpt objects
+ * AnimationClip
+ * Represents a single animation, should be used with Animation
  * @param {!String} name
  * @param {Object} params
  */
@@ -52,7 +53,8 @@ export class AnimationClip extends EventEmitter {
 
 
     /**
-     * Get a cloned AnimationClip object
+     * Gets a new AnimationClip object with same
+     * content as this
      * @returns {AnimationClip}
      */
     clone() {
@@ -62,7 +64,7 @@ export class AnimationClip extends EventEmitter {
 
 
     /**
-     * Start AnimationClip
+     * Starts this AnimationClip
      * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
@@ -118,7 +120,7 @@ export class AnimationClip extends EventEmitter {
     }
 
     /**
-     * Play AnimationClip
+     * Plays AnimationClip
      * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
@@ -127,7 +129,7 @@ export class AnimationClip extends EventEmitter {
     }
 
     /**
-     * Stop AnimationClip
+     * Stops AnimationClip
      * @param {boolean} [reset] - run reset() method after stopping the AnimationClip.
      * @returns {boolean} - success
      */
@@ -151,7 +153,7 @@ export class AnimationClip extends EventEmitter {
     }
 
     /**
-     * Reset all to initial values.
+     * Resets animation values to their initial values.
      * <p>This function reverts all affected values to "before AnimationClip" state</p>
      */
     reset() {
@@ -159,7 +161,7 @@ export class AnimationClip extends EventEmitter {
     }
 
     /**
-     * Check AnimationClip playing status
+     * Checks if the AnimationClip is currently playing
      * @returns {boolean}
      */
     isPlaying() {

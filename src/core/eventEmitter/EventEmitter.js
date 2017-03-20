@@ -1,7 +1,9 @@
 /**
- * Created by gor on 2/7/17.
+ * EventEmitter
+ * Extend from this class in order to add
+ * event emitter functionality like
+ * emit, addEventListener, on, once
  */
-
 export class EventEmitter {
     constructor() {
         this.events = {};
@@ -35,7 +37,8 @@ export class EventEmitter {
     }
 
     /**
-     * Add listener to Event that called once
+     * Adds listener to Event which only needs to be called once
+     * It will be called only the first time event is fired
      * @param {string[]|string} eventNames - event name(s)
      * @param {function} callback - callback function
      */
@@ -49,7 +52,7 @@ export class EventEmitter {
     }
 
     /**
-     * Remove specific listener from Event
+     * Removes specific listener from Event
      * @param {string} eventName - event name
      * @param {function} callback - callback function
      *
@@ -65,7 +68,7 @@ export class EventEmitter {
     }
 
     /**
-     * Emit Event with params
+     * Emits Event with params
      * @param {String} eventName
      * @param {RodinEvent} rodinEvent - a custom Event object
      * @param {Array} args - arguments to be passed to the event callback
@@ -87,7 +90,7 @@ export class EventEmitter {
     }
 
     /**
-     * Emit event async
+     * Emits event async
      * @param {String} eventName
      * @param {RodinEvent} rodinEvent - a custom Event object
      * @param {Array} args - arguments to be passed to the event callback
