@@ -5,7 +5,7 @@ import * as CONST from '../constants';
 import * as Buttons from '../button';
 
 /**
- * Plyfiled mouse gamepad class, for MouseController, by default the navigator does not see mouse as a gamepad device.
+ * Plyfiled mouse gamepad class, for MouseGamepad, by default the navigator does not see mouse as a gamepad device.
  */
 class MouseNavigatorGamePad {
     /**

@@ -4,7 +4,11 @@ import {loadOBJ} from './loadOBJ';
 const supportedTypes = {
     'obj': loadOBJ
 };
-
+/**
+ * Loader class,
+ * Use for loading 3d models
+ * currently only supports .obj
+ */
 export class Loader {
     constructor() {
         throw new ErrorInstantiationFailed('Loader');

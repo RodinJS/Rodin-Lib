@@ -1,3 +1,7 @@
+/**
+ * Button
+ * Represents a single physical button on a gamepad (including keyboard and mouse)
+ */
 export class Button {
     constructor(keyCode = 0, navigatorButtonId = 0) {
         this.keyCode = keyCode;
