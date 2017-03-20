@@ -6,7 +6,7 @@ import {object} from '../utils';
 
 /**
  * Class Animation
- * Each Sculpt object have its own Animation.
+ * Each Sculpt object has its own Animation.
  * @param {!Sculpt} sculpt - Sculpt object
  */
 export class Animation {
@@ -26,7 +26,7 @@ export class Animation {
     }
 
     /**
-     * Get clip by name or index
+     * Gets clip by name or index
      * @param {!*} key
      * @returns {Animation}
      */
@@ -45,7 +45,7 @@ export class Animation {
     }
 
     /**
-     * Add new animation clip to Animation
+     * Adds new animation clip to Animation Object
      * @param {...Animation}
      * @returns {Animation}
      */
@@ -63,7 +63,7 @@ export class Animation {
     }
 
     /**
-     * Remove animations from Animation
+     * Removes animations from Animation by name
      * @params {...string}
      */
     remove() {
@@ -78,7 +78,7 @@ export class Animation {
     }
 
     /**
-     * Get all current clips
+     * Get all clips in current Animation Object
      * @returns {Set.<Animation>}
      */
     getClips() {
@@ -86,7 +86,7 @@ export class Animation {
     }
 
     /**
-     * Check if Animation is busy
+     * Checks if Animation Object is playing any (or specified) animation clip(s)
      * @param {*} [key] -  check the state for a specific animation/clip
      * @returns {boolean}
      */
@@ -105,8 +105,8 @@ export class Animation {
     }
 
     /**
-     * Start animation by name or id
-     * @param {!*} key - Animation name or id
+     * Starts animation by name or index
+     * @param {!*} key - Animation name or index
      * @returns {boolean}
      */
     start(key) {
@@ -120,8 +120,8 @@ export class Animation {
     }
 
     /**
-     * Stop animation by name or id
-     * @param {!*} key - Animation name or id
+     * Stops animation by name or index
+     * @param {!*} key - Animation name or index
      * @param {boolean} [reset] - run animation.reset() method after stopping the animation.
      * @returns {boolean} - success
      */
@@ -138,7 +138,7 @@ export class Animation {
 
 
 /**
- * Plugin for animation
+ * Plugin for Animation
  */
 export class AnimationPlugin extends SculptPlugin {
     constructor() {
