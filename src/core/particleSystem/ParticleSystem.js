@@ -2,6 +2,11 @@ import {Particle} from './Particle';
 import {Sculpt} from '../sculpt';
 import {Time} from '../time';
 import {number, vector3} from '../utils';
+import {ErrorProtectedMethodCall} from '../error';
+import * as CONST from '../constants';
+
+const enforce = function () {
+};
 
 /**
  * set general parameters for Particle System
@@ -63,9 +68,17 @@ export class ParticleSystem extends Sculpt {
         super(new THREE.Group());
         this.particles = [];
         this.params = params;
+
+        this.on(CONST.UPDATE, () => {
+            this.update(enforce);
+        });
     }
 
-    update() {
+    update(e) {
+        if(e !== enforce) {
+            throw new ErrorProtectedMethodCall('update');
+        }
+
         // TODO: toshni hashvel qanak@ 0.3, 0.4, 0.5 (mnacorde eli)
 
         let addNewCount = Math.min(
@@ -81,8 +94,6 @@ export class ParticleSystem extends Sculpt {
             if (particle.isDead()) {
                 return this.destroyParticle(particle);
             }
-
-            particle.update();
 
             if (this.params.velocity.velocityPath instanceof THREE.Vector3) {
                 let vec = new THREE.Vector3().copy(this.params.velocity.velocityPath).multiplyScalar(RODIN.Time.delta * .001);

@@ -631,7 +631,6 @@ export class Sculpt extends EventEmitter {
     }
 
     install(plugin, ...args) {
-        let found = false;
         if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
             throw new ErrorPluginAlreadyInstalled(plugin);
         }
