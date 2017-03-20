@@ -23,9 +23,18 @@ const constructorScheme = {
 
 export class Cylinder extends Sculpt {
     constructor(...args) {
-        args = AScheme.validate(args, constructorScheme, true);
+        args = AScheme.validate(args, constructorScheme);
 
-        const threeBox = new THREE.Mesh(new THREE.CylinderGeometry(...args), args[args.length - 1]);
+        const threeBox = new THREE.Mesh(new THREE.CylinderGeometry(
+            args.radiusTop,
+            args.radiusBottom,
+            args.height,
+            args.radiusSegments,
+            args.heightSegments,
+            args.openEnded,
+            args.thetaStart,
+            args.thetaLength
+        ), args.material);
         super(threeBox);
 
         this._radiusTop = args.radiusTop;
