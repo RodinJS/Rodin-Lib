@@ -43,7 +43,8 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 }
 
 /**
- * Sculpt
+ * Sculpt is a base class for a 3d object in Rodin Lib,
+ * Any 3d object should be either a direct Sculpt, or extended from Sculpt
  */
 export class Sculpt extends EventEmitter {
     constructor(args, deferReadyEvent) {

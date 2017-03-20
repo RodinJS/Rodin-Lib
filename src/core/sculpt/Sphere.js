@@ -26,6 +26,10 @@ export class Sphere extends Sculpt {
         this._radius = args.radius;
     }
 
+    /**
+     * Gets the radius of current Sphere
+     * @returns {Number}
+     */
     get radius() {
         return this._radius;
     }
