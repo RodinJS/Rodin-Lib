@@ -123,8 +123,8 @@ export class AScheme {
             throw new ErrorArgumentLoop();
         }
         been.push(reference);
-        if (scheme[reference]._default && AScheme.isReference(e, scheme[reference]._default)) {
-            res[reference] = AScheme.handleReferenceTree(e, res, scheme, AScheme.getReference(e, scheme[reference]._default), been);
+        if (scheme[reference].hasDefault && AScheme.isReference(e, scheme[reference].default())) {
+            res[reference] = AScheme.handleReferenceTree(e, res, scheme, AScheme.getReference(e, scheme[reference].default()), been);
         }
         if (res.hasOwnProperty(reference))
             return res[reference];
@@ -160,8 +160,8 @@ export class AScheme {
                 // if argument is undefined or doesn't pass validation
                 // try to get the default value for it.
                 if (curArg === undefined || !scheme[i].validate(curArg)) {
-                    if (scheme[i]._default) {
-                        res[i] = AScheme.handleDefault(enforce, res, scheme[i]._default);
+                    if (scheme[i].hasDefault) {
+                        res[i] = AScheme.handleDefault(enforce, res, scheme[i].default());
                     }
                     else {
                         // if it does not have a default value, throw an error
@@ -198,14 +198,14 @@ export class AScheme {
                 // try to instantiate it with a default value
                 if (curArg === undefined) {
                     // if it is a reference add it to an array
-                    if (AScheme.isReference(enforce, scheme[i]._default)) {
+                    if (AScheme.isReference(enforce, scheme[i].default())) {
                         //in this case we handle references later
                         references.push(i);
                         continue;
                     }
 
-                    if (scheme[i]._default) {
-                        res[i] = AScheme.handleDefault(enforce, res, scheme[i]._default);
+                    if (scheme[i].hasDefault) {
+                        res[i] = AScheme.handleDefault(enforce, res, scheme[i].default());
                     }
                     else {
                         // if we don't have a default value, throw an error
@@ -234,4 +234,3 @@ export class AScheme {
 
     }
 }
-window.AScheme = AScheme;

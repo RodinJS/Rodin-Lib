@@ -6,6 +6,12 @@ export class Type {
     }
 
     default(val) {
+        if(arguments.length === 0) {
+            if (typeof this._default === 'function') {
+                return this._default();
+            }
+            return this._default;
+        }
         this._default = val;
         return this;
     }
@@ -24,5 +30,9 @@ export class Type {
     hasProperty(...args) {
         this._properties = this._properties.concat(args);
         return this;
+    }
+
+    get hasDefault() {
+        return this.hasOwnProperty('_default');
     }
 }

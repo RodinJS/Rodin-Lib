@@ -17,6 +17,7 @@ export class Physics {
 
         // create oimo world contains all rigidBodys and joint.
         this.world = new OIMO.World(params);
+        this.world.maxSubSteps = 3;
 
         this.world.gravity = new OIMO.Vec3(params.gravity.x, params.gravity.y, params.gravity.z);
 
@@ -40,7 +41,7 @@ export class Physics {
     update() {
         this.a++;
         if (!this.world) return;
-        if (this.a >= 0) {
+        if (this.a >= 10) {
             this.world.timeStep = Time.delta / 1000;
             this.world.step();
 
@@ -48,13 +49,20 @@ export class Physics {
             while (i--) {
                 if (!this.rigidBodies[i].sleeping) {
 
-                    let newGlobalMatrix = new THREE.Matrix4();
-                    newGlobalMatrix.compose(
-                        oimoToThree(this.rigidBodies[i].position),
-                        oimoToThree(this.rigidBodies[i].getQuaternion()),
-                        this.rigidBodies[i].target.globalScale);
 
-                    this.rigidBodies[i].target.globalMatrix = newGlobalMatrix;
+                    this.rigidBodies[i].target.globalPosition = oimoToThree(this.rigidBodies[i].position);
+                    this.rigidBodies[i].target.globalQuaternion = oimoToThree(this.rigidBodies[i].getQuaternion());
+
+                    if (this.rigidBodies[i].target.name === 'box'){
+                        //console.log(this.rigidBodies[i].target._threeObject.scale);
+                        //if (this.rigidBodies[i].target._scale.x != 1)
+                        //{
+                            //console.log('collision');
+                            //console.log('scale',this.rigidBodies[i].target.globalScale.valueOf());
+                            //console.log('size',this.rigidBodies[i].target.rigidBody.body.size);
+                        //}
+
+                    }
                 }
             }
         }

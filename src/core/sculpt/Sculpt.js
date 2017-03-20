@@ -507,6 +507,9 @@ export class Sculpt extends EventEmitter {
      * @param matrix {THREE.Matrix4}
      */
     set matrix(matrix) {
+        /*if(this._threeObject.scale.x != 1){
+            console.log(matrix);
+        }*/
         this._threeObject.matrix = matrix;
         matrix.decompose(this._threeObject.position, this._threeObject.quaternion, this._threeObject.scale);
         this._syncWithThree();

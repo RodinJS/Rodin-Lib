@@ -1,4 +1,5 @@
 'use strict';
+import * as RODIN from 'rodin/core';
 
 const getSculptType = sculpt => {
     switch (true) {
@@ -7,6 +8,8 @@ const getSculptType = sculpt => {
         case sculpt.isSphere:
             return 'sphere';
 
+        case sculpt.isCylinder:
+            return 'cylinder';
         default:
             return 'boundingBox';
     }
@@ -29,6 +32,7 @@ export class RigidBody {
             params = args[lastArgument];
         }
 
+        // TODO: implement pivot idea
         this.body = Object.assign({
             type: getSculptType(this.sculpt), // type of shape : 'sphere', 'box', 'cylinder'
             scale: this.sculpt.globalScale, // size of shape
@@ -59,76 +63,80 @@ export class RigidBody {
             this.body.rotation.z * (180 / Math.PI)
         ];
 
-        let isGeometry;
-        let geometry = this.sculpt._threeObject.geometry;
-        // // TODO: redirect this.sculpt._threeObject.geometry to this.sculpt.geometry
-        if (geometry.parameters) {
-            isGeometry = true;
-        }
+        const geometry = this.sculpt._threeObject.geometry;
 
         let width = 0.002;
         let height = 0.002;
         let depth = 0.002;
-        let radius = 0.002;
         switch (this.body.type) {
             case 'plane':
-                if (isGeometry) {
-                    width = geometry.parameters.width;
-                    height = geometry.parameters.height;
+                if (this.sculpt.isBox) {
+                    width = this.sculpt.width + 0.01;
+                    height = this.sculpt.height + 0.01;
                 } else {
                     geometry.computeBoundingBox();
-                    let bBox = geometry.boundingBox;
+                    const bBox = geometry.boundingBox;
                     width = Math.abs(bBox.max.x) + Math.abs(bBox.min.x) + 0.01;
                     height = Math.abs(bBox.max.y) + Math.abs(bBox.min.y) + 0.01;
                 }
-
-                this.body.size = [
-                    width * this.body.scale.x * 100,
-                    height * this.body.scale.y * 100,
-                    depth * this.body.scale.z * 100];
                 break;
 
             case 'box':
-                // TODO: cylinder
-            case 'cylinder':
-                if (isGeometry) {
-                    //console.log(geometry);
-                    width = geometry.parameters.width;
-                    height = geometry.parameters.height;
-                    depth = geometry.parameters.depth;
+                if (this.sculpt.isBox) {
+                    width = this.sculpt.width + 0.01;
+                    height = this.sculpt.height + 0.01;
+                    depth = this.sculpt.depth + 0.01;
                 } else {
                     geometry.computeBoundingBox();
-                    let bBox = geometry.boundingBox;
+                    const bBox = geometry.boundingBox;
                     width = Math.abs(bBox.max.x) + Math.abs(bBox.min.x) + 0.01;
                     height = Math.abs(bBox.max.y) + Math.abs(bBox.min.y) + 0.01;
                     depth = Math.abs(bBox.max.z) + Math.abs(bBox.min.z) + 0.01;
                 }
-
-                this.body.size = [
-                    width * this.body.scale.x * 100,
-                    height * this.body.scale.y * 100,
-                    depth * this.body.scale.z * 100];
-
                 break;
 
             case 'sphere':
-                if (isGeometry) {
-                    radius = geometry.parameters.radius;
+                let radius;
+                if (this.sculpt.isSphere) {
+                    radius = this.sculpt.radius + 0.005;
                 } else {
                     geometry.computeBoundingSphere();
-                    let bSphere = geometry.boundingSphere;
+                    const bSphere = geometry.boundingSphere;
                     radius = bSphere.radius + 0.005;
                 }
 
-                // TODO: this is a Oimo.js problem only for sphere (x, y, z) real position
-                this.body.size = [
-                    radius * this.body.scale.y * 100,
-                    radius * this.body.scale.z * 100,
-                    radius * this.body.scale.x * 100];
+                // TODO: calculate sphere scale deformation
+                width = radius;
+                height = radius;
+                depth = radius;
+                break;
+
+            case 'cylinder':
+                if (this.sculpt.isCylinder) {
+                    width = this.sculpt.radiusTop + 0.01;
+                    height = this.sculpt.height   + 0.01;
+                    depth = this.sculpt.radiusTop + 0.01;
+                } else {
+                    geometry.computeBoundingBox();
+                    const bBox = geometry.boundingBox;
+                    width = Math.abs(bBox.max.x) + Math.abs(bBox.min.x) + 0.01;
+                    height = Math.abs(bBox.max.y) + Math.abs(bBox.min.y) + 0.01;
+                    depth = Math.abs(bBox.max.z) + Math.abs(bBox.min.z) + 0.01;
+                }
                 break;
 
             default:
-                return
+                geometry.computeBoundingBox();
+                const bBox = geometry.boundingBox;
+                width = Math.abs(bBox.max.x) + Math.abs(bBox.min.x) + 0.01;
+                height = Math.abs(bBox.max.y) + Math.abs(bBox.min.y) + 0.01;
+                depth = Math.abs(bBox.max.z) + Math.abs(bBox.min.z) + 0.01;
+
         }
+
+        this.body.size = [
+            width * this.body.scale.x * 100,
+            height * this.body.scale.y * 100,
+            depth * this.body.scale.z * 100];
     }
 }

@@ -15,6 +15,8 @@ export * from './animation';
 export * from './video';
 export * from './rodinEvent';
 export * from './loader';
+export * from './plugin';
+export * from './utils';
 
 export {
     CONST,
