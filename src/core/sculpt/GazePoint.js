@@ -1,4 +1,9 @@
 import {Sculpt} from './Sculpt';
+
+/**
+ * A simple gaze point class for cardboard controller or any other gazing selection based controller
+ * @param point object {Sculpt}
+ */
 //TODO: @Aram, @Gor, This is not a place for gazepoint! if it is at least inherit it from sculpt
 export class GazePoint {
     constructor (sculpt = null) {

@@ -5,9 +5,9 @@ import * as CONST from '../constants';
 import {object} from '../utils';
 
 /**
- * Class Animation
  * Each Sculpt object has its own Animation.
- * @param {!Sculpt} sculpt - Sculpt object
+ * <p>Animation manages the clips that are assigned to the Sculpt object</p>
+ * @param {Sculpt} sculpt - Sculpt object
  */
 export class Animation {
     constructor(sculpt = null) {
@@ -19,8 +19,8 @@ export class Animation {
         this.sculpt = sculpt;
 
         /**
-         * Set of clips (animations) to be played.
-         * @type {Set.<Animation>}
+         * Set of clips to be played.
+         * @type {Set.<AnimationClip>}
          */
         this.clips = new Set();
     }
@@ -28,7 +28,7 @@ export class Animation {
     /**
      * Gets clip by name or index
      * @param {!*} key
-     * @returns {Animation}
+     * @returns {AnimationClip}
      */
     getClip(key) {
         if (Number.isInteger(key)) {
@@ -45,9 +45,8 @@ export class Animation {
     }
 
     /**
-     * Adds new animation clip to Animation Object
-     * @param {...Animation}
-     * @returns {Animation}
+     * Adds new animation clip(s) to Animation Object
+     * @param {...AnimationClip}
      */
     add() {
         const ret = [];
@@ -63,8 +62,8 @@ export class Animation {
     }
 
     /**
-     * Removes animations from Animation by name
-     * @params {...string}
+     * Removes animation clip(s) from Animation by name
+     * @params {...string} names
      */
     remove() {
         for (let i = 0; i < arguments.length; i++) {
@@ -79,7 +78,7 @@ export class Animation {
 
     /**
      * Get all clips in current Animation Object
-     * @returns {Set.<Animation>}
+     * @returns {Set.<AnimationClip>}
      */
     getClips() {
         return this.clips;
@@ -87,7 +86,7 @@ export class Animation {
 
     /**
      * Checks if Animation Object is playing any (or specified) animation clip(s)
-     * @param {*} [key] -  check the state for a specific animation/clip
+     * @param {*} [key] -  check the state for a specific animation clip
      * @returns {boolean}
      */
     isPlaying(key = null) {
@@ -105,9 +104,9 @@ export class Animation {
     }
 
     /**
-     * Starts animation by name or index
+     * Starts animation clip by name or index
      * @param {!*} key - Animation name or index
-     * @returns {boolean}
+     * @returns {boolean} returns false is the clip was not found
      */
     start(key) {
         let clip = this.getClip(key);
@@ -120,9 +119,9 @@ export class Animation {
     }
 
     /**
-     * Stops animation by name or index
+     * Stops animation clip by name or index
      * @param {!*} key - Animation name or index
-     * @param {boolean} [reset] - run animation.reset() method after stopping the animation.
+     * @param {boolean} [reset=true] - run animationClip.reset() method after stopping the animation.
      * @returns {boolean} - success
      */
     stop(key, reset = true) {
@@ -138,7 +137,7 @@ export class Animation {
 
 
 /**
- * Plugin for Animation
+ * Plugin class for Animation
  */
 export class AnimationPlugin extends SculptPlugin {
     constructor() {
@@ -147,7 +146,7 @@ export class AnimationPlugin extends SculptPlugin {
     }
 
     /**
-     * Update function
+     * Update function, Run on each render loop
      */
     update() {
         if (!this.isEnabled) return;

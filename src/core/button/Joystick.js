@@ -1,7 +1,7 @@
 import {Button} from './Button';
 /**
  * Joystick
- * Represents a Joystick on a gamepad
+ * Represents a Joystick on a gamepad, with {x,y} coordinates as a value
  */
 export class Joystick extends Button {
     constructor(keyCode = 0, navigatorButtonId = 0) {

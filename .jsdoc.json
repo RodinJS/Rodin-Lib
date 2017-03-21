@@ -14,7 +14,10 @@
 	"templates": {
 		"cleverLinks": false,
 		"monospaceLinks": true,
-		"useLongnameInNav": false
+		"useLongnameInNav": false,
+		"default": {
+			"outputSourceFiles": false
+		}
 	},
 	"opts": {
 		"destination": "./docs/",
@@ -24,3 +27,9 @@
 		"template": "./res/docTemplate/minami"
 	}
 }
+
+// for windows
+// node_modules\.bin\jsdoc --configure .jsdoc.json --verbose
+
+// for non windows
+// node_modules/.bin/jsdoc --configure .jsdoc.json --verbose

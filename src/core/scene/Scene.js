@@ -19,30 +19,38 @@ const postRenderFunctions = new Set();
 
 const instances = new Set();
 
-/**
- * Scene class
- * A scene is an object which can contain many 3d objects, virtual cameras, lights...
- * Anything that can be rendered or viewed must be in a scene
- * You can have multiple scenes in a single experience, for example to represent
- * different levels of a game.
- */
 export class Scene extends EventEmitter {
+    /**
+     * <p>Scene class.</p>
+     * <p>A scene is an object which can contain multiple 3D objects, Cameras, Lights...</p>
+     * <p>Anything that can be rendered or viewed must be in a scene.</p>
+     * <p>You can have multiple scenes in a single experience, for example to represent
+     * different levels of a game, or different isolated environments.</p>
+     * Constructor receives a name string as an argument.
+     * @param [name] {string}
+     */
     constructor(name = utils.string.UID()) {
         super();
 
         this._scene = new THREE.Scene();
-        this._camera = new THREE.PerspectiveCamera(95, window.innerWidth / window.innerHeight, 0.01, 100);
+        this._camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
         this._scene.add(this._camera);
         this._controls = new THREE.VRControls(this._camera);
         this._controls.standing = true;
-
+        /**
+         * Scene name.
+         * @type {string}
+         */
         this.name = name;
 
         this._preRenderFunctions = new Set();
         this._postRenderFunctions = new Set();
 
         instances.push(this);
-
+        /**
+         * Child sculpt objects of the scene
+         * @type {Set.<Sculpt>}
+         */
         this.children = new Set();
 
         this._sculpt = new Sculpt();
@@ -56,12 +64,33 @@ export class Scene extends EventEmitter {
 
         let x = new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial());
         this._camera.add(x);
-        x.position.set(0, 0, -99);
+        x.position.set(0, 1, -99);
 
     }
 
     /**
-     * Checks if your instance is a scene
+     * Gets the names of current scenes in the creation order.
+     * @returns {Array.<string>}
+     */
+    static get sceneNames() {
+        let names = [];
+        for(let si = 0; si < instances.length; si++){
+            names.push(instances[si].name);
+        }
+        return names;
+    }
+    /**
+     * Gets current scene instances in the creation order.
+     * NOTE!!! avoid making changes in scenes using this getter,
+     * instead, switch to the needed scene and perform the modifications there.
+     * @returns {Set.<Scene>}
+     */
+    static get scenes() {
+        return instances;
+    }
+
+    /**
+     * Checks if your instance is scene.
      * @returns {boolean} always true
      */
     get isScene() {
@@ -69,8 +98,8 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds object(s) to scene.
-     * Call with a single or multiple arguments of Sculpt objects
+     * Adds object to scene.
+     * Call with one or more arguments of Sculpt objects.
      */
     add() {
         for(let i = 0; i < arguments.length; i++) {
@@ -86,8 +115,8 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Removes object(s) from scene
-     * Call with a single or multiple arguments of Sculpt objects
+     * Removes objects from scene.
+     * Call with one or more arguments of Sculpt objects.
      */
     remove() {
         for(let i = 0; i < arguments.length; i++) {
@@ -104,8 +133,8 @@ export class Scene extends EventEmitter {
     /**
      * Resets effect size.
      * Resets camera aspect.
-     * Updates camera projection matrix
-     * Resets renderer pixel ratio
+     * Updates camera projection matrix.
+     * Resets renderer pixel ratio.
      */
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
@@ -115,9 +144,16 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds a function to an array of functions
-     * which will be called every time right
-     * before rendering this scene
+     * Sets the current camera property
+     * @param {string} property
+     * @param {*} value
+     */
+    setCameraProperty(property, value) {
+        Object.setProperty(this._camera, property, value);
+        this._camera.projectionMatrixNeedsUpdate = true;
+    }
+    /**
+     * Adds the provided method to a list of methods that are being called before each render call of this scene
      * @param callback {Function}
      */
     preRender(callback) {
@@ -125,8 +161,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds a function to an array of functions
-     * which will be called every time after rendering this scene
+     * Adds the provided method to a list of methods that are being called after each render call of this scene
      * @param callback {Function}
      */
     postRender(callback) {
@@ -135,7 +170,7 @@ export class Scene extends EventEmitter {
 
 
     /**
-     * Starts rendering the current active scene.
+     * Starts rendering the active scene.
      */
     static start() {
         doRender = true;
@@ -145,25 +180,26 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Stops rendering the current active scene.
+     * Stops rendering the active scene.
      */
     static stop() {
         doRender = false;
     }
 
-	/**
-     * Gets the main camera that currently renders
-	 */
+    /**
+     * Gets the rendering camera of the active scene.
+     * @returns {THREE.PerspectiveCamera}
+     */
 	static get activeCamera() {
         return activeScene._camera;
     }
 
     /**
-     * Change Scene and go to other scene.
-     * If parameter is instance of Scene, go to this scene.
-     * If parameter is number, go to scene that created with this number
-     * If parameter is strig, got to scene with this name
-     * @param scene {(Object|number|string)}
+     * Switches to another Scene instance.
+     * If the parameter is an instance of Scene, go to this scene.
+     * If the parameter is a number, go to the scene with that index (creation order)
+     * If the parameter is a string, got to the scene with this name
+     * @param scene {(Scene|number|string)}
      */
     static go(scene) {
         switch (true) {
@@ -189,32 +225,32 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds object(s) to the active scene.
-     * Call with a signle or multiple arguments of Sculpt objects
+     * Adds the object(s) to the active scene.
+     * Call with one or more arguments of Sculpt type.
+     * @param arguments {...Sculpt}
      */
     static add() {
         Scene.active.add(...arguments);
     }
 
     /**
-     * Removes object(s) from active scene.
-     * Call with a single or multiple arguments of Sculpt objects
+     * Removes the object(s) from the active scene.
+     * Call with one or more arguments of Sculpt type.
+     * @param arguments {...Sculpt}
      */
     static remove() {
         Scene.active.remove(...arguments);
     }
 
     /**
-     * Calls active scene onResize method
+     * Calls the active scene onResize method
      */
     static onResize() {
         Scene.active.onResize();
     }
 
     /**
-     * Adds a function to an array of functions
-     * which will be called every time right
-     * before rendering <b>the active</b> scene
+     * Adds the provided method to a list of methods that are being called before each render call of every scene
      * @param callback {Function}
      */
     static preRender(callback) {
@@ -222,9 +258,7 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds a function to an array of functions
-     * which will be called every time right
-     * after rendering <b>the active</b> scene
+     * Adds the provided method to a list of methods that are being called after each render call of every scene
      * @param callback {Function}
      */
     static postRender(callback) {
@@ -232,9 +266,9 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Render function
-     * Not available for user
+     * Render function.
      * @param timestamp {number}
+     * @private
      */
     //todo: maybe add an enforce argument? @Gor
     static render(timestamp) {
@@ -271,8 +305,8 @@ export class Scene extends EventEmitter {
 
     /**
      * Requests render function
-     * Not available for user
      * @param e {Function} Enforce function
+     * @private
      */
     static requestFrame(e) {
         // renderRequested becomes false every time
@@ -299,7 +333,8 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Active scene
+     * Active scene.
+     * @returns scene {Scene}
      */
     static get active() {
         return activeScene;
@@ -307,7 +342,7 @@ export class Scene extends EventEmitter {
 }
 /**
  * renderer object
- * @type {Object}
+ * @type {THREE.WebGLRenderer}
  * @static
  */
 Scene.renderer = new THREE.WebGLRenderer({
@@ -315,7 +350,7 @@ Scene.renderer = new THREE.WebGLRenderer({
 });
 /**
  * VREffect plugin from three.js
- * @type {Object}
+ * @type {THREE.VREffect}
  * @static
  */
 

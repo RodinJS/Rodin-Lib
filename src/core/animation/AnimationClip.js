@@ -10,10 +10,28 @@ function enforce() {
 }
 
 /**
- * AnimationClip
- * Represents a single animation, should be used with Animation
+ * AnimationClip class.
+ * Represents a single animation, should be used with Animation.
+ * <p>
+ *     Parameters that need to be changed must be described in the following pattern:
+ * </p>
+ * <div class="codeSample">
+ * <p> rotation: {
+ * </p><p class="tab1"> x: 0,
+ * </p><p class="tab1"> y: {
+ * </p><p class="tab2"> from: -Math.PI / 2,
+ * </p><p class="tab2"> to: Math.PI / 2
+ * </p><p class="tab1"> },
+ * </p><p class="tab1"> z: 0
+ * </p><p> }
+ * </p>
+ * </div>
  * @param {!String} name
  * @param {Object} params
+ * @param {!string} params.parameterName name of the main parameter, who's value will be modified in the clip
+ * @param {!string} params.parameterName.subParameter a sub-parameter of the main parameter
+ * @param {number} [params.parameterName.subParameter.from] the starting value
+ * @param {!number} params.parameterName.subParameter.to the final value
  */
 export class AnimationClip extends EventEmitter {
     constructor(name, params) {

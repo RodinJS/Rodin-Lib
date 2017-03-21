@@ -104,7 +104,8 @@ h4 {
   font-size: 18px;
   margin: 1em 0 .2em;
   /*color: #4d4e53;*/
-  color: #4790d0;
+  /*color: #4790d0;*/
+  color:#ff4041;
 }
 
 h5, .container-overview .subsection-title {
@@ -126,6 +127,29 @@ tt, code, kbd, samp {
   background: #f4f4f4;
   padding: 1px 5px;
   border-radius: 5px;
+}
+.codeSample{
+  color: #ffffff !important;
+  line-height: 0.6em;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
+  font-size: 0.8em;
+  background-color: #272727;
+  padding: 1em;
+}
+.codeSample>.tab1{
+  margin-left: 20px;
+}
+.codeSample>.tab2{
+  margin-left: 40px;
+}
+.codeSample>.tab3{
+  margin-left: 60px;
+}
+.codeSample>.tab4{
+  margin-left: 80px;
+}
+.codeSample>.tab5{
+  margin-left: 100px;
 }
 
 .class-description {
@@ -329,6 +353,8 @@ footer {
 .description {
   margin-bottom: 1em;
   margin-top: 1em;
+  color: #ffffff;
+  font-style: italic;
 }
 
 .code-caption {
@@ -450,9 +476,11 @@ footer {
   margin-bottom: 0;
   padding-bottom: 0;
 }
-
-dl.param-type {
+dl.delimiter-border {
   border-bottom: 1px solid hsl(0, 0%, 87%);
+  margin-bottom: 10px;
+}
+dl.param-type {
   margin-bottom: 30px;
   padding-bottom: 30px;
 }
@@ -463,6 +491,11 @@ dl.param-type {
 
 .param-type dd {
   font-family: Consolas, Monaco, 'Andale Mono', monospace
+}
+
+.param-type {
+  color: hsl(200, 100%, 43%);
+  text-decoration: none;
 }
 
 .disabled {

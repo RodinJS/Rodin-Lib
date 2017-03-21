@@ -4,17 +4,19 @@ import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
 
 /**
- * DynamicText Class, used to create flat text objects with wrapping capability, parameters have the following structure:
+ * DynamicText Class (experimental), used to create flat text objects with wrapping capability, parameters have the following structure:
+ * <div class="codeSample">
  * <p>{</p>
- * <p>&nbsp; &nbsp;      text: string,</p>
- * <p>&nbsp; &nbsp;      width: number,</p>
- * <p>&nbsp; &nbsp;      color : hex,</p>
- * <p>&nbsp; &nbsp;      fontFamily : string,</p>
- * <p>&nbsp; &nbsp;      fontSize : number,</p>
- * <p>&nbsp; &nbsp;      lineHeight : number,</p>
- * <p>&nbsp; &nbsp;      transparent : boolean,</p>
- * <p>&nbsp; &nbsp;      ppm : number</p>
+ * <p class="tab1"> text: string,</p>
+ * <p class="tab1"> width: number,</p>
+ * <p class="tab1"> color : hex,</p>
+ * <p class="tab1"> fontFamily : string,</p>
+ * <p class="tab1"> fontSize : number,</p>
+ * <p class="tab1"> lineHeight : number,</p>
+ * <p class="tab1"> transparent : boolean,</p>
+ * <p class="tab1"> ppm : number</p>
  * <p>}</p>
+ * </div>
  *
  * ppm is the Pixel Per Meter resolution
  * @param {!Object}  - parameters
