@@ -11,3 +11,7 @@ export const addNoise = (...args) => {
     const noise = Math.random() * 2 * args.e - args.e;
     return args.n + noise;
 };
+
+export const randomIn = (from = 0, to = 0) => {
+    return Math.random() * (to - from) + from;
+};

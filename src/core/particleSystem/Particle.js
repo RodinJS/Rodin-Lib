@@ -1,5 +1,11 @@
 import {Sculpt} from '../sculpt';
+import {Time} from '../time';
 import {number, vector3} from '../utils';
+import * as CONST from '../constants';
+import {ErrorProtectedMethodCall} from '../error';
+
+function enforce() {
+}
 
 /**
  * set general parameters for each Particle
@@ -23,30 +29,36 @@ import {number, vector3} from '../utils';
  */
 
 export class Particle extends Sculpt {
-    constructor(material, lifetime, particleSize, startPositionRandomness) {
+    constructor(material, lifetime, particleSize, startPosition) {
 
         super(new THREE.Sprite(material));
 
-        this.bornTime = RODIN.Time.now;
+        this.bornTime = Time.now;
         this.lifetime = number.addNoise(lifetime.value, lifetime.randomness);
 
         particleSize.value = vector3.toVector3(particleSize.value);
-        startPositionRandomness.randomness = vector3.toVector3(startPositionRandomness.randomness);
+        startPosition.randomness = vector3.toVector3(startPosition.randomness);
 
         // set particle random size
-        this.scale.copy(number.addNoise(particleSize.value, particleSize.randomness));
+        this.scale.copy(vector3.addNoise(particleSize.value, particleSize.randomness));
 
         // set particle random position
-        let initial = new THREE.Vector3().copy(vector3.addNoise(new THREE.Vector3(0, 0, 0), startPositionRandomness.randomness));
+        let initial = new THREE.Vector3().copy(vector3.addNoise(new THREE.Vector3(0, 0, 0), startPosition.randomness));
         this.position.copy(initial);
         this.initialPosition = new THREE.Vector3().copy(initial);
+
+        this.on(CONST.UPDATE, () => {
+            this.update(enforce);
+        })
     }
 
-    update() {
-        // ...
+    update(e) {
+        if(e !== enforce) {
+            throw new ErrorProtectedMethodCall('update');
+        }
     }
 
     isDead() {
-        return RODIN.Time.now - this.bornTime > this.lifetime;
+        return Time.now - this.bornTime > this.lifetime;
     }
 }
