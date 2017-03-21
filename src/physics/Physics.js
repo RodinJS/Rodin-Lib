@@ -48,21 +48,8 @@ export class Physics {
             let i = this.rigidBodies.length;
             while (i--) {
                 if (!this.rigidBodies[i].sleeping) {
-
-
                     this.rigidBodies[i].target.globalPosition = oimoToThree(this.rigidBodies[i].position);
                     this.rigidBodies[i].target.globalQuaternion = oimoToThree(this.rigidBodies[i].getQuaternion());
-
-                    if (this.rigidBodies[i].target.name === 'box'){
-                        //console.log(this.rigidBodies[i].target._threeObject.scale);
-                        //if (this.rigidBodies[i].target._scale.x != 1)
-                        //{
-                            //console.log('collision');
-                            //console.log('scale',this.rigidBodies[i].target.globalScale.valueOf());
-                            //console.log('size',this.rigidBodies[i].target.rigidBody.body.size);
-                        //}
-
-                    }
                 }
             }
         }
@@ -71,6 +58,7 @@ export class Physics {
 
 }
 
+// TODO: teleport it to utils
 function oimoToThree(a) {
     switch (a.constructor) {
         case (new OIMO.Vec3()).constructor:

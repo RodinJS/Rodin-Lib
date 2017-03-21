@@ -37,7 +37,7 @@ export class RigidBody {
             type: getSculptType(this.sculpt), // type of shape : 'sphere', 'box', 'cylinder'
             scale: this.sculpt.globalScale, // size of shape
             position: this.sculpt.globalPosition, // start position in degree
-            rotation: this.sculpt.rotation, // start rotation in degree
+            rotation: this.sculpt.globalRotation, // start rotation in degree
             move: true, // dynamic or statique
             density: 1,
             friction: 0.2,
