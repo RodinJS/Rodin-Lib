@@ -2,6 +2,7 @@
 
 import * as CONST from './constants';
 import * as Buttons from './button';
+import * as utils from './utils';
 
 export * from './error';
 export * from './time';
@@ -16,10 +17,12 @@ export * from './video';
 export * from './rodinEvent';
 export * from './loader';
 export * from './plugin';
+export * from './particleSystem';
 
 export {
     CONST,
-    Buttons
+    Buttons,
+    utils
 };
 
 export let v = '0.0.2';
