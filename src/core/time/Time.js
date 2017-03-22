@@ -33,7 +33,7 @@ export class Time {
     }
 
     /**
-     * call this function on each render
+     * Call this function on each render. It resets the this.delta value
      */
     tick () {
         this.delta = this.now() - this.lastTeak;
@@ -49,7 +49,7 @@ export class Time {
 
     /**
      * This method will change delta and lastTeak parameters.
-     * Not available for user
+     * @private
      */
     static tick(e) {
         if(e !== enforce) {
@@ -60,7 +60,7 @@ export class Time {
 
     /**
      * Active scene current time in milliseconds.
-     * @returns {number}
+     * @type {number}
      */
     static get now() {
         return activeTime.now();
@@ -68,7 +68,7 @@ export class Time {
 
     /**
      * Milliseconds between current frame and last frame.
-     * @returns {number}
+     * @type {number}
      */
     static get delta() {
         return activeTime.delta
@@ -76,6 +76,7 @@ export class Time {
 
     /**
      * Change active scene time speed
+     * @type {number}
      */
     static set speed(value) {
         activeTime.speed = value;
@@ -84,16 +85,18 @@ export class Time {
 
     /**
      * Get active scene time speed
+     * @type {number}
      */
     static get speed() {
         return activeTime.speed;
     }
 
+    //TODO Gor es timestamp inch a ? mi hat nkaragri pliz
     /**
      * Set current frame timestamp.
-     * Not available for user
      * @param {function} e Enforce function
      * @param {number} timestamp current frame render timestamp.
+     * @private
      */
     static setCurrentFrameTimestamp(e, timestamp) {
         if(e !== enforce) {
@@ -105,7 +108,7 @@ export class Time {
 
     /**
      * Get current frame render timestamp.
-     * @returns {number}
+     * @type {number}
      */
     static get currentFrameTimestamp() {
         return activeTime.currentFrameTimestamp;

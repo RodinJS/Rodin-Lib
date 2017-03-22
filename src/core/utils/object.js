@@ -12,8 +12,14 @@ export const getId = (object) => {
 
     return object["__uid__"];
 };
-
-export const getProperty = (obj, prop) => {
+/**
+ *
+ * @param obj
+ * @param prop
+ * @returns {*}
+ */
+export const getProperty
+= (obj, prop) => {
     let props = prop.split('.');
     let tmp = obj;
 
@@ -28,6 +34,12 @@ export const getProperty = (obj, prop) => {
     return tmp;
 };
 
+/**
+ *
+ * @param obj
+ * @param prop
+ * @param val
+ */
 export const setProperty =  (obj, prop, val) => {
     let props = prop.split('.');
     let tmp = obj;

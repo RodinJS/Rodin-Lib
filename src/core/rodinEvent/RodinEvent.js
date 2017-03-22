@@ -1,7 +1,6 @@
 import {Time} from '../time';
 
 export class RodinEvent {
-    //TODO: we also need key value in params, for example for touch event on vive controller we need coordinates as well.
     /**
      * Event Class
      * @param {Sculpt} target

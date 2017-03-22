@@ -5,16 +5,17 @@ import {messenger} from '../messenger';
 import * as Buttons from '../button';
 
 /**
- * A controller class for describing HTC Vive controllers event handlers.
+ * A controller class for describing Oculus Rift Touch controllers event handlers.
  * @param {string} hand Required - "left" or "right".
- * @param {THREE.Scene} scene Required - the scene where the controller will be used.
- * @param {THREE.PerspectiveCamera} camera Required - the camera where the controller will be used.
- * @param {number} raycastLayers - the number of objects that can be reycasted by the same ray.
  */
 export class OculusTouchGamePad extends GamePad {
     constructor(hand) {
         super('oculus', hand, CONST.VR);
-
+        /**
+         * An array with Button objects.
+         * @type {Button[]}
+         */
+        this.buttons = [];
         if (hand === CONST.LEFT) {
             this.buttons = [Buttons.oculusTouchLeftThumbstick, Buttons.oculusTouchX, Buttons.oculusTouchY, Buttons.oculusTouchLeftGrip, Buttons.oculusTouchLeftTrigger];
         } else {
@@ -42,13 +43,17 @@ export class OculusTouchGamePad extends GamePad {
         this.standingMatrix = new THREE.Matrix4().setPosition(new THREE.Vector3(0, 1.6, 0));
     }
 
+    /**
+     * Returns true to indicate that this is an instance of OculusTouchGamePad.
+     * @returns {boolean} - true
+     */
     get isOculusTouchGamePad() {
         return true;
     }
 
     /**
      * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
-     * @returns [Object]
+     * @returns {Sculpt[]}
      */
     getIntersections() {
         const tempMatrix = new THREE.Matrix4().identity().extractRotation(this.sculpt.globalMatrix);
@@ -58,10 +63,11 @@ export class OculusTouchGamePad extends GamePad {
     }
 
     /**
-     * Set Controller model to our RODIN Oculus touch controller model.
+     * Set Controller model to Oculus touch controller model.
+     * @param {string} [url] - url to .obj model of the controller.
      */
-    initControllerModel() {
-        this.controllerModel = new Sculpt(`https://cdn.rodin.io/resources/models/OculusTouchController_v4/${this.hand}_oculus_controller.obj`);
+    initControllerModel(url = `https://cdn.rodin.io/resources/models/OculusTouchController_v4/${this.hand}_oculus_controller.obj`) {
+        this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
             this.controllerModel.parent = this.sculpt;
@@ -69,17 +75,23 @@ export class OculusTouchGamePad extends GamePad {
     }
 
     /**
-     * Init raycasting line. Create red line for controller direction
+     * Init raycasting line. Create a line for controller direction
+     *
+     * @param {number} [color=0xff0000]
      */
-    initRaycastingLine() {
+    initRaycastingLine(color = 0xff0000) {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(
             new THREE.Vector3(0, 0, 0),
             new THREE.Vector3(0, 0, -1)
         );
 
-        let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: 0xff0000}));
-        targetLine.geometry.vertices[1].z = -10000;
+        let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: color}));
+        targetLine.geometry.vertices[1].z = -1000;
+        /**
+         * The raycasting line Sculpt.
+         * @type {Sculpt}
+         */
         this.raycastingLine = new Sculpt(targetLine);
 
         this.raycastingLine.on(CONST.READY, () => {

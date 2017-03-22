@@ -24,6 +24,7 @@ import {utils3D} from '../../utils';
  * <p class="tab1"> },</p>
  * <p class="tab1"> label: {</p>
  * <p class="tab2"> text: string,</p>
+ * <p class="tab2"> position: { v: number, h: number },</p>
  * <p class="tab2"> fontFamily: string,</p>
  * <p class="tab2"> fontSize: number,</p>
  * <p class="tab2"> opacity: number,</p>

@@ -658,11 +658,11 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Install a plugin to this object.
-     *
+     *<p>See also <a href="Plugin.html">Plugin</a> and <a href="AnimationPlugin.html">AnimationPlugin</a> </p>
      * @param plugin
      * @param args
      */
-    //TODO Gor jan mi hat nkaragri es
+
     install(plugin, ...args) {
         if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
             throw new ErrorPluginAlreadyInstalled(plugin);

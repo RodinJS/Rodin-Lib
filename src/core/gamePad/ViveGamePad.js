@@ -4,20 +4,18 @@ import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
 
-function enforce() {
-}
-
 /**
  * A controller class for describing HTC Vive controllers event handlers.
  * @param {string} hand Required - "left" or "right".
- * @param {THREE.Scene} scene Required - the scene where the controller will be used.
- * @param {THREE.PerspectiveCamera} camera Required - the camera where the controller will be used.
- * @param {number} raycastLayers - the number of objects that can be reycasted by the same ray.
  */
 export class ViveController extends GamePad {
     constructor(hand) {
         super('openvr', hand, CONST.VR);
-
+        /**
+         * An array with Button objects.
+         * @type {Button[]}
+         */
+        this.buttons = [];
         if (hand === CONST.LEFT) {
             this.buttons = [Buttons.viveLeftTrackpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
         } else {
@@ -36,7 +34,7 @@ export class ViveController extends GamePad {
 
     /**
      * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
-     * @returns [Object]
+     * @returns {Sculpt[]}
      */
     getIntersections() {
         const tempMatrix = new THREE.Matrix4().identity().extractRotation(this.sculpt.globalMatrix);
@@ -46,10 +44,11 @@ export class ViveController extends GamePad {
     }
 
     /**
-     * Set Controller model to our RODIN Vive controller model.
+     * Set Controller model to HTC Vive controller model.
+     * @param {string} [url] - url to .obj model of the controller.
      */
-    initControllerModel() {
-        this.controllerModel = new Sculpt('https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj');
+    initControllerModel(url = 'https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj') {
+        this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
             this.controllerModel.parent = this.sculpt;
@@ -57,17 +56,23 @@ export class ViveController extends GamePad {
     }
 
     /**
-     * Init raycasting line. Create red line for controller direction
+     * Init raycasting line. Create a line for controller direction
+     *
+     * @param {number} [color=0xff0000]
      */
-    initRaycastingLine() {
+    initRaycastingLine(color = 0xff0000) {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(
             new THREE.Vector3(0, 0, 0),
             new THREE.Vector3(0, 0, -1)
         );
 
-        let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: 0xff0000}));
-        targetLine.geometry.vertices[1].z = -10000;
+        let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: color}));
+        targetLine.geometry.vertices[1].z = -1000;
+        /**
+         * The raycasting line Sculpt.
+         * @type {Sculpt}
+         */
         this.raycastingLine = new Sculpt(targetLine);
         this.raycastingLine.gamepadVisible = false;
         this.raycastingLine.parent = this.sculpt;

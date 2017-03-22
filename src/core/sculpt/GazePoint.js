@@ -20,7 +20,15 @@ export class GazePoint {
             sculpt.on('ready', () => {
                 sculpt._threeObject.renderOrder = 10000;
             });
+            /**
+             * The default distance from the camera, when not intersected with any object.
+             * @type {number}
+             */
             this.defaultDistance = 3;
+            /**
+             * Set to any value >0 to keep it on that fixed distance all the time.
+             * @type {number}
+             */
             this.fixedDistance = 0;
         }
 
