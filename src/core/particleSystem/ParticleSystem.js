@@ -4,6 +4,7 @@ import {Time} from '../time';
 import {number, vector3, object} from '../utils';
 import {ErrorProtectedMethodCall} from '../error';
 import * as CONST from '../constants';
+import {Loader} from '../loader';
 
 const enforce = function () {
 };
@@ -69,11 +70,9 @@ export class ParticleSystem extends Sculpt {
         //     lifetime: {value: 3000, randomness: 100}
         // }, params);
 
-        if (params && (!params.particlesMaterial || Object.keys(params.particlesMaterial).length === 0)) {
-            const loader = new THREE.TextureLoader();
-            loader.setCrossOrigin('anonymous');
+        if (params && !params.particlesMaterial) {
             params.particlesMaterial = new THREE.SpriteMaterial({
-                map: loader.load('https://cdn.rodin.io/resources/img/particleSystem/particle_default_map.png'),
+                map: Loader.loadTexture('https://cdn.rodin.io/resources/img/particleSystem/particle_default_map.png'),
             });
         }
 
