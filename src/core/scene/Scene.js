@@ -278,14 +278,24 @@ export class Scene extends EventEmitter {
         // Update VR headset position and apply to camera.
         Scene.active._controls.update();
 
-        preRenderFunctions.map(fn => fn());
-        Scene.active._preRenderFunctions.map(fn => fn());
+        // call all prerender functions
+        for(let i = 0; i < preRenderFunctions.length; i ++) {
+            preRenderFunctions[i]();
+        }
 
-        Scene.active.children.map(child => {
+        // call all scene specific prerender functions
+        for(let i = 0; i < Scene.active._preRenderFunctions.length; i ++) {
+            Scene.active._preRenderFunctions[i]();
+        }
+
+        // emit update for all childs
+        for(let i = 0; i < Scene.active.children.length; i ++) {
+            const child = Scene.active.children[i];
+
             if(child.isReady) {
                 child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
-        });
+        }
         //TODO: camera needs to be a sculpt object, to avoid sh*t like this
         Scene.active._camera.children.map(child => {
             if(child.Sculpt && child.Sculpt.isReady) {
@@ -294,9 +304,17 @@ export class Scene extends EventEmitter {
         });
 
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
-        Scene.active._postRenderFunctions.map(fn => fn());
         messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
-        postRenderFunctions.map(fn => fn());
+
+        // call all scene specific postrender functions
+        for(let i = 0; i < Scene.active._postRenderFunctions.length; i ++) {
+            Scene.active._postRenderFunctions[i]();
+        }
+
+        // call all postrender functions
+        for(let i = 0; i < postRenderFunctions.length; i ++) {
+            postRenderFunctions[i]();
+        }
 
         Scene.requestFrame(enforce);
 
