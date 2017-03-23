@@ -5,7 +5,7 @@ import * as CONST from '../constants';
 import * as Buttons from '../button';
 
 /**
- * Plyfiled mouse gamepad class, for MouseGamepad, by default the navigator does not see mouse as a gamepad device.
+ * Polyfilled mouse gamepad class, for MouseGamepad, by default the navigator does not see mouse as a gamepad device.
  */
 class MouseNavigatorGamePad {
     /**
@@ -159,17 +159,22 @@ class MouseNavigatorGamePad {
         document.body.addEventListener('wheel', scroll, false);
     }
 }
-
+/**
+* Mouse Gamepad class, overrides buttons and intersecting method.
+*/
 export class MouseGamePad extends GamePad {
     constructor() {
         super('mouse', null, CONST.NON_VR);
-
+        /**
+         * Mouse Buttons array
+         * @type {Button[]}
+         */
         this.buttons = [Buttons.mouseLeft, Buttons.mouseWheel, Buttons.mouseRight];
     }
 
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are under mouse pointer.
-     * @returns [Object]
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are positioned under mouse pointer.
+     * @returns {Sculpt[]}
      */
     getIntersections() {
         // todo: use our custom camera later

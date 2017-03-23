@@ -1,14 +1,6 @@
 import {Sculpt} from './Sculpt';
 import {AScheme} from '../utils';
 
-/**
- * Simple Box
- * @param width {number} box width
- * @param height {number} box height
- * @param depth {number} box depth
- * @param material {THREE.Material}
- */
-
 const constructorScheme = {
     radiusTop: AScheme.number().default(.1),
     radiusBottom: AScheme.number().default('$radiusTop'),
@@ -20,6 +12,15 @@ const constructorScheme = {
     thetaLength: AScheme.number().default(2 * Math.PI),
     material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
 };
+
+/**
+ * Simple Box
+ * @param width {number} box width
+ * @param height {number} box height
+ * @param depth {number} box depth
+ * @param material {THREE.Material}
+ */
+
 
 export class Cylinder extends Sculpt {
     constructor(...args) {

@@ -1,16 +1,19 @@
 /**
- * EventEmitter
- * Extend from this class in order to add
+ * EventEmitter extend from this class in order to add
  * event emitter functionality like
  * emit, addEventListener, on, once
  */
 export class EventEmitter {
     constructor() {
+        /**
+         * event handlers map, with eventNames as keys, and handler functions Arrays as values {"update" : [func1, func2]}
+         * @type {Object}
+         */
         this.events = {};
     }
 
     /**
-     * Add listener to Event.
+     * Add listener(s) to Event(s).
      * @param {string[]|string} eventNames - event name(s)
      * @param {function} callback - callback function
      */
@@ -28,7 +31,7 @@ export class EventEmitter {
     }
 
     /**
-     * Add listener to Event
+     * Add listener(s) to Event(s). Alias to addEventListener()
      * @param {string[]|string} eventNames - event name(s)
      * @param {function} callback - callback function
      */
@@ -37,8 +40,8 @@ export class EventEmitter {
     }
 
     /**
-     * Adds listener to Event which only needs to be called once
-     * It will be called only the first time event is fired
+     * Adds listener(s) to Event(s) which only need to be called once.
+     * It will be called only the first time event is fired.
      * @param {string[]|string} eventNames - event name(s)
      * @param {function} callback - callback function
      */
@@ -52,7 +55,7 @@ export class EventEmitter {
     }
 
     /**
-     * Removes specific listener from Event
+     * Removes specific listener from Event.
      * @param {string} eventName - event name
      * @param {function} callback - callback function
      *
@@ -68,7 +71,7 @@ export class EventEmitter {
     }
 
     /**
-     * Emits Event with params
+     * Emits Event with params.
      * @param {String} eventName
      * @param {RodinEvent} rodinEvent - a custom Event object
      * @param {Array} args - arguments to be passed to the event callback

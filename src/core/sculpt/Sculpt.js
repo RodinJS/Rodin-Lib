@@ -10,7 +10,6 @@ import {Loader} from '../loader';
 function enforce() {
 }
 
-
 function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     switch (true) {
         case args.isSculpt:
@@ -21,11 +20,6 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
         case args.isObject3D:
             //if we get a three object 3D
             //use it as our base
-            /*if(args.material && args.material.map === null){
-             args.material.map = texture;
-             texture.needsUpdate = true;
-             args.material.needsUpdate = true;
-             }*/
             args = {threeObject: args};
             break;
         case typeof args === 'string':
@@ -41,10 +35,11 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
         sculpt: undefined
     }, args);
 }
-
 /**
  * Sculpt is a base class for a 3d object in Rodin Lib,
  * Any 3d object should be either a direct Sculpt, or extended from Sculpt
+ * @param {Sculpt|string|THREE.Object3D} args
+ * @param {boolean} [deferReadyEvent=false]
  */
 export class Sculpt extends EventEmitter {
     constructor(args, deferReadyEvent) {
@@ -54,14 +49,14 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Three object
-         * @type {null}
+         * @type {THREE.Object3D}
          * @private
          */
         this._threeObject = null;
 
         /**
          * Parent Sculpt
-         * @type {null}
+         * @type {Sculpt}
          * @private
          */
         this._parent = null;
@@ -82,6 +77,7 @@ export class Sculpt extends EventEmitter {
 
         /**
          * name
+         * @type {string}
          */
         this.name = args.name;
 
@@ -89,6 +85,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Position
+         * @type {WrappedVector3}
+         * @private
          */
         this._position = new WrappedVector3();
         this._position.onChange((position) => {
@@ -97,6 +95,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Rotation
+         * @type {WrappedEuler}
+         * @private
          */
         this._rotation = new WrappedEuler();
         this._rotation.onChange((rotation) => {
@@ -105,6 +105,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Quaternion
+         * @type {WrappedQuaternion}
+         * @private
          */
         this._quaternion = new WrappedQuaternion();
         this._quaternion.onChange((quaternion) => {
@@ -113,6 +115,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Scale
+         * @type {WrappedVector3}
+         * @private
          */
         this._scale = new WrappedVector3();
         this._scale.onChange((scale) => {
@@ -121,6 +125,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Global Position
+         * @type {WrappedVector3}
+         * @private
          */
         this._globalPosition = new WrappedVector3();
         this._globalPosition.onChange((globalPosition) => {
@@ -129,6 +135,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Global Rotation
+         * @type {WrappedEuler}
+         * @private
          */
         this._globalRotation = new WrappedEuler();
         this._globalRotation.onChange((rotation) => {
@@ -137,6 +145,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Global Quaternion
+         * @type {WrappedQuaternion}
+         * @private
          */
         this._globalQuaternion = new WrappedQuaternion();
         this._globalQuaternion.onChange((quaternion) => {
@@ -145,6 +155,8 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Global Scale
+         * @type {WrappedVector3}
+         * @private
          */
         this._globalScale = new WrappedVector3();
         this._globalScale.onChange((globalScale) => {
@@ -210,28 +222,36 @@ export class Sculpt extends EventEmitter {
 		this.install(AnimationPlugin);
 	}
 
-    emitReady = () => {
+    /**
+     * Emit ready event, used when this event needs to be emitted manually (deferReadyEvent).
+     * For example, when a class extended from Sculpt, builds an object in constructor,
+     * and needs to emit ready event, only after the constructor has finished it's job.
+     * @return {boolean}
+     */
+    emitReady() {
         this.emitAsync(CONST.READY, new RodinEvent(this));
     };
 
     /**
-     * gets visibility of object
+     * Gets visibility of the object
+     * @type {boolean}
      */
     get visible() {
         return this._threeObject.visible;
     }
 
     /**
-     * set visibility of object
+     * Sets visibility of the object
+     * @type {boolean}
      */
     set visible(value) {
         this._threeObject.visible = value;
     }
 
     /**
-     * gets global visibility of sculpt
-     * returns false, if one of parents is invisible, otherwise returns true
-     * @return {boolean}
+     * Gets the global visibility of sculpt.
+     * Returns false, if one of parents is invisible, otherwise returns true.
+     * @type {boolean}
      */
     get globalVisible() {
         if (!this.visible) return false;
@@ -242,30 +262,32 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * to check if an object is of sculpt type
-     * @returns {boolean} true
+     * Checks if this object is of sculpt type.
+     * @type {boolean}
      */
     get isSculpt() {
         return true;
     }
 
     /**
-     * to check if our sculpt is ready
-     * @returns {boolean}
+     * Checks if this sculpt object is ready.
+     * @type {boolean}
      */
     get isReady() {
         return this._ready
     }
 
     /**
-     * gets our parent
+     * Gets this object's parent.
+     * @type {Sculpt|null}
      */
     get parent() {
         return this._parent;
     }
 
     /**
-     * Set new parent
+     * Sets new parent for this object.
+     * @type {Sculpt|null}
      */
     set parent(parent) {
         if (parent === null) {
@@ -288,8 +310,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the position of our object with respect to its parent (local)
-     * @param position {THREE.Vector3}
+     * Sets the position of this object relative to it's parent (local).
+     * @type {THREE.Vector3}
      */
     set position(position) {
         this._threeObject.position.copy(position);
@@ -297,24 +319,23 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Check if this sculpt is gamepadVisible
-     * @return {boolean}
+     * Checks if this sculpt is visible for gamepads.
+     * @type {boolean}
      */
     get gamepadVisible() {
         return this._gamepadVisible;
     }
 
     /**
-     * Sets if this sculpt gamepadVisible or not gamepadVisible
-     * @param value {boolean}
+     * Sets this sculpt visible/invisible for gamepads.
+     * @type {boolean}
      */
     set gamepadVisible(value) {
         this._gamepadVisible = !!value;
     }
-
     /**
-     * Gets the position of our object with respect to its parent (local)
-     * @return {THREE.Vector3}
+     * Gets the position of this object relative to it's parent (local)
+     * @type {THREE.Vector3}
      */
     get position() {
         // not sure if we should copy threeObject.position to our position
@@ -324,8 +345,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the rotation of our object with respect to its parent (local)
-     * @param rotation {THREE.Vector3}
+     * Sets the rotation of this object relative to it's parent (local)
+     * @type {THREE.Vector3}
      */
     set rotation(rotation) {
         this._threeObject.rotation.copy(rotation);
@@ -333,8 +354,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the rotation of our object with respect to its parent (local)
-     * @return {THREE.Vector3}
+     * Gets the rotation of this object relative to it's parent (local)
+     * @type {THREE.Vector3}
      */
     get rotation() {
         this._rotation.silentCopy(this._threeObject.rotation);
@@ -342,8 +363,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the quaternion of our object with respect to its parent (local)
-     * @param quaternion {THREE.Quaternion}
+     * Sets the quaternion of this object relative to it's parent (local)
+     * @type {THREE.Quaternion}
      */
     set quaternion(quaternion) {
         this._threeObject.quaternion.copy(quaternion);
@@ -351,8 +372,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the quaternion of our object with respect to its parent (local)
-     * @return {THREE.Quaternion}
+     * Get the quaternion of this object relative to it's parent (local)
+     * @type {THREE.Quaternion}
      */
     get quaternion() {
         this._quaternion.silentCopy(this._threeObject.quaternion);
@@ -360,8 +381,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the scale of our object
-     * @param scale {THREE.Vector3}
+     * Sets the scale of this object
+     * @type {THREE.Vector3}
      */
     set scale(scale) {
         this._threeObject.scale.copy(scale);
@@ -369,16 +390,16 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the scale of our object
-     * @return {THREE.Vector3}
+     * Gets the scale of this object
+     * @type {THREE.Vector3}
      */
     get scale() {
         return this._scale;
     }
 
     /**
-     * Sets the position of our object with respect to scene (global)
-     * @param position {THREE.Vector3}
+     * Sets the position of this object relative to the scene (global)
+     * @type {THREE.Vector3}
      */
     set globalPosition(position) {
         const initialPosition = new THREE.Vector3();
@@ -395,8 +416,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the position of our object with respect to scene (global)
-     * @return {THREE.Vector3}
+     * Gets the position of this object relative to the scene (global)
+     * @type {THREE.Vector3}
      */
     get globalPosition() {
         // global get ers are very slow right now,
@@ -414,8 +435,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the rotation of our object with respect to scene (global)
-     * @param rotation {THREE.Euler}
+     * Sets the rotation of this object relative to the scene (global)
+     * @type {THREE.Euler}
      */
     set globalRotation(rotation) {
         const initialPosition = new THREE.Vector3();
@@ -430,8 +451,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the scale of our object with respect to scene (global)
-     * @return {THREE.Euler}
+     * Gets the rotation of this object relative to the scene (global)
+     * @type {THREE.Euler}
      */
     get globalRotation() {
         const initialPosition = new THREE.Vector3();
@@ -445,8 +466,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the quaternion of our object with respect to scene (global)
-     * @param quaternion {THREE.Quaternion}
+     * Sets the quaternion of this object relative to the scene (global)
+     * @type {THREE.Quaternion}
      */
     set globalQuaternion(quaternion) {
         const initialPosition = new THREE.Vector3();
@@ -460,8 +481,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the quaternion of our object with respect to scene (global)
-     * @return {THREE.Quaternion}
+     * Gets the quaternion of this object relative to the scene (global)
+     * @type {THREE.Quaternion}
      */
     get globalQuaternion() {
         const initialPosition = new THREE.Vector3();
@@ -475,8 +496,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the scale of our object with respect to scene (global)
-     * @param scale {THREE.Vector3}
+     * Sets the scale of this object relative to the scene (global)
+     * @type{THREE.Vector3}
      */
     set globalScale(scale) {
         const initialPosition = new THREE.Vector3();
@@ -490,8 +511,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the scale of our object with respect to scene (global)
-     * @return {THREE.Vector3}
+     * Gets the scale of this object relative to the scene (global)
+     * @type {THREE.Vector3}
      */
     get globalScale() {
         const initialPosition = new THREE.Vector3();
@@ -504,8 +525,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Sets the matrix of out object with respect to its parent (local)
-     * @param matrix {THREE.Matrix4}
+     * Sets the matrix of out object relative to it's parent (local)
+     * @type {THREE.Matrix4}
      */
     set matrix(matrix) {
         /*if(this._threeObject.scale.x != 1){
@@ -517,8 +538,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the matrix of our object with respect to its parent (local)
-     * @return {THREE.Matrix4} [recursive=true]
+     * Gets the matrix of this object relative to it's parent (local)
+     * @type {THREE.Matrix4}
      */
     get matrix() {
         //this._threeObject.updateMatrix(true);
@@ -526,9 +547,9 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Set the matrix of out object with respect to the scene it is in (global)
-     * if our object doesn't have a parent same as .matrix
-     * @param matrix {THREE.Matrix4}
+     * Sets the matrix of this object relative to the scene (global)
+     * if our object doesn't have a parent, this function is equivalent to .matrix setter
+     * @type {THREE.Matrix4}
      */
     set globalMatrix(matrix) {
         if (!this.parent) {
@@ -550,21 +571,25 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Gets the matrix of our object with respect to the scene it is in (global)
-     * if our object doesn't have a parent same as .matrix
-     * @return {THREE.Matrix4}
+     * Gets the matrix of this object relative to the scene (global)
+     * if this object doesn't have a parent, this function is equivalent to .matrix getter
+     * @type {THREE.Matrix4}
      */
     get globalMatrix() {
         this._threeObject.updateMatrixWorld(true);
         return this._threeObject.matrixWorld;
     }
 
+    /**
+     * Gets the Set of this object's children.
+     * @type {Set.<Sculpt>}
+     */
 	get children() {
 		return this._children;
 	}
 
 	/**
-	 * Copies obj into our object
+	 * Copies given object's parameters into this object
 	 * @param {Sculpt} sculpt
 	 * @param {boolean} [recursive=true]
 	 */
@@ -586,7 +611,7 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Creates a new sculpt object that is a clone of our object
+     * Creates a new sculpt object that is a clone of this object
      * @param {boolean} [recursive=true]
      */
     clone(recursive = true) {
@@ -594,9 +619,9 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Add object(s) to this object.
-     * Call with multiple arguments of Sculpt objects
-     * Not available for user
+     * Adds object(s) to this object.
+     * Call with one or more arguments of Sculpt type
+     * @private
      */
     add(e) {
         if (e !== enforce) {
@@ -634,8 +659,14 @@ export class Sculpt extends EventEmitter {
         }
     }
 
+    /**
+     * Install a plugin to this object.
+     *<p>See also <a href="Plugin.html">Plugin</a> and <a href="AnimationPlugin.html">AnimationPlugin</a> </p>
+     * @param plugin
+     * @param args
+     */
+
     install(plugin, ...args) {
-        let found = false;
         if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
             throw new ErrorPluginAlreadyInstalled(plugin);
         }
@@ -646,8 +677,8 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * Remove object(s) from
-     * Call with multiple arguments of Sculpt objects
+     * Removes object(s) from
+     * Call with one or more arguments of Sculpt type
      * Not available for user
      */
     remove(e) {
@@ -674,7 +705,7 @@ export class Sculpt extends EventEmitter {
     /**
      * Syncs sculpts parameters with _threeObject parameters
      * call this in case you modify _threeObject
-     * Note. this does not work if you added or removed children from _threeObject
+     * Note. this does not apply to the children of the _threeObject
      */
     _syncWithThree() {
         this._position.silentCopy(this._threeObject.position);

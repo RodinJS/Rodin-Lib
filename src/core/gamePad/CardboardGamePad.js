@@ -8,7 +8,7 @@ import {GazePoint} from '../sculpt/GazePoint';
 import {Scene} from '../scene';
 
 /**
- * Custom (virtual) gamepad class, for CardboardController.
+ * Custom (virtual) navigator gamepad class, for CardboardController.
  */
 export class CardboardNavigatorGamePad {
 
@@ -84,15 +84,11 @@ export class CardboardNavigatorGamePad {
 }
 
 /**
- * A controller class for describing event handlers for cardboard use.
- * @param {THREE.Scene} scene - the scene where the controller will be used.
- * @param {THREE.PerspectiveCamera} camera - the camera where the controller will be used.
+ * A controller class for describing event handlers for cardboard use. Transfers the mobile screen touch event to the raycasted (gaze point) object.
  */
 export class CardboardGamePad extends GamePad {
     constructor() {
         super("cardboard", null, CONST.VR);
-        // this.vrOnly = true;
-
         this.buttons = [Buttons.cardboardTrigger];
         let gp = new GazePoint();
         gp.Sculpt.on("ready", () => {
@@ -103,7 +99,7 @@ export class CardboardGamePad extends GamePad {
 
     /**
      * Set GazePoint
-     * @param {GazePoint} gazePoint object to add
+     * @param {THREE.Object3D} gazePoint object to add
      */
     setGazePoint(gazePoint) {
         gazePoint.controller = this;
@@ -113,6 +109,9 @@ export class CardboardGamePad extends GamePad {
         }
     }
 
+    /**
+     * Enables Cardboard controller, adds the gaze point object to the camera if set.
+     */
     enable() {
         super.enable();
         if(this.gazePoint){
@@ -122,6 +121,9 @@ export class CardboardGamePad extends GamePad {
         }
     }
 
+    /**
+     * Disables Cardboard controller, removes the gaze point object from the camera if set.
+     */
     disable() {
         super.disable();
         if(this.gazePoint){
@@ -131,8 +133,8 @@ export class CardboardGamePad extends GamePad {
         }
     }
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are in camera's center.
-     * @returns {Object[]}
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are in camera's center (gaze point).
+     * @returns {Sculpt[]}
      */
     getIntersections() {
         // todo: use our custom camera later

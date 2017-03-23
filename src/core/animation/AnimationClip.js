@@ -10,10 +10,28 @@ function enforce() {
 }
 
 /**
- * AnimationClip
- * Represents a single animation, should be used with Animation
+ * AnimationClip class.
+ * Represents a single animation, should be used with Animation.
+ * <p>
+ *     Parameters that need to be changed, must be described in the following pattern sample:
+ * </p>
+ * <div class="codeSample">
+ * <p> rotation: {
+ * </p><p class="tab1"> x: 0,
+ * </p><p class="tab1"> y: {
+ * </p><p class="tab2"> from: -Math.PI / 2,
+ * </p><p class="tab2"> to: Math.PI / 2
+ * </p><p class="tab1"> },
+ * </p><p class="tab1"> z: 0
+ * </p><p> }
+ * </p>
+ * </div>
  * @param {!String} name
  * @param {Object} params
+ * @param {!string} params.parameterName name of the main parameter, who's value will be modified in the clip
+ * @param {!string} params.parameterName.subParameter a sub-parameter of the main parameter
+ * @param {number} [params.parameterName.subParameter.from] the starting value
+ * @param {!number} params.parameterName.subParameter.to the final value
  */
 export class AnimationClip extends EventEmitter {
     constructor(name, params) {
@@ -53,8 +71,7 @@ export class AnimationClip extends EventEmitter {
 
 
     /**
-     * Gets a new AnimationClip object with same
-     * content as this
+     * Gets a new AnimationClip object cloned from this.
      * @returns {AnimationClip}
      */
     clone() {
@@ -64,8 +81,8 @@ export class AnimationClip extends EventEmitter {
 
 
     /**
-     * Starts this AnimationClip
-     * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
+     * Starts this AnimationClip.
+     * @param {boolean} [forceStart=false] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
     start(forceStart = false) {
@@ -120,7 +137,7 @@ export class AnimationClip extends EventEmitter {
     }
 
     /**
-     * Plays AnimationClip
+     * Plays AnimationClip - an alias to start();
      * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
@@ -171,7 +188,7 @@ export class AnimationClip extends EventEmitter {
     /**
      * set/get loop
      * <p>Sets loop value if provided as param, otherwise returns current loop value</p>
-     * @param [loop]
+     * @param [loop=null]
      * @returns {AnimationClip}
      */
     loop(loop = null) {
@@ -185,8 +202,8 @@ export class AnimationClip extends EventEmitter {
 
     /**
      * set/get duration
-     * <p>Sets duration value if provided as param, otherwise returns current duration value</p>
-     * @param {number} [duration]
+     * <p>Sets duration value if provided as param, otherwise returns current duration value.</p>
+     * @param {number} [duration=null] clip duration in milliseconds
      * @returns {AnimationClip}
      */
     duration(duration = null) {
@@ -200,8 +217,8 @@ export class AnimationClip extends EventEmitter {
 
     /**
      * set/get delay.
-     * <p>Sets delay value if provided as param, otherwise returns current delay value</p>
-     * @param {number} [delay]
+     * <p>Sets delay value if provided as param, otherwise returns current delay value.</p>
+     * @param {number} [delay=null] start delay in milliseconds
      * @returns {AnimationClip}
      */
     delay(delay = null) {
@@ -246,6 +263,7 @@ export class AnimationClip extends EventEmitter {
      * @param {Object} params
      * @param {Sculpt} obj
      * @returns {Object} normalized params
+     * @private
      */
     static normalizeParams(e, params, obj) {
         if (e !== enforce) {

@@ -1,7 +1,7 @@
 import {EventEmitter} from '../eventEmitter';
 /**
- * Base class for plugins
- * Extend plugin types from this
+ * Base class for plugins.
+ * Extend plugin types from this class.
  */
 export class Plugin extends EventEmitter {
     constructor() {

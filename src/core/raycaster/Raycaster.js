@@ -12,8 +12,7 @@ let allChildren = (obj) => {
 
 
 /**
- * Class Raycaster, just an easier way to use THREE.JS raycasting
- * @param {!THREE.Scene} _scene - the scene where the raycasting happens
+ * Raycaster, just an easier way to use THREE.JS raycasting
  */
 export class Raycaster extends THREE.Raycaster {
     constructor() {
@@ -22,9 +21,10 @@ export class Raycaster extends THREE.Raycaster {
 
     /**
      * Raycast
-     * @returns [Sculpt] all raycasted objects from the gamepadVisibles array, that ar appended to the scene (directly or not).
+     * @param {number} [depth = Infinity] the raycasting layers depth
+     * @returns {Sculpt[]} all raycasted objects from the gamepadVisibles array, that are children of the scene (directly or not).
      */
-    raycast(depth) {
+    raycast(depth = Infinity) {
         let ret = [];
         // todo: implement gamepadVisibles logic with messenger
         let intersects = this.intersectObjects(allChildren(Scene.active));

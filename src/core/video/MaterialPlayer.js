@@ -169,7 +169,7 @@ export class MaterialPlayer {
         };
 
         this.update = (delta) => {
-            if (Time.speed  * speed !== video.playbackRate) {
+/*            if (Time.speed  * speed !== video.playbackRate) {
                 video.playbackRate = Time.speed * speed;
             }
 
@@ -177,7 +177,7 @@ export class MaterialPlayer {
             if (currDelta < frameDuration) {
                 return;
             }
-            currDelta -= frameDuration;
+            currDelta -= frameDuration;*/
 
 
             if (bufferCounter == 0 && !this.isBuffering && this.isPlaying()) {
@@ -229,12 +229,12 @@ export class MaterialPlayer {
         let _rodinVideoTrigger = function (e) {
             video.play();
             video.pause();
-            window.removeEventListener("touchstart", _rodinVideoTrigger);
-            window.removeEventListener("mousedown", _rodinVideoTrigger);
+            window.removeEventListener("touchend", _rodinVideoTrigger);
+            window.removeEventListener("click", _rodinVideoTrigger);
         };
 
-        window.addEventListener("touchstart", _rodinVideoTrigger);
-        window.addEventListener("mousedown", _rodinVideoTrigger);
+        window.addEventListener("touchend", _rodinVideoTrigger);
+        window.addEventListener("click", _rodinVideoTrigger);
 
     }
 }

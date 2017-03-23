@@ -53,9 +53,7 @@ export class Physics {
                 }
             }
         }
-
     }
-
 }
 
 // TODO: teleport it to utils

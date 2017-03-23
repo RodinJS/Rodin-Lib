@@ -23,9 +23,9 @@ messenger.on(CONST.RENDER_START, () => {
 
 /**
  * General GamePad class, custom gamepads should extend this class.
- * @param {string} [navigatorGamePadId] - custom ID for the gamepad instance.
- * @param {string} [hand] - gamepad hand (left/right).
- * @param {string} [type] - VR or NON-VR
+ * @param {string} [navigatorGamePadId] - custom ID for the gamepad instance in navigator.
+ * @param {string} [hand] - gamepad holding hand (left/right).
+ * @param {string} [type] - VR, NON-VR or both
  */
 export class GamePad extends EventEmitter {
     constructor(navigatorGamePadId = "", hand = null, type = CONST.BOTH) {
@@ -61,13 +61,16 @@ export class GamePad extends EventEmitter {
          */
         this.navigatorGamePad = null;
 
-        //todo: Why we need this ?
-        //todo: Because user may want to raycast on object or 3 in one line. The number of objects that can be reycasted by the same ray.
+        /**
+         * Indicates how many objects can be raycasted by this gamepad in a row.
+         * @type {Number}
+         * @default
+         */
         this.raycastLayers = Infinity;
 
         /**
          * Objects currently intersected by this gamepad.
-         * @type {Set}
+         * @type {Set.<Sculpt>}
          */
         this.intersected = new Set();
         /**
@@ -77,11 +80,11 @@ export class GamePad extends EventEmitter {
         this.raycaster = new Raycaster();
         /**
          * Buttons array from current navigatorGamePad.
-         * @type {Array}
+         * @type {Button[]}
          */
         this.buttons = [];
         /**
-         * The gamePad mesh model in the scene.
+         * The gamePad mesh model (if any) in the scene.
          * @type {Sculpt}
          */
         this.sculpt = new Sculpt();
@@ -154,7 +157,7 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * get controller from navigator
+     * Get controller from navigator
      * @param {string} id
      * @param {string} hand
      * @returns {Object} controller or null
@@ -226,7 +229,7 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * Checks all intersect and emits hover and hoverOut events.
+     * Checks all intersected objects and emits hover and hoverOut events.
      */
     intersectObjects() {
         if (!this.getIntersections) {
@@ -274,7 +277,7 @@ export class GamePad extends EventEmitter {
         this.intersected = [...intersections];
     }
     /**
-     * Update controller object in scene, update position and rotation.
+     * Updates controller object in scene, updates position and rotation.
      */
     updateObject() {
         let pose = this.navigatorGamePad.pose;
@@ -289,6 +292,15 @@ export class GamePad extends EventEmitter {
         this.sculpt._threeObject.matrixWorldNeedsUpdate = true;
     }
 
+    /**
+     * Emits the given event for all provided objects til the last one, or til the one that stops the propagation.
+     * @param e
+     * @param objects
+     * @param eventName
+     * @param DOMEvent
+     * @param button
+     * @private
+     */
     emitAll(e, objects, eventName, DOMEvent, button) {
         if (e !== enforce) {
             // todo: change this
@@ -309,12 +321,19 @@ export class GamePad extends EventEmitter {
         } while (currentEvent.propagation && i < objects.length);
     }
 
+    /**
+     * Emits the given event for all intersected objects til the last one, or til the one that stops the propagation.
+     * @param e
+     * @param eventName
+     * @param DOMEvent
+     * @param button
+     */
     emitIntersected(e, eventName, DOMEvent, button) {
         this.emitAll(e, this.intersected, eventName, DOMEvent, button)
     }
 
     /**
-     * The keyDown function emitter.
+     * Emits the  CONST.GAMEPAD_BUTTON_DOWN event
      * @param {object} button
      */
     buttonDown(button) {
@@ -324,7 +343,7 @@ export class GamePad extends EventEmitter {
     }
 
     /**
-     * The keyUp function emitter.
+     * Emits the CONST.GAMEPAD_BUTTON_UP event
      * @param {object} button
      */
     buttonUp(button) {

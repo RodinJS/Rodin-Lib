@@ -5,9 +5,9 @@ import * as CONST from '../constants';
 import {object} from '../utils';
 
 /**
- * Class Animation
  * Each Sculpt object has its own Animation.
- * @param {!Sculpt} sculpt - Sculpt object
+ * <p>Animation manages the clips that are assigned to the Sculpt object.</p>
+ * @param {Sculpt} [sculpt=null] - Sculpt object
  */
 export class Animation {
     constructor(sculpt = null) {
@@ -19,16 +19,16 @@ export class Animation {
         this.sculpt = sculpt;
 
         /**
-         * Set of clips (animations) to be played.
-         * @type {Set.<Animation>}
+         * A Set of clips to be played.
+         * @type {Set.<AnimationClip>}
          */
         this.clips = new Set();
     }
 
     /**
-     * Gets clip by name or index
+     * Gets clip by name or index.
      * @param {!*} key
-     * @returns {Animation}
+     * @returns {AnimationClip}
      */
     getClip(key) {
         if (Number.isInteger(key)) {
@@ -45,9 +45,8 @@ export class Animation {
     }
 
     /**
-     * Adds new animation clip to Animation Object
-     * @param {...Animation}
-     * @returns {Animation}
+     * Adds new animation clip(s) to Animation object.
+     * @param {...AnimationClip}
      */
     add() {
         const ret = [];
@@ -63,8 +62,8 @@ export class Animation {
     }
 
     /**
-     * Removes animations from Animation by name
-     * @params {...string}
+     * Removes animation clip(s) from Animation by name.
+     * @params {...string} names
      */
     remove() {
         for (let i = 0; i < arguments.length; i++) {
@@ -78,16 +77,16 @@ export class Animation {
     }
 
     /**
-     * Get all clips in current Animation Object
-     * @returns {Set.<Animation>}
+     * Gets all clips in current Animation object.
+     * @returns {Set.<AnimationClip>}
      */
     getClips() {
         return this.clips;
     }
 
     /**
-     * Checks if Animation Object is playing any (or specified) animation clip(s)
-     * @param {*} [key] -  check the state for a specific animation/clip
+     * Checks if Animation Object is playing any (or specified) animation clip(s).
+     * @param {*} [key=null] -  check the state for a specific animation clip
      * @returns {boolean}
      */
     isPlaying(key = null) {
@@ -105,9 +104,9 @@ export class Animation {
     }
 
     /**
-     * Starts animation by name or index
+     * Starts animation clip by name or index.
      * @param {!*} key - Animation name or index
-     * @returns {boolean}
+     * @returns {boolean}  false if the clip was not found
      */
     start(key) {
         let clip = this.getClip(key);
@@ -120,9 +119,9 @@ export class Animation {
     }
 
     /**
-     * Stops animation by name or index
+     * Stops animation clip by name or index.
      * @param {!*} key - Animation name or index
-     * @param {boolean} [reset] - run animation.reset() method after stopping the animation.
+     * @param {boolean} [reset=true] - run animationClip.reset() method after stopping the animation
      * @returns {boolean} - success
      */
     stop(key, reset = true) {
@@ -138,16 +137,23 @@ export class Animation {
 
 
 /**
- * Plugin for Animation
+ * Plugin class for Animation. Using this class you can apply animation to any Sculpt object.
+ * This plugin is by default installed on Sculpt objects.
  */
 export class AnimationPlugin extends SculptPlugin {
     constructor() {
         super();
+        /**
+         * The main Animation object to be connected to the Sculpt object.
+         * @type {Animation}
+         */
         this.animation = new Animation();
     }
 
     /**
-     * Update function
+     * Update function, Run on each render loop.
+     * <p>On each call this function iterates through the currently playing clips of this.animation and </p>
+     * <p>updates the host sculpt properties according to the values updated by those clips.</p>
      */
     update() {
         if (!this.isEnabled) return;
@@ -163,8 +169,12 @@ export class AnimationPlugin extends SculptPlugin {
     }
 
     /**
-     * Apply to sculpt.
-     * @param sculpt
+     * applyTo is called as the last step of installing a plugin to Sculpt.
+     * <p>It sets the this.sculpt object and this.animation.sculpt object to the provided sculpt</p>
+     * <p> and creates sculpt.animation parameter on the sculpt object, that back refers to this.animation.</p>
+     * <p>This way this.animation.sculpt refers to the sculpt object, and sculpt.animation back-refers to this.animation. Tricky I know :)</p>
+     * <p>After the references are set, this.update is added to the sculpts update event handlers, to be called in renderer loop.</p>
+     * @param {!Sculpt} sculpt the sculpt object to apply this plugin to.
      */
     applyTo(sculpt) {
         super.applyTo(sculpt);

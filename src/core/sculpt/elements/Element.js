@@ -4,39 +4,43 @@ import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
 
 /**
- * Element Class, used to create flat objects, parameters have the following structure:
+ * Element Class (experimental), used to create flat objects, parameters have the following structure:
+ *
+ * <div class="codeSample">
  * <p>{</p>
- * <p>      name: string,</p>
- * <p>      width : meters,</p>
- * <p>      height : meters,</p>
- * <p>      background : {</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; color: hex,</p>
- * <p>&nbsp;&nbsp;&nbsp; image: {url:string}</p>
- * <p>                  },</p>
- * <p>      border : {</p>
- * <p>&nbsp;&nbsp;&nbsp; radius: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; color: hex,</p>
- * <p>&nbsp;&nbsp;&nbsp; width: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number</p>
- * <p>              },</p>
- * <p>      label: {</p>
- * <p>&nbsp;&nbsp;&nbsp; text: string,</p>
- * <p>&nbsp;&nbsp;&nbsp; fontFamily: string,</p>
- * <p>&nbsp;&nbsp;&nbsp; fontSize: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; color: Hex</p>
- * <p>              },</p>
- * <p>      image: {</p>
- * <p>&nbsp;&nbsp;&nbsp; url: string,</p>
- * <p>&nbsp;&nbsp;&nbsp; position: {v: number, h: number},</p>
- * <p>&nbsp;&nbsp;&nbsp; width: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; height: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number</p>
- * <p>              },</p>
- * <p>      transparent : boolean,</p>
- * <p>      ppm : number</p>
+ * <p class="tab1"> name: string,</p>
+ * <p class="tab1"> width: number,</p>
+ * <p class="tab1"> height: number,</p>
+ * <p class="tab1"> background: {</p>
+ * <p class="tab2"> opacity: number,</p>
+ * <p class="tab2"> color: hex,</p>
+ * <p class="tab2"> image: { url: string }</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> border: {</p>
+ * <p class="tab2"> radius: number,</p>
+ * <p class="tab2"> color: hex,</p>
+ * <p class="tab2"> width: number,</p>
+ * <p class="tab2"> opacity: number</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> label: {</p>
+ * <p class="tab2"> text: string,</p>
+ * <p class="tab2"> position: { v: number, h: number },</p>
+ * <p class="tab2"> fontFamily: string,</p>
+ * <p class="tab2"> fontSize: number,</p>
+ * <p class="tab2"> opacity: number,</p>
+ * <p class="tab2"> color: Hex</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> image: {</p>
+ * <p class="tab2"> url: string,</p>
+ * <p class="tab2"> position: { v: number, h: number },</p>
+ * <p class="tab2"> width: number,</p>
+ * <p class="tab2"> height: number,</p>
+ * <p class="tab2"> opacity: number</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> transparent: boolean,</p>
+ * <p class="tab1"> ppm: number</p>
  * <p>}</p>
+ * </div>
  *
  * ppm is the Pixel Per Meter resolution
  * @param {!Object}  - parameters
@@ -124,7 +128,7 @@ export class Element extends Sculpt {
                  canvas.style.left = "0";
                  */
             }
-            else if (this.background.color) {
+            else if (this.background.color !== undefined) {
                 let ctx = this.canvas.getContext("2d");
                 let rgb = utils3D.hexToRgb(this.background.color);
                 ctx.fillStyle = "rgba("
@@ -230,7 +234,7 @@ export class Element extends Sculpt {
 
             let buttonMat = null;
 
-            if (this.image || this.label || this.background.image || this.background.color|| this.border.width) {
+            if (this.image || this.label || this.background.image || this.background.color !== undefined || this.border.width) {
                 let w = utils3D.nearestPow2(this.canvas.width) / this.canvas.width;
                 let h = utils3D.nearestPow2(this.canvas.height) / this.canvas.height;
 

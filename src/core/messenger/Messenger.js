@@ -1,8 +1,4 @@
 /**
- * Created by gor on 2/7/17.
- */
-
-/**
  * Messenger for collaborating classes
  */
 export class Messenger {

@@ -5,16 +5,18 @@ import {utils3D} from '../../utils';
 
 
 /**
- * Text Class, used to create flat text objects, parameters have the following structure:
+ * Text Class (experimental), used to create flat text objects, parameters have the following structure:
+ * <div class="codeSample">
  * <p>{</p>
- * <p>&nbsp; &nbsp;      text: string,</p>
- * <p>&nbsp; &nbsp;      color : hex,</p>
- * <p>&nbsp; &nbsp;      fontFamily : string,</p>
- * <p>&nbsp; &nbsp;      fontSize : number,</p>
- * <p>&nbsp; &nbsp;      fontStyle : string,</p>
- * <p>&nbsp; &nbsp;      transparent : boolean,</p>
- * <p>&nbsp; &nbsp;      ppm : number</p>
+ * <p class="tab1"> text: string,</p>
+ * <p class="tab1"> color : hex,</p>
+ * <p class="tab1"> fontFamily : string,</p>
+ * <p class="tab1"> fontSize : number,</p>
+ * <p class="tab1"> fontStyle : string,</p>
+ * <p class="tab1"> transparent : boolean,</p>
+ * <p class="tab1"> ppm : number</p>
  * <p>}</p>
+ * </div>
  *
  * ppm is the Pixel Per Meter resolution
  * @param {!Object}  - parameters
