@@ -5,7 +5,7 @@
  * @param {number} z - coordinate, whenever this parameter is changed, onChangeCallback() methods will be called
  * @param {number} w - coordinate, whenever this parameter is changed, onChangeCallback() methods will be called
  */
-export class WrappedQuaternion extends THREE.Quaternion {
+export class Quaternion extends THREE.Quaternion {
 	constructor(...args) {
 		super(...args);
 		this._callbacks = [];
@@ -31,7 +31,7 @@ export class WrappedQuaternion extends THREE.Quaternion {
 	/**
 	 * Sets the x, y, z, w coordinates of the given object to this Quaternion and returns this.
 	 * @param {object} val - with x, y, z, w numeric parameters
-	 * @returns {WrappedQuaternion}
+	 * @returns {Quaternion}
      */
 	silentCopy(val) {
 		this._x = val.x;

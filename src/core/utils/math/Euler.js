@@ -5,11 +5,12 @@
  * @param {number} [z = 0] - the angle of the z axis in radians, whenever this parameter is changed, onChangeCallback() methods will be called
  * @param {string} [order = 'XYZ'] - a string representing the order that the rotations are applied (for example 'XYZ'), whenever this parameter is changed, onChangeCallback() methods will be called
  */
-export class WrappedEuler extends THREE.Euler {
+export class Euler extends THREE.Euler {
 	constructor(...args) {
 		super(...args);
 		this._callbacks = [];
 	}
+
 	/**
 	 * An overridden method of adding callback (instead of setting)
 	 * @param {function} callback
@@ -26,6 +27,7 @@ export class WrappedEuler extends THREE.Euler {
 			this._callbacks[i](this);
 		}
 	}
+
 	/**
 	 * Sets the x, y, z angles and the order of the given object to this Euler and returns this.
 	 * @param {object} val - with x, y, z, order numeric parameters
@@ -38,6 +40,7 @@ export class WrappedEuler extends THREE.Euler {
 		this._order = val.order;
 		return this;
 	}
+
 	/**
 	 * Gets the values of this Euler as an object with angles and order.
 	 * @returns {{x: number, y: number, z: number, order: string}}
