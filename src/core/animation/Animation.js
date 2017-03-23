@@ -158,14 +158,16 @@ export class AnimationPlugin extends SculptPlugin {
     update() {
         if (!this.isEnabled) return;
 
-        this.animation.clips.map(clip => {
-            // todo: replace with get method
-            if (!clip.isPlaying()) return;
+        for(let i = 0; i < this.animation.clips.length; i ++) {
+            const clip = this.animation.clips[i];
 
-            for (let i in clip.animatedValues) {
-                object.setProperty(this.sculpt._threeObject, i, clip.animatedValues[i]);
+            // todo: replace with get method
+            if (!clip.isPlaying()) continue;
+
+            for (let j in clip.animatedValues) {
+                object.setProperty(this.sculpt._threeObject, j, clip.animatedValues[j]);
             }
-        });
+        }
     }
 
     /**

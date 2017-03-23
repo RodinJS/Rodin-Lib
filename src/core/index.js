@@ -18,6 +18,7 @@ export * from './rodinEvent';
 export * from './loader';
 export * from './plugin';
 export * from './particleSystem';
+export * from './eventEmitter';
 
 export {
     CONST,

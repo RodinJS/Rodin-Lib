@@ -4,7 +4,7 @@
  * @param {number} [y = 0] - the y value of the vector, whenever this parameter is changed, onChangeCallback() methods will be called
  * @param {number} [z = 0] - the z value of the vector, whenever this parameter is changed, onChangeCallback() methods will be called
  */
-export function WrappedVector3(...args) {
+export function Vector3(...args) {
 	THREE.Vector3.apply(this, args);
 
 	let privates = {x: this.x, y: this.y, z: this.z};
@@ -30,6 +30,7 @@ export function WrappedVector3(...args) {
 			}
 		});
 	}
+
 	/**
 	 * An overridden method of adding callback (instead of setting)
 	 * @param {function} callback
@@ -37,10 +38,11 @@ export function WrappedVector3(...args) {
 	this.onChange = (callback) => {
 		callbacks.push(callback);
 	};
+
 	/**
 	 * Sets the x, y, z values of the given object to this Vector3 and returns this.
 	 * @param {object} val - with x, y, z, numeric parameters
-	 * @returns {WrappedVector3}
+	 * @returns {Vector3}
 	 */
 	this.silentCopy = (val) => {
 		privates.x = val.x;
@@ -48,6 +50,7 @@ export function WrappedVector3(...args) {
 		privates.z = val.z;
 		return this;
 	};
+
 	/**
 	 * Gets the values of this Vector3 as an object with x,y,z values.
 	 * @returns {{x: number, y: number, z: number}}
@@ -57,5 +60,5 @@ export function WrappedVector3(...args) {
 	}
 }
 
-WrappedVector3.prototype = Object.create(THREE.Vector3.prototype);
-WrappedVector3.prototype.constructor = WrappedVector3;
+Vector3.prototype = Object.create(THREE.Vector3.prototype);
+Vector3.prototype.constructor = Vector3;

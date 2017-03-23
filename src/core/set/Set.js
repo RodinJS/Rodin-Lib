@@ -3,7 +3,6 @@ let oldPush = Array.prototype.push;
 /**
  * Class for collecting unique fields
  */
-//todo: There is a native Set, maybe we should get rid of this? @Gor
 export class Set extends Array {
     constructor() {
         super(...arguments);

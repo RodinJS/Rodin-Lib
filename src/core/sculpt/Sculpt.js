@@ -3,7 +3,7 @@ import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {WrappedVector3, WrappedEuler, WrappedQuaternion} from '../utils/threeWrappers';
+import {Vector3, Euler, Quaternion} from '../utils';
 import {AnimationPlugin} from '../animation';
 import {Loader} from '../loader';
 
@@ -35,6 +35,7 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
         sculpt: undefined
     }, args);
 }
+
 /**
  * Sculpt is a base class for a 3d object in Rodin Lib,
  * Any 3d object should be either a direct Sculpt, or extended from Sculpt
@@ -85,80 +86,80 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Position
-         * @type {WrappedVector3}
+         * @type {Vector3}
          * @private
          */
-        this._position = new WrappedVector3();
+        this._position = new Vector3();
         this._position.onChange((position) => {
             this.position = position;
         });
 
         /**
          * Rotation
-         * @type {WrappedEuler}
+         * @type {Euler}
          * @private
          */
-        this._rotation = new WrappedEuler();
+        this._rotation = new Euler();
         this._rotation.onChange((rotation) => {
             this.rotation = rotation;
         });
 
         /**
          * Quaternion
-         * @type {WrappedQuaternion}
+         * @type {Quaternion}
          * @private
          */
-        this._quaternion = new WrappedQuaternion();
+        this._quaternion = new Quaternion();
         this._quaternion.onChange((quaternion) => {
             this.quaternion = quaternion;
         });
 
         /**
          * Scale
-         * @type {WrappedVector3}
+         * @type {Vector3}
          * @private
          */
-        this._scale = new WrappedVector3();
+        this._scale = new Vector3();
         this._scale.onChange((scale) => {
             this.scale = scale;
         });
 
         /**
          * Global Position
-         * @type {WrappedVector3}
+         * @type {Vector3}
          * @private
          */
-        this._globalPosition = new WrappedVector3();
+        this._globalPosition = new Vector3();
         this._globalPosition.onChange((globalPosition) => {
             this.globalPosition = globalPosition;
         });
 
         /**
          * Global Rotation
-         * @type {WrappedEuler}
+         * @type {Euler}
          * @private
          */
-        this._globalRotation = new WrappedEuler();
+        this._globalRotation = new Euler();
         this._globalRotation.onChange((rotation) => {
             this.globalRotation = rotation;
         });
 
         /**
          * Global Quaternion
-         * @type {WrappedQuaternion}
+         * @type {Quaternion}
          * @private
          */
-        this._globalQuaternion = new WrappedQuaternion();
+        this._globalQuaternion = new Quaternion();
         this._globalQuaternion.onChange((quaternion) => {
             this.globalQuaternion = quaternion;
         });
 
         /**
          * Global Scale
-         * @type {WrappedVector3}
+         * @type {Vector3}
          * @private
          */
-        this._globalScale = new WrappedVector3();
+        this._globalScale = new Vector3();
         this._globalScale.onChange((globalScale) => {
             this.globalScale = globalScale;
         });
@@ -212,11 +213,11 @@ export class Sculpt extends EventEmitter {
         });
 
 		this.on(CONST.UPDATE, () => {
-			this.children.map(child => {
-				if (child.isReady) {
-					child.emit(CONST.UPDATE, new RodinEvent(child, {}));
-				}
-			});
+		    for(let i = 0; i < this.children.length; i ++) {
+                if (this.children[i].isReady) {
+                    this.children[i].emit(CONST.UPDATE, new RodinEvent(this.children[i], {}));
+                }
+            }
 		});
 
 		this.install(AnimationPlugin);
@@ -311,7 +312,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the position of this object relative to it's parent (local).
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     set position(position) {
         this._threeObject.position.copy(position);
@@ -335,7 +336,7 @@ export class Sculpt extends EventEmitter {
     }
     /**
      * Gets the position of this object relative to it's parent (local)
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     get position() {
         // not sure if we should copy threeObject.position to our position
@@ -346,7 +347,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the rotation of this object relative to it's parent (local)
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     set rotation(rotation) {
         this._threeObject.rotation.copy(rotation);
@@ -355,7 +356,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets the rotation of this object relative to it's parent (local)
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     get rotation() {
         this._rotation.silentCopy(this._threeObject.rotation);
@@ -364,7 +365,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the quaternion of this object relative to it's parent (local)
-     * @type {THREE.Quaternion}
+     * @type {Quaternion}
      */
     set quaternion(quaternion) {
         this._threeObject.quaternion.copy(quaternion);
@@ -373,7 +374,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Get the quaternion of this object relative to it's parent (local)
-     * @type {THREE.Quaternion}
+     * @type {Quaternion}
      */
     get quaternion() {
         this._quaternion.silentCopy(this._threeObject.quaternion);
@@ -382,7 +383,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the scale of this object
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     set scale(scale) {
         this._threeObject.scale.copy(scale);
@@ -391,7 +392,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets the scale of this object
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     get scale() {
         return this._scale;
@@ -399,17 +400,17 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the position of this object relative to the scene (global)
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     set globalPosition(position) {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         this.globalMatrix = this.globalMatrix.compose(position, initialRotation, initialScale);
 
-        // use copy to preserve type of _globalPosition, i.e. WrappedVector3
+        // use copy to preserve type of _globalPosition, i.e. Rodin Vector3
         // dont use direct copy to prevent infinite recursion
         // implement this with a separate function to prevent this
         this._globalPosition.silentCopy(position);
@@ -417,16 +418,16 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets the position of this object relative to the scene (global)
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     get globalPosition() {
         // global get ers are very slow right now,
         // we can sync this with position and matrix
         // setters to make faster but will slow down those
 
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
 
@@ -436,12 +437,12 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the rotation of this object relative to the scene (global)
-     * @type {THREE.Euler}
+     * @type {Euler}
      */
     set globalRotation(rotation) {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         initialRotation.setFromEuler(rotation);
@@ -452,27 +453,27 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets the rotation of this object relative to the scene (global)
-     * @type {THREE.Euler}
+     * @type {Euler}
      */
     get globalRotation() {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         //create a new Euler in order to use silentCopy
-        this._globalRotation.silentCopy(new THREE.Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
+        this._globalRotation.silentCopy(new Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
         return this._globalRotation;
     }
 
     /**
      * Sets the quaternion of this object relative to the scene (global)
-     * @type {THREE.Quaternion}
+     * @type {Quaternion}
      */
     set globalQuaternion(quaternion) {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         this.globalMatrix = this.globalMatrix.compose(initialPosition, quaternion, initialScale);
@@ -482,12 +483,12 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets the quaternion of this object relative to the scene (global)
-     * @type {THREE.Quaternion}
+     * @type {Quaternion}
      */
     get globalQuaternion() {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
 
@@ -497,12 +498,12 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets the scale of this object relative to the scene (global)
-     * @type{THREE.Vector3}
+     * @type{Vector3}
      */
     set globalScale(scale) {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         this.globalMatrix = this.globalMatrix.compose(initialPosition, initialRotation, scale);
@@ -512,12 +513,12 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets the scale of this object relative to the scene (global)
-     * @type {THREE.Vector3}
+     * @type {Vector3}
      */
     get globalScale() {
-        const initialPosition = new THREE.Vector3();
-        const initialRotation = new THREE.Quaternion();
-        const initialScale = new THREE.Vector3();
+        const initialPosition = new Vector3();
+        const initialRotation = new Quaternion();
+        const initialScale = new Vector3();
 
         this.globalMatrix.decompose(initialPosition, initialRotation, initialScale);
         this._globalScale.silentCopy(initialScale);

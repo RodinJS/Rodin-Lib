@@ -1,7 +1,6 @@
-'use strict';
-
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
+import {Vector3} from '../../utils/math';
 
 
 /**
@@ -99,7 +98,7 @@ export class Text extends Sculpt {
         }
 
         let geometry = new THREE.PlaneGeometry(1,1, 5, 5);
-        geometry = utils3D.scaleGeometry(geometry, new THREE.Vector3(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1));
+        geometry = utils3D.scaleGeometry(geometry, new Vector3(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1));
         if(!(this._threeObject instanceof THREE.Mesh)){
             this._threeObject = new THREE.Mesh(geometry, this.textMat);
         }else{

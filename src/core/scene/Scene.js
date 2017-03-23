@@ -267,25 +267,38 @@ export class Scene extends EventEmitter {
 
     /**
      * Render function.
+     * @param e Enforce function
      * @param timestamp {number}
      * @private
      */
-    //todo: maybe add an enforce argument? @Gor
-    static render(timestamp) {
+    static render(e, timestamp) {
+        if (e !== enforce) {
+            throw new ErrorProtectedMethodCall('render');
+        }
 
         messenger.post(CONSTANTS.RENDER_START, {});
 
         // Update VR headset position and apply to camera.
         Scene.active._controls.update();
 
-        preRenderFunctions.map(fn => fn());
-        Scene.active._preRenderFunctions.map(fn => fn());
+        // call all prerender functions
+        for(let i = 0; i < preRenderFunctions.length; i ++) {
+            preRenderFunctions[i]();
+        }
 
-        Scene.active.children.map(child => {
+        // call all scene specific prerender functions
+        for(let i = 0; i < Scene.active._preRenderFunctions.length; i ++) {
+            Scene.active._preRenderFunctions[i]();
+        }
+
+        // emit update for all childs
+        for(let i = 0; i < Scene.active.children.length; i ++) {
+            const child = Scene.active.children[i];
+
             if(child.isReady) {
                 child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
-        });
+        }
         //TODO: camera needs to be a sculpt object, to avoid sh*t like this
         Scene.active._camera.children.map(child => {
             if(child.Sculpt && child.Sculpt.isReady) {
@@ -294,9 +307,17 @@ export class Scene extends EventEmitter {
         });
 
         Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
-        Scene.active._postRenderFunctions.map(fn => fn());
         messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
-        postRenderFunctions.map(fn => fn());
+
+        // call all scene specific postrender functions
+        for(let i = 0; i < Scene.active._postRenderFunctions.length; i ++) {
+            Scene.active._postRenderFunctions[i]();
+        }
+
+        // call all postrender functions
+        for(let i = 0; i < postRenderFunctions.length; i ++) {
+            postRenderFunctions[i]();
+        }
 
         Scene.requestFrame(enforce);
 
@@ -326,7 +347,9 @@ export class Scene extends EventEmitter {
         if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) {
             Scene.webVRmanager.hmd.requestAnimationFrame(Scene.render);
         } else {
-            requestAnimationFrame(Scene.render);
+            requestAnimationFrame((timestamp) => {
+                Scene.render(enforce, timestamp)
+            });
         }
 
         renderRequested = true;

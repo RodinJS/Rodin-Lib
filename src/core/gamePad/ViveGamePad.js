@@ -3,6 +3,7 @@ import * as CONST from '../constants';
 import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
+import {Vector3} from '../utils/math';
 
 /**
  * A controller class for describing HTC Vive controllers event handlers.
@@ -63,8 +64,8 @@ export class ViveController extends GamePad {
     initRaycastingLine(color = 0xff0000) {
         let targetGeometry = new THREE.Geometry();
         targetGeometry.vertices.push(
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 0, -1)
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, -1)
         );
 
         let targetLine = new THREE.Line(targetGeometry, new THREE.LineBasicMaterial({color: color}));
