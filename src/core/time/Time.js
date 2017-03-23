@@ -91,11 +91,10 @@ export class Time {
         return activeTime.speed;
     }
 
-    //TODO Gor es timestamp inch a ? mi hat nkaragri pliz
     /**
      * Set current frame timestamp.
      * @param {function} e Enforce function
-     * @param {number} timestamp current frame render timestamp.
+     * @param timestamp {number} current frame render timestamp.
      * @private
      */
     static setCurrentFrameTimestamp(e, timestamp) {

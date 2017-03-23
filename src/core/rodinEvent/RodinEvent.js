@@ -14,7 +14,7 @@ export class RodinEvent {
      */
     constructor (target, params) {
         //todo: JOI
-        //todo: maybe just assign all the params to this? @Gor
+        //todo: maybe just assign all the params to this?
         params = Object.assign({type: 'event', domEvent: null, button: null, hand: '', gamepad: null}, params);
 
         /**

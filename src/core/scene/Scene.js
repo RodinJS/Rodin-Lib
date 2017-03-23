@@ -267,11 +267,14 @@ export class Scene extends EventEmitter {
 
     /**
      * Render function.
+     * @param e Enforce function
      * @param timestamp {number}
      * @private
      */
-    //todo: maybe add an enforce argument? @Gor
-    static render(timestamp) {
+    static render(e, timestamp) {
+        if (e !== enforce) {
+            throw new ErrorProtectedMethodCall('render');
+        }
 
         messenger.post(CONSTANTS.RENDER_START, {});
 
@@ -344,7 +347,9 @@ export class Scene extends EventEmitter {
         if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) {
             Scene.webVRmanager.hmd.requestAnimationFrame(Scene.render);
         } else {
-            requestAnimationFrame(Scene.render);
+            requestAnimationFrame((timestamp) => {
+                Scene.render(enforce, timestamp)
+            });
         }
 
         renderRequested = true;
