@@ -161,8 +161,7 @@ export class AnimationPlugin extends SculptPlugin {
         for(let i = 0; i < this.animation.clips.length; i ++) {
             const clip = this.animation.clips[i];
 
-            // todo: replace with get method
-            if (!clip.isPlaying()) continue;
+            if (!clip.updatedInCurrentFrame) continue;
 
             for (let j in clip.animatedValues) {
                 object.setProperty(this.sculpt, j, clip.animatedValues[j]);
