@@ -19,6 +19,7 @@ export * from './loader';
 export * from './plugin';
 export * from './particleSystem';
 export * from './eventEmitter';
+export * from './color';
 
 export {
     CONST,

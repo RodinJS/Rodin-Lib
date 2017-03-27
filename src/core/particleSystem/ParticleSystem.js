@@ -46,8 +46,6 @@ const enforce = function () {
  *
  * @param {THREE.SpriteMaterial} [ params.particlesMaterial = new THREE.SpriteMaterial()] - Material for each particle
  */
-
-
 export class ParticleSystem extends Sculpt {
     constructor(params) {
         // params = object.deepAssign({
@@ -125,6 +123,46 @@ export class ParticleSystem extends Sculpt {
                     particle.position.set(vec.x, vec.y, vec.z).add(particle.initialPosition);
                 }
             }
+
+            // TODO: set color with noise
+            // TODO: crete Color class
+            if (!isNaN(this.params.color.value)) {
+                if(!particle.__color__) {
+                    particle.__color__ = new THREE.Color(this.params.color.value);
+                }
+            // If value is a string
+            } else if(typeof(this.params.color.value) === "string"){
+                if(!particle.__color__) {
+                    particle.__color__ = new THREE.Color(this.params.color.value);
+                }
+            // If value is an object
+            } else if (typeof(this.params.color.value) === 'object') {
+                if(!particle.__color__) {
+                    let starColor = new THREE.Color(this.params.color.value.from);
+                    let lastColor = new THREE.Color(this.params.color.value.to);
+
+                    particle.__color__ = new THREE.Color(
+                        starColor.r + Math.abs((starColor.r - lastColor.r)) * Math.random(),
+                        starColor.g + Math.abs((starColor.g - lastColor.g)) * Math.random(),
+                        starColor.b + Math.abs((starColor.b - lastColor.b)) * Math.random()
+                    );
+                }
+            // If value is an array
+            } else if (Array.isArray(this.params.color.value)) {
+                if(!particle.__color__) {
+                    particle.__color__ = new THREE.Color(
+                        this.params.color.value[Math.floor(Math.random()*this.params.color.value.length)]
+                    );
+                }
+            // If value is a function
+            } else {
+                if(!particle.__color__) {
+                    let coef = Time.now - particle.bornTime;
+                    particle.__color__ = new THREE.Color(this.params.color.value(coef, particle))
+                }
+
+            }
+            particle._threeObject.material.color = particle.__color__;
         });
     }
 
@@ -136,7 +174,7 @@ export class ParticleSystem extends Sculpt {
 
     createParticle() {
         let particle = new Particle(
-            this.params.particlesMaterial,
+            this.params.particlesMaterial.clone(),
             this.params.lifetime,
             this.params.particleSize,
             this.params.startPosition
