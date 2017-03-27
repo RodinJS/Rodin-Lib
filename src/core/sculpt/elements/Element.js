@@ -42,12 +42,22 @@ import {utils3D} from '../../utils';
  * <p>}</p>
  * </div>
  *
- * ppm is the Pixel Per Meter resolution
- * @param {!Object}  - parameters
+ * @param {!Object} params - parameters
+ * @param {Object} [params.name="element"] - the element name
+ * @param {number} [params.width=0.2] - the element width in meters
+ * @param {number} [params.height=0.15] - the element height in meters
+ * @param {Object} [params.background] - the element background parameters
+ * @param {Object} [params.border] - the element border parameters
+ * @param {Object} [params.label] - a Text label that should appear on the element
+ * @param {Object} [params.image] - an image that should appear on the element
+ * @param {boolean} [params.transparent=true] - defines whether the mesh should be rendered as a transparent object or not
+ * @param {number} [params.ppm=500] - the pixel per meter resolution
  */
 export class Element extends Sculpt {
+
+
     constructor({
-        name = "button",
+        name = "element",
         width = 0.2,
         height = 0.15,
         background = {},
