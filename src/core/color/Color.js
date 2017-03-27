@@ -47,4 +47,3 @@ export class Color extends THREE.Color {
     }
 }
 
-window.Color = Color;
