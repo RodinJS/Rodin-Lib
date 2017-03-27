@@ -1,7 +1,3 @@
-/**
- * Created by gor on 2/7/17.
- */
-
 let oldPush = Array.prototype.push;
 
 /**

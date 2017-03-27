@@ -2,12 +2,13 @@ import {GamePad} from './GamePad';
 import {messenger} from '../messenger';
 import * as CONST from '../constants';
 import * as Buttons from '../button';
+import {GazePoint} from '../sculpt/GazePoint';
 
 // todo: implement with messenger
 import {Scene} from '../scene';
 
 /**
- * Custom (virtual) gamepad class, for CardboardController.
+ * Custom (virtual) navigator gamepad class, for CardboardController.
  */
 export class CardboardNavigatorGamePad {
 
@@ -83,26 +84,62 @@ export class CardboardNavigatorGamePad {
 }
 
 /**
- * A controller class for describing event handlers for cardboard use.
- * @param {THREE.Scene} scene - the scene where the controller will be used.
- * @param {THREE.PerspectiveCamera} camera - the camera where the controller will be used.
+ * A controller class for describing event handlers for cardboard use. Transfers the mobile screen touch event to the raycasted (gaze point) object.
  */
 export class CardboardGamePad extends GamePad {
     constructor() {
         super("cardboard", null, CONST.VR);
-        // this.vrOnly = true;
-
         this.buttons = [Buttons.cardboardTrigger];
+        let gp = new GazePoint();
+        gp.Sculpt.on("ready", () => {
+            this.setGazePoint(gp);
+            this.disable();
+        });
     }
 
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are in camera's center.
-     * @returns {Object[]}
+     * Set GazePoint
+     * @param {THREE.Object3D} gazePoint object to add
+     */
+    setGazePoint(gazePoint) {
+        gazePoint.controller = this;
+        this.gazePoint = gazePoint;
+        if(Scene.active._camera) {
+            Scene.active._camera.add(this.gazePoint.Sculpt._threeObject);
+        }
+    }
+
+    /**
+     * Enables Cardboard controller, adds the gaze point object to the camera if set.
+     */
+    enable() {
+        super.enable();
+        if(this.gazePoint){
+            if(Scene.active._camera) {
+                Scene.active._camera.add(this.gazePoint.Sculpt._threeObject);
+            }
+        }
+    }
+
+    /**
+     * Disables Cardboard controller, removes the gaze point object from the camera if set.
+     */
+    disable() {
+        super.disable();
+        if(this.gazePoint){
+            if(Scene.active._camera) {
+                Scene.active._camera.remove(this.gazePoint.Sculpt._threeObject);
+            }
+        }
+    }
+    /**
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are in camera's center (gaze point).
+     * @returns {Sculpt[]}
      */
     getIntersections() {
         // todo: use our custom camera later
         this.raycaster.set(Scene.active._camera.getWorldPosition(), Scene.active._camera.getWorldDirection());
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers);
     }
 }
 

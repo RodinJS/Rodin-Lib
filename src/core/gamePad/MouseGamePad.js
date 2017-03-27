@@ -5,7 +5,7 @@ import * as CONST from '../constants';
 import * as Buttons from '../button';
 
 /**
- * Plyfiled mouse gamepad class, for MouseController, by default the navigator does not see mouse as a gamepad device.
+ * Polyfilled mouse gamepad class, for MouseGamepad, by default the navigator does not see mouse as a gamepad device.
  */
 class MouseNavigatorGamePad {
     /**
@@ -99,6 +99,7 @@ class MouseNavigatorGamePad {
         };
 
         let mouseDown = (event) => {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             if(this.buttons[event.button]) {
                 this.buttons[event.button].pressed = true
             }
@@ -109,6 +110,7 @@ class MouseNavigatorGamePad {
         };
 
         let mouseUp = (event) => {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             if(this.buttons[event.button]) {
                 this.buttons[event.button].pressed = false
             }
@@ -119,6 +121,7 @@ class MouseNavigatorGamePad {
         };
 
         let scroll = (event) => {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             this.buttons[1].value += event.deltaY;
             if (this.stopPropagationOnScroll) {
                 event.stopPropagation();
@@ -130,11 +133,13 @@ class MouseNavigatorGamePad {
         document.body.addEventListener('mouseup', mouseUp, false);
 
         document.body.addEventListener('touchmove', (evt)=> {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             evt.clientX = evt.touches[0].clientX;
             evt.clientY = evt.touches[0].clientY;
             mouseMove(evt);
         }, false);
         document.body.addEventListener('touchstart', (evt)=> {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             evt.button = 0;
             evt.clientX = evt.touches[0].clientX;
             evt.clientY = evt.touches[0].clientY;
@@ -142,32 +147,39 @@ class MouseNavigatorGamePad {
             mouseDown(evt);
         }, false);
         document.body.addEventListener('touchend', (evt)=> {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             evt.button = 0;
             mouseUp(evt);
         }, false);
 
         document.body.addEventListener('contextmenu', (e) => {
+            if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             e.preventDefault();
         }, false);
         document.body.addEventListener('wheel', scroll, false);
     }
 }
-
+/**
+* Mouse Gamepad class, overrides buttons and intersecting method.
+*/
 export class MouseGamePad extends GamePad {
     constructor() {
         super('mouse', null, CONST.NON_VR);
-
+        /**
+         * Mouse Buttons array
+         * @type {Button[]}
+         */
         this.buttons = [Buttons.mouseLeft, Buttons.mouseWheel, Buttons.mouseRight];
     }
 
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are under mouse pointer.
-     * @returns [Object]
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are positioned under mouse pointer.
+     * @returns {Sculpt[]}
      */
     getIntersections() {
         // todo: use our custom camera later
         this.raycaster.setFromCamera(new THREE.Vector2(this.navigatorGamePad.axes[0], this.navigatorGamePad.axes[1]), Scene.active._camera);
-        return this.raycaster.raycast();
+        return this.raycaster.raycast(this.raycastLayers);
     }
 }
 

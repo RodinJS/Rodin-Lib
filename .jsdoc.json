@@ -4,8 +4,7 @@
 		"dictionaries": ["jsdoc"]
 	},
 	"source": {
-		"include": ["src/rodin"],
-		"exclude": ["src/rodin/mobile"],
+		"include": ["src/core"],
 		"includePattern": ".js$",
 		"excludePattern": "(node_modules/|docs)"
 	},
@@ -15,13 +14,22 @@
 	"templates": {
 		"cleverLinks": false,
 		"monospaceLinks": true,
-		"useLongnameInNav": false
+		"useLongnameInNav": false,
+		"default": {
+			"outputSourceFiles": false
+		}
 	},
 	"opts": {
 		"destination": "./docs/",
 		"encoding": "utf8",
 		"private": true,
 		"recurse": true,
-		"template": "./resources/docTemplate/minami"
+		"template": "./res/docTemplate/minami"
 	}
 }
+
+// for windows
+// node_modules\.bin\jsdoc --configure .jsdoc.json --verbose
+
+// for non windows
+// node_modules/.bin/jsdoc --configure .jsdoc.json --verbose

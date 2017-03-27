@@ -1,30 +1,30 @@
 /*****************************************************************************************
 
-The MIT License
+ The MIT License
 
-Copyright (c) 2010-2012 Tween.js authors.
+ Copyright (c) 2010-2012 Tween.js authors.
 
-Easing equations Copyright (c) 2001 Robert Penner http://robertpenner.com/easing/
+ Easing equations Copyright (c) 2001 Robert Penner http://robertpenner.com/easing/
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
 
-*****************************************************************************************/
+ *****************************************************************************************/
 
 /**
  * Tween.js - Licensed under the MIT license
@@ -35,226 +35,843 @@ THE SOFTWARE.
  * Thank you all, you're awesome!
  */
 
-import * as CONSTANTS from '../constants';
-import {EventEmitter} from '../eventEmitter';
-import {RodinEvent} from '../rodinEvent';
 import {Time} from '../time';
 
-export class Tween extends EventEmitter {
- 	constuctor(object) {
-		this._object = object;
-		this._valuesStart = {};
-		this._valuesEnd = {};
-		this._valuesStartRepeat = {};
-		this._duration = 1000;
-		this._repeat = 0;
-		this._yoyo = false;
-		this._isPlaying = false;
-		this._reversed = false;
-		this._delayTime = 0;
-		this._startTime = null;
-		this._easingFunction = TWEEN.Easing.Linear.None;
-		this._interpolationFunction = TWEEN.Interpolation.Linear;
-		this._chainedTweens = [];
-		this._onStartCallback = null;
-		this._onStartCallbackFired = false;
-		this._onUpdateCallback = null;
-		this._onCompleteCallback = null;
-		this._onStopCallback = null;
+import {messenger} from '../messenger';
+import * as CONST from '../constants';
 
-		for (let field in object) {
-			_valuesStart[field] = parseFloat(object[field], 10);
-		}
- 	}
+export var TWEEN = TWEEN || (function () {
 
-	to(properties, duration) {
-		if (duration !== undefined) {
-			this._duration = duration;
-		}
+        var _tweens = [];
 
-		this._valuesEnd = properties;
-	}
+        return {
 
-	start(time) {
-		this._isPlaying = true;
+            getAll: function () {
 
-		this._onStartCallbackFired = false;
+                return _tweens;
 
-		this._startTime = time !== undefined ? time : Time.now();
-		this._startTime += this._delayTime;
+            },
 
-		for (let property in this._valuesEnd) {
+            removeAll: function () {
 
-			// Check if an Array was provided as property value
-			if (this._valuesEnd[property] instanceof Array) {
-				if (this._valuesEnd[property].length === 0) {
-					continue;
-				}
+                _tweens = [];
 
-				// Create a local copy of the Array with the start value at the front
-				this._valuesEnd[property] = [this._object[property]].concat(this._valuesEnd[property]);
-			}
+            },
 
-			// If `to()` specifies a property that doesn't exist in the source object,
-			// we should not set that property in the object
-			if (this._valuesStart[property] === undefined) {
-				continue;
-			}
+            add: function (tween) {
 
-			this._valuesStart[property] = this._object[property];
+                _tweens.push(tween);
 
-			if ((this._valuesStart[property] instanceof Array) === false) {
-				this._valuesStart[property] *= 1.0; // Ensures we're using numbers, not strings
-			}
+            },
 
-			this._valuesStartRepeat[property] = this._valuesStart[property] || 0;
-		}
-		return this;
-	}
+            remove: function (tween) {
 
-	stop() {
-		if (!this._isPlaying) {
-			return this;
-		}
+                var i = _tweens.indexOf(tween);
 
-		this._isPlaying = false;
+                if (i !== -1) {
+                    _tweens.splice(i, 1);
+                }
 
-		this.emit(CONSTANTS.STOP, new RodinEvent(null, {values: this}));
+            },
 
-		this.stopChainedTweens();
-		return this;
-	}
+            update: function (time, preserve) {
 
-	stopChainedTweens() {
-		for (let i = 0, numChainedTweens = this._chainedTweens.length; i < numChainedTweens; i++) {
-			this._chainedTweens[i].stop();
-		}
-	}
+                if (_tweens.length === 0) {
+                    return false;
+                }
 
-	delay(amount) {
-		this._delayTime = amount;
-		return this;
-	}
+                var i = 0;
 
-	repeat(times) {
-		this._repeat = times;
-		return this;
-	}
+                time = time !== undefined ? time : TWEEN.now();
 
-	yoyo(yoyo) {
-		this._yoyo = yoyo;
-		return this;
-	}
+                while (i < _tweens.length) {
+
+                    if (_tweens[i].update(time) || preserve) {
+                        i++;
+                    } else {
+                        _tweens.splice(i, 1);
+                    }
+
+                }
+
+                return true;
+
+            }
+        };
+
+    })();
+
+TWEEN.now = function () {
+    return Time.now;
+};
+
+TWEEN.Tween = function (object) {
+
+    var _object = object;
+    var _valuesStart = {};
+    var _valuesEnd = {};
+    var _valuesStartRepeat = {};
+    var _duration = 1000;
+    var _repeat = 0;
+    var _yoyo = false;
+    var _isPlaying = false;
+    var _reversed = false;
+    var _delayTime = 0;
+    var _startTime = null;
+    var _easingFunction = TWEEN.Easing.Linear.None;
+    var _interpolationFunction = TWEEN.Interpolation.Linear;
+    var _chainedTweens = [];
+    var _onStartCallback = null;
+    var _onStartCallbackFired = false;
+    var _onUpdateCallback = null;
+    var _onCompleteCallback = null;
+    var _onStopCallback = null;
+
+    // Set all starting values present on the target object
+    for (var field in object) {
+        _valuesStart[field] = parseFloat(object[field], 10);
+    }
+
+    this.to = function (properties, duration) {
+
+        if (duration !== undefined) {
+            _duration = duration;
+        }
+
+        _valuesEnd = properties;
+
+        return this;
+
+    };
+
+    this.start = function (time) {
+
+        TWEEN.add(this);
+
+        _isPlaying = true;
+
+        _onStartCallbackFired = false;
+
+        _startTime = time !== undefined ? time : TWEEN.now();
+        _startTime += _delayTime;
+
+        for (var property in _valuesEnd) {
+
+            // Check if an Array was provided as property value
+            if (_valuesEnd[property] instanceof Array) {
+
+                if (_valuesEnd[property].length === 0) {
+                    continue;
+                }
+
+                // Create a local copy of the Array with the start value at the front
+                _valuesEnd[property] = [_object[property]].concat(_valuesEnd[property]);
+
+            }
+
+            // If `to()` specifies a property that doesn't exist in the source object,
+            // we should not set that property in the object
+            if (_valuesStart[property] === undefined) {
+                continue;
+            }
+
+            _valuesStart[property] = _object[property];
+
+            if ((_valuesStart[property] instanceof Array) === false) {
+                _valuesStart[property] *= 1.0; // Ensures we're using numbers, not strings
+            }
+
+            _valuesStartRepeat[property] = _valuesStart[property] || 0;
+
+        }
+
+        return this;
+
+    };
+
+    this.stop = function () {
+
+        if (!_isPlaying) {
+            return this;
+        }
+
+        TWEEN.remove(this);
+        _isPlaying = false;
+
+        if (_onStopCallback !== null) {
+            _onStopCallback.call(_object);
+        }
+
+        this.stopChainedTweens();
+        return this;
+
+    };
+
+    this.stopChainedTweens = function () {
+
+        for (var i = 0, numChainedTweens = _chainedTweens.length; i < numChainedTweens; i++) {
+            _chainedTweens[i].stop();
+        }
+
+    };
+
+    this.delay = function (amount) {
+
+        _delayTime = amount;
+        return this;
+
+    };
+
+    this.repeat = function (times) {
+
+        _repeat = times;
+        return this;
+
+    };
+
+    this.yoyo = function (yoyo) {
+
+        _yoyo = yoyo;
+        return this;
+
+    };
 
 
-	easing(easing) {
-		this._easingFunction = easing;
-		return this;
-	}
+    this.easing = function (easing) {
 
-	interpolation(interpolation) {
-		this._interpolationFunction = interpolation;
-		return this;
-	}
+        _easingFunction = easing;
+        return this;
 
-	chain() {
-		this._chainedTweens = arguments;
-		return this;
-	}
+    };
 
-	update(time) {
+    this.interpolation = function (interpolation) {
 
-		let property;
-		let elapsed;
-		let value;
+        _interpolationFunction = interpolation;
+        return this;
 
-		if (time < this._startTime) {
-			return true;
-		}
+    };
 
-		if (this._onStartCallbackFired === false) {
-			this.emit(CONSTANTS.START, new RodinEvent(null, {values: this}));
+    this.chain = function () {
 
-			this._onStartCallbackFired = true;
-		}
+        _chainedTweens = arguments;
+        return this;
 
-		elapsed = (time - this._startTime) / this._duration;
-		elapsed = elapsed > 1 ? 1 : elapsed;
+    };
 
-		value = this._easingFunction(elapsed);
+    this.onStart = function (callback) {
 
-		for (property in this._valuesEnd) {
-			// Don't update properties that do not exist in the source object
-			if (this._valuesStart[property] === undefined) {
-				continue;
-			}
+        _onStartCallback = callback;
+        return this;
 
-			let start = this._valuesStart[property] || 0;
-			let end = this._valuesEnd[property];
+    };
 
-			if (end instanceof Array) {
-				this._object[property] = _interpolationFunction(end, value);
-			} else {
-				// Parses relative end values with start as base (e.g.: +10, -3)
-				if (typeof (end) === 'string') {
+    this.onUpdate = function (callback) {
 
-					if (end.charAt(0) === '+' || end.charAt(0) === '-') {
-						end = start + parseFloat(end, 10);
-					} else {
-						end = parseFloat(end, 10);
-					}
-				}
+        _onUpdateCallback = callback;
+        return this;
 
-				// Protect against non numeric properties.
-				if (typeof (end) === 'number') {
-					this._object[property] = start + (end - start) * value;
-				}
-			}
-		}
+    };
 
-		this.emit(CONSTANTS.UPDATE, new RodinEvent(null, {values: this}));
+    this.onComplete = function (callback) {
 
-		if (elapsed === 1) {
+        _onCompleteCallback = callback;
+        return this;
 
-			if (this._repeat > 0) {
-				if (isFinite(this._repeat)) {
-					this._repeat--;
-				}
+    };
 
-				// Reassign starting values, restart by making startTime = now
-				for (property in this._valuesStartRepeat) {
+    this.onStop = function (callback) {
 
-					if (typeof(this._valuesEnd[property]) === 'string') {
-						this._valuesStartRepeat[property] = this._valuesStartRepeat[property] + parseFloat(this._valuesEnd[property], 10);
-					}
+        _onStopCallback = callback;
+        return this;
 
-					if (this._yoyo) {
-						let tmp = this._valuesStartRepeat[property];
+    };
 
-						this._valuesStartRepeat[property] = this._valuesEnd[property];
-						this._valuesEnd[property] = tmp;
-					}
+    this.update = function (time) {
 
-					this._valuesStart[property] = this._valuesStartRepeat[property];
+        var property;
+        var elapsed;
+        var value;
 
-				}
+        if (time < _startTime) {
+            return true;
+        }
 
-				if (this._yoyo) {
-					this._reversed = !this._reversed;
-				}
+        if (_onStartCallbackFired === false) {
 
-				this._startTime = time + this._delayTime;
-				return true;
-			} else {
-				this.emit(CONSTANTS.COMPLETE, new RodinEvent(null, {values: this}));
-				for (let i = 0, numChainedTweens = this._chainedTweens.length; i < numChainedTweens; i++) {
-					// Make the chained tweens start exactly at the time they should,
-					// even if the `update()` method was called way past the duration of the tween
-					this._chainedTweens[i].start(this._startTime + this._duration);
-				}
-				return false;
-			}
-		}
-		return true;
-	}
- }
+            if (_onStartCallback !== null) {
+                _onStartCallback.call(_object);
+            }
+
+            _onStartCallbackFired = true;
+
+        }
+
+        elapsed = (time - _startTime) / _duration;
+        elapsed = elapsed > 1 ? 1 : elapsed;
+
+        value = _easingFunction(elapsed);
+
+        for (property in _valuesEnd) {
+
+            // Don't update properties that do not exist in the source object
+            if (_valuesStart[property] === undefined) {
+                continue;
+            }
+
+            var start = _valuesStart[property] || 0;
+            var end = _valuesEnd[property];
+
+            if (end instanceof Array) {
+
+                _object[property] = _interpolationFunction(end, value);
+
+            } else {
+
+                // Parses relative end values with start as base (e.g.: +10, -3)
+                if (typeof (end) === 'string') {
+
+                    if (end.charAt(0) === '+' || end.charAt(0) === '-') {
+                        end = start + parseFloat(end, 10);
+                    } else {
+                        end = parseFloat(end, 10);
+                    }
+                }
+
+                // Protect against non numeric properties.
+                if (typeof (end) === 'number') {
+                    _object[property] = start + (end - start) * value;
+                }
+
+            }
+
+        }
+
+        if (_onUpdateCallback !== null) {
+            _onUpdateCallback.call(_object, value);
+        }
+
+        if (elapsed === 1) {
+
+            if (_repeat > 0) {
+
+                if (isFinite(_repeat)) {
+                    _repeat--;
+                }
+
+                // Reassign starting values, restart by making startTime = now
+                for (property in _valuesStartRepeat) {
+
+                    if (typeof (_valuesEnd[property]) === 'string') {
+                        _valuesStartRepeat[property] = _valuesStartRepeat[property] + parseFloat(_valuesEnd[property], 10);
+                    }
+
+                    if (_yoyo) {
+                        var tmp = _valuesStartRepeat[property];
+
+                        _valuesStartRepeat[property] = _valuesEnd[property];
+                        _valuesEnd[property] = tmp;
+                    }
+
+                    _valuesStart[property] = _valuesStartRepeat[property];
+
+                }
+
+                if (_yoyo) {
+                    _reversed = !_reversed;
+                }
+
+                _startTime = time + _delayTime;
+
+                return true;
+
+            } else {
+
+                if (_onCompleteCallback !== null) {
+                    _onCompleteCallback.call(_object);
+                }
+
+                for (var i = 0, numChainedTweens = _chainedTweens.length; i < numChainedTweens; i++) {
+                    // Make the chained tweens start exactly at the time they should,
+                    // even if the `update()` method was called way past the duration of the tween
+                    _chainedTweens[i].start(_startTime + _duration);
+                }
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    };
+
+};
+
+
+TWEEN.Easing = {
+
+    Linear: {
+
+        None: function (k) {
+
+            return k;
+
+        }
+
+    },
+
+    Quadratic: {
+
+        In: function (k) {
+
+            return k * k;
+
+        },
+
+        Out: function (k) {
+
+            return k * (2 - k);
+
+        },
+
+        InOut: function (k) {
+
+            if ((k *= 2) < 1) {
+                return 0.5 * k * k;
+            }
+
+            return - 0.5 * (--k * (k - 2) - 1);
+
+        }
+
+    },
+
+    Cubic: {
+
+        In: function (k) {
+
+            return k * k * k;
+
+        },
+
+        Out: function (k) {
+
+            return --k * k * k + 1;
+
+        },
+
+        InOut: function (k) {
+
+            if ((k *= 2) < 1) {
+                return 0.5 * k * k * k;
+            }
+
+            return 0.5 * ((k -= 2) * k * k + 2);
+
+        }
+
+    },
+
+    Quartic: {
+
+        In: function (k) {
+
+            return k * k * k * k;
+
+        },
+
+        Out: function (k) {
+
+            return 1 - (--k * k * k * k);
+
+        },
+
+        InOut: function (k) {
+
+            if ((k *= 2) < 1) {
+                return 0.5 * k * k * k * k;
+            }
+
+            return - 0.5 * ((k -= 2) * k * k * k - 2);
+
+        }
+
+    },
+
+    Quintic: {
+
+        In: function (k) {
+
+            return k * k * k * k * k;
+
+        },
+
+        Out: function (k) {
+
+            return --k * k * k * k * k + 1;
+
+        },
+
+        InOut: function (k) {
+
+            if ((k *= 2) < 1) {
+                return 0.5 * k * k * k * k * k;
+            }
+
+            return 0.5 * ((k -= 2) * k * k * k * k + 2);
+
+        }
+
+    },
+
+    Sinusoidal: {
+
+        In: function (k) {
+
+            return 1 - Math.cos(k * Math.PI / 2);
+
+        },
+
+        Out: function (k) {
+
+            return Math.sin(k * Math.PI / 2);
+
+        },
+
+        InOut: function (k) {
+
+            return 0.5 * (1 - Math.cos(Math.PI * k));
+
+        }
+
+    },
+
+    Exponential: {
+
+        In: function (k) {
+
+            return k === 0 ? 0 : Math.pow(1024, k - 1);
+
+        },
+
+        Out: function (k) {
+
+            return k === 1 ? 1 : 1 - Math.pow(2, - 10 * k);
+
+        },
+
+        InOut: function (k) {
+
+            if (k === 0) {
+                return 0;
+            }
+
+            if (k === 1) {
+                return 1;
+            }
+
+            if ((k *= 2) < 1) {
+                return 0.5 * Math.pow(1024, k - 1);
+            }
+
+            return 0.5 * (- Math.pow(2, - 10 * (k - 1)) + 2);
+
+        }
+
+    },
+
+    Circular: {
+
+        In: function (k) {
+
+            return 1 - Math.sqrt(1 - k * k);
+
+        },
+
+        Out: function (k) {
+
+            return Math.sqrt(1 - (--k * k));
+
+        },
+
+        InOut: function (k) {
+
+            if ((k *= 2) < 1) {
+                return - 0.5 * (Math.sqrt(1 - k * k) - 1);
+            }
+
+            return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
+
+        }
+
+    },
+
+    Elastic: {
+
+        In: function (k) {
+
+            if (k === 0) {
+                return 0;
+            }
+
+            if (k === 1) {
+                return 1;
+            }
+
+            return -Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
+
+        },
+
+        Out: function (k) {
+
+            if (k === 0) {
+                return 0;
+            }
+
+            if (k === 1) {
+                return 1;
+            }
+
+            return Math.pow(2, -10 * k) * Math.sin((k - 0.1) * 5 * Math.PI) + 1;
+
+        },
+
+        InOut: function (k) {
+
+            if (k === 0) {
+                return 0;
+            }
+
+            if (k === 1) {
+                return 1;
+            }
+
+            k *= 2;
+
+            if (k < 1) {
+                return -0.5 * Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
+            }
+
+            return 0.5 * Math.pow(2, -10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI) + 1;
+
+        }
+
+    },
+
+    Back: {
+
+        In: function (k) {
+
+            var s = 1.70158;
+
+            return k * k * ((s + 1) * k - s);
+
+        },
+
+        Out: function (k) {
+
+            var s = 1.70158;
+
+            return --k * k * ((s + 1) * k + s) + 1;
+
+        },
+
+        InOut: function (k) {
+
+            var s = 1.70158 * 1.525;
+
+            if ((k *= 2) < 1) {
+                return 0.5 * (k * k * ((s + 1) * k - s));
+            }
+
+            return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
+
+        }
+
+    },
+
+    Bounce: {
+
+        In: function (k) {
+
+            return 1 - TWEEN.Easing.Bounce.Out(1 - k);
+
+        },
+
+        Out: function (k) {
+
+            if (k < (1 / 2.75)) {
+                return 7.5625 * k * k;
+            } else if (k < (2 / 2.75)) {
+                return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
+            } else if (k < (2.5 / 2.75)) {
+                return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
+            } else {
+                return 7.5625 * (k -= (2.625 / 2.75)) * k + 0.984375;
+            }
+
+        },
+
+        InOut: function (k) {
+
+            if (k < 0.5) {
+                return TWEEN.Easing.Bounce.In(k * 2) * 0.5;
+            }
+
+            return TWEEN.Easing.Bounce.Out(k * 2 - 1) * 0.5 + 0.5;
+
+        }
+
+    }
+
+};
+
+TWEEN.Interpolation = {
+
+    Linear: function (v, k) {
+
+        var m = v.length - 1;
+        var f = m * k;
+        var i = Math.floor(f);
+        var fn = TWEEN.Interpolation.Utils.Linear;
+
+        if (k < 0) {
+            return fn(v[0], v[1], f);
+        }
+
+        if (k > 1) {
+            return fn(v[m], v[m - 1], m - f);
+        }
+
+        return fn(v[i], v[i + 1 > m ? m : i + 1], f - i);
+
+    },
+
+    Bezier: function (v, k) {
+
+        var b = 0;
+        var n = v.length - 1;
+        var pw = Math.pow;
+        var bn = TWEEN.Interpolation.Utils.Bernstein;
+
+        for (var i = 0; i <= n; i++) {
+            b += pw(1 - k, n - i) * pw(k, i) * v[i] * bn(n, i);
+        }
+
+        return b;
+
+    },
+
+    CatmullRom: function (v, k) {
+
+        var m = v.length - 1;
+        var f = m * k;
+        var i = Math.floor(f);
+        var fn = TWEEN.Interpolation.Utils.CatmullRom;
+
+        if (v[0] === v[m]) {
+
+            if (k < 0) {
+                i = Math.floor(f = m * (1 + k));
+            }
+
+            return fn(v[(i - 1 + m) % m], v[i], v[(i + 1) % m], v[(i + 2) % m], f - i);
+
+        } else {
+
+            if (k < 0) {
+                return v[0] - (fn(v[0], v[0], v[1], v[1], -f) - v[0]);
+            }
+
+            if (k > 1) {
+                return v[m] - (fn(v[m], v[m], v[m - 1], v[m - 1], f - m) - v[m]);
+            }
+
+            return fn(v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2], f - i);
+
+        }
+
+    },
+
+    Utils: {
+
+        Linear: function (p0, p1, t) {
+
+            return (p1 - p0) * t + p0;
+
+        },
+
+        Bernstein: function (n, i) {
+
+            var fc = TWEEN.Interpolation.Utils.Factorial;
+
+            return fc(n) / fc(i) / fc(n - i);
+
+        },
+
+        Factorial: (function () {
+
+            var a = [1];
+
+            return function (n) {
+
+                var s = 1;
+
+                if (a[n]) {
+                    return a[n];
+                }
+
+                for (var i = n; i > 1; i--) {
+                    s *= i;
+                }
+
+                a[n] = s;
+                return s;
+
+            };
+
+        })(),
+
+        CatmullRom: function (p0, p1, p2, p3, t) {
+
+            var v0 = (p2 - p0) * 0.5;
+            var v1 = (p3 - p1) * 0.5;
+            var t2 = t * t;
+            var t3 = t * t2;
+
+            return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (- 3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+
+        }
+
+    }
+
+};
+
+// UMD (Universal Module Definition)
+(function (root) {
+
+    if (typeof define === 'function' && define.amd) {
+
+        // AMD
+        define([], function () {
+            return TWEEN;
+        });
+
+    } else if (typeof module !== 'undefined' && typeof exports === 'object') {
+
+        // Node.js
+        module.exports = TWEEN;
+
+    } else if (root !== undefined) {
+
+        // Global variable
+        root.TWEEN = TWEEN;
+
+    }
+
+})(this);
+
+messenger.on(CONST.RENDER_START, () => {
+    TWEEN.update();
+});

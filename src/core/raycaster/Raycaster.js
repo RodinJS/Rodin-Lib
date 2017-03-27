@@ -1,9 +1,10 @@
 import {Scene} from '../scene';
 
-let allChilds = (obj) => {
-    let currChilds = obj.children.map(i => i._threeObject);
+let allChildren = (obj) => {
+    // todo: fix this with one loop
+    let currChilds = obj.children.filter(i => i.isReady).map(i => i._threeObject);
     for(let i = 0; i < obj.children.length; i ++) {
-        currChilds = currChilds.concat(allChilds(obj.children[i]));
+        currChilds = currChilds.concat(allChildren(obj.children[i]));
     }
 
     return currChilds;
@@ -11,8 +12,7 @@ let allChilds = (obj) => {
 
 
 /**
- * Class Raycaster, just an easier way to use THREE.JS raycasting
- * @param {!THREE.Scene} _scene - the scene where the raycasting happens
+ * Raycaster, just an easier way to use THREE.JS raycasting
  */
 export class Raycaster extends THREE.Raycaster {
     constructor() {
@@ -21,12 +21,13 @@ export class Raycaster extends THREE.Raycaster {
 
     /**
      * Raycast
-     * @returns [Sculpt] all raycasted objects from the Raycastables array, that ar appended to the scene (directly or not).
+     * @param {number} [depth = Infinity] the raycasting layers depth
+     * @returns {Sculpt[]} all raycasted objects from the gamepadVisibles array, that are children of the scene (directly or not).
      */
-    raycast() {
+    raycast(depth = Infinity) {
         let ret = [];
-        // todo: implement raycastables logic with messenger
-        let intersects = this.intersectObjects(allChilds(Scene.active));
+        // todo: implement gamepadVisibles logic with messenger
+        let intersects = this.intersectObjects(allChildren(Scene.active));
 
         for (let i = 0; i < intersects.length; i++) {
             let centerObj = intersects[i].object;
@@ -36,11 +37,13 @@ export class Raycaster extends THREE.Raycaster {
                 centerObj = centerObj.parent;
             }
 
-            ret.push({
-                sculpt: centerObj.Sculpt,
-                uv: intersects[i].uv,
-                distance: intersects[i].distance
-            });
+            if(centerObj.Sculpt.globalVisible && centerObj.Sculpt.gamepadVisible){
+                ret.push({
+                    sculpt: centerObj.Sculpt,
+                    uv: intersects[i].uv,
+                    distance: intersects[i].distance
+                });
+            }
         }
 
         ret.push({
@@ -48,6 +51,7 @@ export class Raycaster extends THREE.Raycaster {
             uv: null,
             distance: Infinity
         });
+        if(ret.length > depth)  ret.splice(depth,ret.length-1-depth);
 
         return ret;
     }

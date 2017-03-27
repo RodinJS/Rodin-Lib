@@ -1,21 +1,44 @@
-import {TWEEN} from './TWEEN';
+import {TWEEN} from './tween';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
 import {ErrorProtectedMethodCall} from '../error';
 import {Sculpt} from '../sculpt/Sculpt';
+import {EventEmitter} from '../eventEmitter';
+import {messenger} from '../messenger';
 
 import {object} from '../utils';
-function enforce () {
+function enforce() {
 }
-//TODO: Gor jan, mi hat nkaragri inch parametra astanum u inchi hamar
 
 /**
- * AnimationClip Class, used to create animations on Sculpt objects
+ * AnimationClip class.
+ * Represents a single animation, should be used with Animation.
+ * <p>
+ *     Parameters that need to be changed, must be described in the following pattern sample:
+ * </p>
+ * <div class="codeSample">
+ * <p> rotation: {
+ * </p><p class="tab1"> x: 0,
+ * </p><p class="tab1"> y: {
+ * </p><p class="tab2"> from: -Math.PI / 2,
+ * </p><p class="tab2"> to: Math.PI / 2
+ * </p><p class="tab1"> },
+ * </p><p class="tab1"> z: 0
+ * </p><p> }
+ * </p>
+ * </div>
  * @param {!String} name
  * @param {Object} params
+ * @param {!string} params.parameterName name of the main parameter, who's value will be modified in the clip
+ * @param {!string} params.parameterName.subParameter a sub-parameter of the main parameter
+ * @param {number} [params.parameterName.subParameter.from] the starting value
+ * @param {!number} params.parameterName.subParameter.to the final value
  */
-export class AnimationClip {
-    constructor (name, params) {
+export class AnimationClip extends EventEmitter {
+    constructor(name, params) {
+        super();
+
+
         this._loop = false;
         /**
          * The host Sculpt object.
@@ -28,6 +51,8 @@ export class AnimationClip {
          * @type {Object}
          */
         this.params = object.clone(params);
+
+        this.animatedValues = object.clone(params);
 
         /**
          * AnimationClip name.
@@ -43,25 +68,35 @@ export class AnimationClip {
          * @type {boolean}
          */
         this.playing = false;
+
+        /**
+         * Shows if this clip has been updated in current frame
+         * @type {boolean}
+         */
+        this.updatedInCurrentFrame = false;
+
+        messenger.on(CONST.RENDER_END, () => {
+            this.updatedInCurrentFrame = false;
+        });
     }
 
 
     /**
-     * Get a cloned AnimationClip object
+     * Gets a new AnimationClip object cloned from this.
      * @returns {AnimationClip}
      */
-    copy () {
+    clone() {
         let newAnimation = new AnimationClip(this.name, this.params);
         return newAnimation.duration(this.duration()).easing(this.easing()).delay(this.delay()).loop(this.loop());
     }
 
 
     /**
-     * Start AnimationClip
-     * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
+     * Starts this AnimationClip.
+     * @param {boolean} [forceStart=false] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
-    start (forceStart = false) {
+    start(forceStart = false) {
         if (!this.sculpt instanceof Sculpt) {
             return console.warn('AnimationClip cannot be played without adding in object');
         }
@@ -80,55 +115,54 @@ export class AnimationClip {
         let startValues = normalizedParams.from;
         let endValues = normalizedParams.to;
 
-        this.playing = true;
         this.initialProps = object.clone(startValues);
         let _this = this;
         this.tween = new TWEEN.Tween(startValues)
             .to(endValues, this._duration)
             .delay(this._delay)
             .onStart(function () {
+                _this.playing = true;
                 let evt = new RodinEvent(_this.sculpt);
-                evt.AnimationClip = _this.name;
+                evt.animation = _this.name;
                 _this.sculpt.emit(CONST.ANIMATION_START, evt);
             })
             .onUpdate(function () {
-                for (let i in this) {
-                    object.setProperty(_this.sculpt._threeObject, i, this[i]);
-                }
+                _this.animatedValues = this;
+                _this.updatedInCurrentFrame = true;
             })
             .easing(this._easing)
             .start()
             .onComplete(function () {
+                _this.playing = false;
+
                 if (_this._loop) {
-                    _this.playing = false;
                     _this.reset();
                     _this.start();
                 } else {
-                    _this.playing = false;
                     delete this.tween;
                 }
 
                 let evt = new RodinEvent(_this.sculpt);
-                evt.AnimationClip = _this.name;
+                evt.animation = _this.name;
                 _this.sculpt.emit(CONST.ANIMATION_COMPLETE, evt);
             });
     }
 
     /**
-     * Play AnimationClip
+     * Plays AnimationClip - an alias to start();
      * @param {boolean} [forceStart] - stops this AnimationClip (if currently playing) and starts again
      * @returns {boolean}
      */
-    play (forceStart = false) {
+    play(forceStart = false) {
         return this.start(forceStart);
     }
 
     /**
-     * Stop AnimationClip
+     * Stops AnimationClip
      * @param {boolean} [reset] - run reset() method after stopping the AnimationClip.
      * @returns {boolean} - success
      */
-    stop (reset = true) {
+    stop(reset = false) {
         if (this.isPlaying()) {
             this.tween.stop();
             delete this.tween;
@@ -148,30 +182,28 @@ export class AnimationClip {
     }
 
     /**
-     * Reset all to initial values.
+     * Resets animation values to their initial values.
      * <p>This function reverts all affected values to "before AnimationClip" state</p>
      */
-    reset () {
-        for (let i in this.initialProps) {
-            object.setProperty(this.sculpt._threeObject, i, this.initialProps[i]);
-        }
+    reset() {
+        this.animatedValues = object.clone(this.initialProps);
     }
 
     /**
-     * Check AnimationClip playing status
+     * Checks if the AnimationClip is currently playing
      * @returns {boolean}
      */
-    isPlaying () {
+    isPlaying() {
         return this.playing;
     }
 
     /**
      * set/get loop
      * <p>Sets loop value if provided as param, otherwise returns current loop value</p>
-     * @param [loop]
+     * @param [loop=null]
      * @returns {AnimationClip}
      */
-    loop (loop = null) {
+    loop(loop = null) {
         if (loop === null) {
             return this._loop;
         }
@@ -182,11 +214,11 @@ export class AnimationClip {
 
     /**
      * set/get duration
-     * <p>Sets duration value if provided as param, otherwise returns current duration value</p>
-     * @param {number} [duration]
+     * <p>Sets duration value if provided as param, otherwise returns current duration value.</p>
+     * @param {number} [duration=null] clip duration in milliseconds
      * @returns {AnimationClip}
      */
-    duration (duration = null) {
+    duration(duration = null) {
         if (duration === null) {
             return this._duration;
         }
@@ -197,11 +229,11 @@ export class AnimationClip {
 
     /**
      * set/get delay.
-     * <p>Sets delay value if provided as param, otherwise returns current delay value</p>
-     * @param {number} [delay]
+     * <p>Sets delay value if provided as param, otherwise returns current delay value.</p>
+     * @param {number} [delay=null] start delay in milliseconds
      * @returns {AnimationClip}
      */
-    delay (delay = null) {
+    delay(delay = null) {
         if (delay === null) {
             return this._delay;
         }
@@ -215,7 +247,7 @@ export class AnimationClip {
      * @param {TWEEN.Easing} [easing]
      * @returns {AnimationClip}
      */
-    easing (easing = null) {
+    easing(easing = null) {
         if (easing === null) {
             return this._easing;
         }
@@ -230,7 +262,7 @@ export class AnimationClip {
      * @param {!Sculpt}  sculpt
      * @returns {AnimationClip}
      */
-    setSculpt (sculpt) {
+    setSculpt(sculpt) {
         this.initialProps = {};
         this.sculpt = sculpt;
         return this;
@@ -243,16 +275,17 @@ export class AnimationClip {
      * @param {Object} params
      * @param {Sculpt} obj
      * @returns {Object} normalized params
+     * @private
      */
-    static normalizeParams (e, params, obj) {
+    static normalizeParams(e, params, obj) {
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('normalizeParams');
         }
 
         let _params = object.joinParams(params, ['from', 'to']);
-        let res = { from: {}, to: {} };
+        let res = {from: {}, to: {}};
         for (let i in _params) {
-            if(!_params.hasOwnProperty(i))
+            if (!_params.hasOwnProperty(i))
                 continue;
 
             if (_params[i].hasOwnProperty('from')) {

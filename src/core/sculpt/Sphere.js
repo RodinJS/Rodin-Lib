@@ -1,4 +1,13 @@
 import {Sculpt} from './Sculpt';
+import {AScheme} from '../utils';
+
+
+const constructorScheme = {
+    radius: AScheme.number().default(.2),
+    widthSegments: AScheme.number().default(10),
+    heightSegments: AScheme.number().default(10),
+    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
+};
 
 /**
  * Simple Sphere
@@ -8,8 +17,22 @@ import {Sculpt} from './Sculpt';
  * @param material {THREE.Material}
  */
 export class Sphere extends Sculpt {
-    constructor(radius = .2, widthSegments = 10, heightSegments = 10, material = new THREE.MeshBasicMaterial({color: 336699})) {
-        const threeSphere = new THREE.Mesh(new THREE.SphereGeometry(radius, widthSegments, heightSegments), material);
+    constructor(...args) {
+        args = AScheme.validate(args, constructorScheme);
+
+        const threeSphere = new THREE.Mesh(new THREE.SphereGeometry(args.radius, args.widthSegments, args.heightSegments), args.material);
         super(threeSphere);
+
+        this._radius = args.radius;
     }
+
+    /**
+     * Gets the radius of current Sphere
+     * @type {Number}
+     */
+    get radius() {
+        return this._radius;
+    }
+
+    // todo: add setter for radius
 }

@@ -12,13 +12,19 @@ export const getId = (object) => {
 
     return object["__uid__"];
 };
-
-export const getProperty = (obj, prop) => {
+/**
+ *
+ * @param obj
+ * @param prop
+ * @returns {*}
+ */
+export const getProperty
+= (obj, prop) => {
     let props = prop.split('.');
     let tmp = obj;
 
     for (let i = 0; i < props.length; i++) {
-        if (!tmp.hasOwnProperty(props[i])) {
+        if (tmp[props[i]] === undefined) {
             return;
         }
 
@@ -28,12 +34,18 @@ export const getProperty = (obj, prop) => {
     return tmp;
 };
 
+/**
+ *
+ * @param obj
+ * @param prop
+ * @param val
+ */
 export const setProperty =  (obj, prop, val) => {
     let props = prop.split('.');
     let tmp = obj;
 
     for (let i = 0; i < props.length - 1; i++) {
-        if (!tmp.hasOwnProperty(props[i])) {
+        if (tmp[props[i]] === undefined) {
             tmp[props[i]] = {};
         }
 
@@ -91,4 +103,72 @@ export const joinParams = (obj, skip = []) => {
             res[i] = obj[i];
     }
     return res;
+};
+
+const isObj = function (x) {
+    const type = typeof x;
+    return x !== null && (type === 'object' /*|| type === 'function'*/);
+};
+
+function toObject(val) {
+    if (val === null || val === undefined) {
+        throw new TypeError('Cannot convert undefined or null to object');
+    }
+
+    return Object(val);
+}
+
+function assignKey(to, from, key) {
+    let val = from[key];
+
+    if (val === undefined || val === null) {
+        return;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(to, key)) {
+        if (to[key] === undefined || to[key] === null) {
+            throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
+        }
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(to, key) || !isObj(val)) {
+        to[key] = val;
+    } else {
+        to[key] = assign(Object(to[key]), from[key]);
+    }
+}
+
+const assign = (to, from) => {
+    if (to === from) {
+        return to;
+    }
+
+    from = Object(from);
+
+    for (let key in from) {
+        if (Object.prototype.hasOwnProperty.call(from, key)) {
+            assignKey(to, from, key);
+        }
+    }
+
+    if (Object.getOwnPropertySymbols) {
+        let symbols = Object.getOwnPropertySymbols(from);
+
+        for (let i = 0; i < symbols.length; i++) {
+            if (Object.prototype.propIsEnumerable.call(from, symbols[i])) {
+                assignKey(to, from, symbols[i]);
+            }
+        }
+    }
+
+    return to;
+};
+
+export const deepAssign = target => {
+    target = toObject(target);
+
+    for (let s = 1; s < arguments.length; s++) {
+        assign(target, arguments[s]);
+    }
+    return target;
 };

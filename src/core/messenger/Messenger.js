@@ -1,8 +1,4 @@
 /**
- * Created by gor on 2/7/17.
- */
-
-/**
  * Messenger for collaborating classes
  */
 export class Messenger {
@@ -20,7 +16,9 @@ export class Messenger {
             return;
         }
 
-        this.channels[channel].map(cb => cb(body));
+        for(let i = 0; i < this.channels[channel].length; i ++) {
+            this.channels[channel][i](body);
+        }
     }
 
     postAsync(channel, body) {

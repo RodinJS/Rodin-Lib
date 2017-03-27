@@ -1,19 +1,21 @@
-'use strict';
-
-import {RodinEvent} from '../../RodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
+import {Vector3} from '../../utils/math';
+
+
 /**
- * Text Class, used to create flat text objects, parameters have the following structure:
+ * Text Class (experimental), used to create flat text objects, parameters have the following structure:
+ * <div class="codeSample">
  * <p>{</p>
- * <p>&nbsp; &nbsp;      text: string,</p>
- * <p>&nbsp; &nbsp;      color : hex,</p>
- * <p>&nbsp; &nbsp;      fontFamily : string,</p>
- * <p>&nbsp; &nbsp;      fontSize : number,</p>
- * <p>&nbsp; &nbsp;      fontStyle : string,</p>
- * <p>&nbsp; &nbsp;      transparent : boolean,</p>
- * <p>&nbsp; &nbsp;      ppm : number</p>
+ * <p class="tab1"> text: string,</p>
+ * <p class="tab1"> color : hex,</p>
+ * <p class="tab1"> fontFamily : string,</p>
+ * <p class="tab1"> fontSize : number,</p>
+ * <p class="tab1"> fontStyle : string,</p>
+ * <p class="tab1"> transparent : boolean,</p>
+ * <p class="tab1"> ppm : number</p>
  * <p>}</p>
+ * </div>
  *
  * ppm is the Pixel Per Meter resolution
  * @param {!Object}  - parameters
@@ -29,7 +31,8 @@ export class Text extends Sculpt {
         transparent = true,
         ppm = 500
         }) {
-        super(0);
+
+        super(new THREE.Object3D(), true);
         this.background = background;
         this.text = text;
         this.color = color;
@@ -40,15 +43,9 @@ export class Text extends Sculpt {
         this.ppm = ppm;
         this.texture = null;
         this.textMat = null;
-        this.textMesh = null;
         this.canvas = document.createElement("canvas");
         this.draw();
-        super.init(this.textMesh);
-        let timer = setTimeout(function(){ this.emit("ready", new RodinEvent(this)); }, 0);
-        clearTimeout(timer);
-        // timeout(() => {
-        //     this.emit("ready", new RodinEvent(this));
-        // }, 0);
+        this.emitReady();
     };
 
     draw() {
@@ -101,15 +98,15 @@ export class Text extends Sculpt {
         }
 
         let geometry = new THREE.PlaneGeometry(1,1, 5, 5);
-        geometry = utils3D.scaleGeometry(geometry, new THREE.Vector3(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1));
-        if(!this.textMesh){
-            this.textMesh = new THREE.Mesh(geometry, this.textMat);
+        geometry = utils3D.scaleGeometry(geometry, new Vector3(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1));
+        if(!(this._threeObject instanceof THREE.Mesh)){
+            this._threeObject = new THREE.Mesh(geometry, this.textMat);
         }else{
-            this.textMesh.geometry.dispose();
-            this.textMesh.geometry = geometry;
+            this._threeObject.geometry.dispose();
+            this._threeObject.geometry = geometry;
         }
-        //this.textMesh.scale.set(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1);
-        //this.textMesh.geometry.center();
+        //this._threeObject.scale.set(this.canvas.width / this.ppm, this.canvas.height / this.ppm, 1);
+        //this._threeObject.geometry.center();
         this.texture.needsUpdate = true;
         delete this.canvas;
         inMemCanvas = null;

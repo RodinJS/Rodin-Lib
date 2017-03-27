@@ -1,50 +1,63 @@
 'use strict';
 
-import {RodinEvent} from '../../RodinEvent';
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
 
 /**
- * Element Class, used to create flat objects, parameters have the following structure:
- * <p>{</p>
- * <p>      name: string,</p>
- * <p>      width : meters,</p>
- * <p>      height : meters,</p>
- * <p>      background : {</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; color: hex,</p>
- * <p>&nbsp;&nbsp;&nbsp; image: {url:string}</p>
- * <p>                  },</p>
- * <p>      border : {</p>
- * <p>&nbsp;&nbsp;&nbsp; radius: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; color: hex,</p>
- * <p>&nbsp;&nbsp;&nbsp; width: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number</p>
- * <p>              },</p>
- * <p>      label: {</p>
- * <p>&nbsp;&nbsp;&nbsp; text: string,</p>
- * <p>&nbsp;&nbsp;&nbsp; fontFamily: string,</p>
- * <p>&nbsp;&nbsp;&nbsp; fontSize: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; color: Hex</p>
- * <p>              },</p>
- * <p>      image: {</p>
- * <p>&nbsp;&nbsp;&nbsp; url: string,</p>
- * <p>&nbsp;&nbsp;&nbsp; position: {v: number, h: number},</p>
- * <p>&nbsp;&nbsp;&nbsp; width: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; height: number,</p>
- * <p>&nbsp;&nbsp;&nbsp; opacity: number</p>
- * <p>              },</p>
- * <p>      transparent : boolean,</p>
- * <p>      ppm : number</p>
- * <p>}</p>
+ * Element Class (experimental), used to create flat objects, parameters have the following structure:
  *
- * ppm is the Pixel Per Meter resolution
- * @param {!Object}  - parameters
+ * <div class="codeSample">
+ * <p>{</p>
+ * <p class="tab1"> name: string,</p>
+ * <p class="tab1"> width: number,</p>
+ * <p class="tab1"> height: number,</p>
+ * <p class="tab1"> background: {</p>
+ * <p class="tab2"> opacity: number,</p>
+ * <p class="tab2"> color: hex,</p>
+ * <p class="tab2"> image: { url: string }</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> border: {</p>
+ * <p class="tab2"> radius: number,</p>
+ * <p class="tab2"> color: hex,</p>
+ * <p class="tab2"> width: number,</p>
+ * <p class="tab2"> opacity: number</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> label: {</p>
+ * <p class="tab2"> text: string,</p>
+ * <p class="tab2"> position: { v: number, h: number },</p>
+ * <p class="tab2"> fontFamily: string,</p>
+ * <p class="tab2"> fontSize: number,</p>
+ * <p class="tab2"> opacity: number,</p>
+ * <p class="tab2"> color: Hex</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> image: {</p>
+ * <p class="tab2"> url: string,</p>
+ * <p class="tab2"> position: { v: number, h: number },</p>
+ * <p class="tab2"> width: number,</p>
+ * <p class="tab2"> height: number,</p>
+ * <p class="tab2"> opacity: number</p>
+ * <p class="tab1"> },</p>
+ * <p class="tab1"> transparent: boolean,</p>
+ * <p class="tab1"> ppm: number</p>
+ * <p>}</p>
+ * </div>
+ *
+ * @param {!Object} params - parameters
+ * @param {Object} [params.name="element"] - the element name
+ * @param {number} [params.width=0.2] - the element width in meters
+ * @param {number} [params.height=0.15] - the element height in meters
+ * @param {Object} [params.background] - the element background parameters
+ * @param {Object} [params.border] - the element border parameters
+ * @param {Object} [params.label] - a Text label that should appear on the element
+ * @param {Object} [params.image] - an image that should appear on the element
+ * @param {boolean} [params.transparent=true] - defines whether the mesh should be rendered as a transparent object or not
+ * @param {number} [params.ppm=500] - the pixel per meter resolution
  */
 export class Element extends Sculpt {
+
+
     constructor({
-        name = "button",
+        name = "element",
         width = 0.2,
         height = 0.15,
         background = {},
@@ -54,7 +67,7 @@ export class Element extends Sculpt {
         transparent = true,
         ppm = 500
         }) {
-        super(0);
+        super(new THREE.Object3D(), true);
         this.name = name;
         this.width = width;
         this.height = height;
@@ -125,7 +138,7 @@ export class Element extends Sculpt {
                  canvas.style.left = "0";
                  */
             }
-            else if (this.background.color) {
+            else if (this.background.color !== undefined) {
                 let ctx = this.canvas.getContext("2d");
                 let rgb = utils3D.hexToRgb(this.background.color);
                 ctx.fillStyle = "rgba("
@@ -231,7 +244,7 @@ export class Element extends Sculpt {
 
             let buttonMat = null;
 
-            if (this.image || this.label || this.background.image || this.background.color|| this.border.width) {
+            if (this.image || this.label || this.background.image || this.background.color !== undefined || this.border.width) {
                 let w = utils3D.nearestPow2(this.canvas.width) / this.canvas.width;
                 let h = utils3D.nearestPow2(this.canvas.height) / this.canvas.height;
 
@@ -264,13 +277,9 @@ export class Element extends Sculpt {
 
 
             // Finalizing
-            super.init(buttonMesh);
-            let timer = setTimeout(function(){ this.emit("ready", new RodinEvent(this)); }, 0);
-            clearTimeout(timer);
-            // timeout(() => {
-            //     this.emit("ready", new RodinEvent(this));
-            // }, 0);
-            // //console.log(this)
+            this._threeObject = buttonMesh;
+            this.emitReady();
+
         };
 
         draw();
