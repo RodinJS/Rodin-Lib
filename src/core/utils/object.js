@@ -24,7 +24,7 @@ export const getProperty
     let tmp = obj;
 
     for (let i = 0; i < props.length; i++) {
-        if (!tmp.hasOwnProperty(props[i])) {
+        if (tmp[props[i]] === undefined) {
             return;
         }
 
@@ -45,7 +45,7 @@ export const setProperty =  (obj, prop, val) => {
     let tmp = obj;
 
     for (let i = 0; i < props.length - 1; i++) {
-        if (!tmp.hasOwnProperty(props[i])) {
+        if (tmp[props[i]] === undefined) {
             tmp[props[i]] = {};
         }
 

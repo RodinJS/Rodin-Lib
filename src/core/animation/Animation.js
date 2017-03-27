@@ -165,7 +165,7 @@ export class AnimationPlugin extends SculptPlugin {
             if (!clip.isPlaying()) continue;
 
             for (let j in clip.animatedValues) {
-                object.setProperty(this.sculpt._threeObject, j, clip.animatedValues[j]);
+                object.setProperty(this.sculpt, j, clip.animatedValues[j]);
             }
         }
     }
