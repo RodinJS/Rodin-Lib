@@ -4,6 +4,7 @@ import * as CONST from '../constants';
 import {ErrorProtectedMethodCall} from '../error';
 import {Sculpt} from '../sculpt/Sculpt';
 import {EventEmitter} from '../eventEmitter';
+import {messenger} from '../messenger';
 
 import {object} from '../utils';
 function enforce() {
@@ -67,6 +68,16 @@ export class AnimationClip extends EventEmitter {
          * @type {boolean}
          */
         this.playing = false;
+
+        /**
+         * Shows if this clip has been updated in current frame
+         * @type {boolean}
+         */
+        this.updatedInCurrentFrame = false;
+
+        messenger.on(CONST.RENDER_END, () => {
+            this.updatedInCurrentFrame = false;
+        });
     }
 
 
@@ -117,6 +128,7 @@ export class AnimationClip extends EventEmitter {
             })
             .onUpdate(function () {
                 _this.animatedValues = this;
+                _this.updatedInCurrentFrame = true;
             })
             .easing(this._easing)
             .start()

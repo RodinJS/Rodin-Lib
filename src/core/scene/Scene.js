@@ -345,10 +345,12 @@ export class Scene extends EventEmitter {
         }
 
         if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) {
-            Scene.webVRmanager.hmd.requestAnimationFrame(Scene.render);
+            Scene.webVRmanager.hmd.requestAnimationFrame((timestamp) => {
+                Scene.render(enforce, timestamp);
+            });
         } else {
             requestAnimationFrame((timestamp) => {
-                Scene.render(enforce, timestamp)
+                Scene.render(enforce, timestamp);
             });
         }
 

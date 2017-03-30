@@ -43,6 +43,11 @@ export class MaterialPlayer {
         textureL.minFilter = textureL.magFilter = THREE.LinearFilter;
         textureL.format = THREE.RGBFormat;
         textureL.generateMipmaps = false;
+        /**
+         * The currently playing video url source key
+         * @type {string}
+         */
+        this.currentSource = url.default;
 
         let textureR = null;
 
@@ -83,6 +88,7 @@ export class MaterialPlayer {
             video.appendChild(source);
             video.load();
             video.currentTime = timePoint;
+            this.currentSource = key;
         };
         /**
          * A customizable function call on buffering end.
