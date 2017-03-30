@@ -41,6 +41,9 @@ export class Raycaster extends THREE.Raycaster {
                 ret.push({
                     sculpt: centerObj.Sculpt,
                     uv: intersects[i].uv,
+                    face: intersects[i].face,
+                    faceIndex: intersects[i].faceIndex,
+                    point: intersects[i].point,
                     distance: intersects[i].distance
                 });
             }
@@ -49,6 +52,9 @@ export class Raycaster extends THREE.Raycaster {
         ret.push({
             sculpt: Scene.active,
             uv: null,
+            face: null,
+            faceIndex: null,
+            point: null,
             distance: Infinity
         });
         if(ret.length > depth)  ret.splice(depth,ret.length-1-depth);
