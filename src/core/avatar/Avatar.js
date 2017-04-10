@@ -16,6 +16,7 @@ export class Avatar extends Sculpt {
 
         super();
         this._hmdCamera = args.HMDCamera;
+        this.add(this._hmdCamera);
 
         this.trackPosition = args.trackPosition;
         this.trackRotation = args.trackRotation;
@@ -39,6 +40,9 @@ export class Avatar extends Sculpt {
 
     static instances = [];
 
+    // we need to figure out if this is really static, or per avatar property
+    static userHeight = 1.6;
+
     static init() {
         if ('VRFrameData' in window) {
             Avatar._frameData = new VRFrameData();
@@ -57,7 +61,7 @@ export class Avatar extends Sculpt {
         if (!Avatar.isRunning)
             return;
 
-        if (!Avatar.vrDisplay) {
+        if (!Avatar._vrDisplay) {
             Avatar.pause();
 
             if (navigator.getVRDisplays) {
@@ -73,16 +77,17 @@ export class Avatar extends Sculpt {
                     // we stay paused if no vr displays
                 });
             }
+            return;
         }
 
         let pose = null;
 
         // to support different versions of webvr api
-        if (Avatar.vrDisplay.getFrameData) {
-            Avatar.vrDisplay.getFrameData(Avatar._frameData);
+        if (Avatar._vrDisplay.getFrameData) {
+            Avatar._vrDisplay.getFrameData(Avatar._frameData);
             pose = Avatar._frameData.pose;
-        } else if (Avatar.vrDisplay.getPose) {
-            pose = Avatar.vrDisplay.getPose();
+        } else if (Avatar._vrDisplay.getPose) {
+            pose = Avatar._vrDisplay.getPose();
         }
 
         if (pose.orientation !== null) {
@@ -96,11 +101,11 @@ export class Avatar extends Sculpt {
         }
 
         if (Avatar.standing) {
-            if (Avatar.vrDisplay.stageParameters) {
-                const standingMatrix = new THREE.Matrix4().fromArray(Avatar.vrDisplay.stageParameters.sittingToStandingTransform);
+            if (Avatar._vrDisplay.stageParameters) {
+                const standingMatrix = new THREE.Matrix4().fromArray(Avatar._vrDisplay.stageParameters.sittingToStandingTransform);
                 Avatar.trackingSculpt.matrix.multiplyMatrices(standingMatrix, Avatar.trackingSculpt.matrix);
             } else {
-                Avatar.trackingSculpt.position.y += this.userHeight;
+                Avatar.trackingSculpt.position.y += Avatar.userHeight;
             }
         }
 
@@ -113,13 +118,17 @@ export class Avatar extends Sculpt {
             }
 
             if (Avatar.instances[i].trackRotation) {
-                Avatar.instances[i].quaternion.copy(Avatar.trackingSculpt.quaternion);
+                Avatar.instances[i].HMDCamera.quaternion.copy(Avatar.trackingSculpt.quaternion);
+                Avatar.instances[i].HMDCamera.updateProjectionMatrix();
             }
         }
 
     }
 }
 
-messenger.on(CONST.UPDATE, () => {
+messenger.on(CONST.RENDER_START, () => {
     Avatar.update();
 });
+
+Avatar.init();
+Avatar.isRunning = true;

@@ -67,9 +67,10 @@ export class Scene extends EventEmitter {
          * @type {Array}
          */
         this.cameras = [];
-        this._hmdCamera = new HMDCamera();
         this.avatar = new Avatar();
-        this.addCamera(this.avatar.HMDCamera);
+        this.add(this.avatar);
+        Avatar.standing = true;
+        //this.addCamera(this.avatar.HMDCamera);
         //this._controls = new THREE.VRControls(this.HMDCamera._threeCamera);
         //this._controls.standing = true;
 
@@ -77,7 +78,8 @@ export class Scene extends EventEmitter {
         //TODO: get rid of this sh*t. this is to cover the bug with crash on vr exit on mobiles
 
         let x = new Sculpt(new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial()));
-        this._hmdCamera.add(x);
+        this.avatar.HMDCamera.add(x);
+
         x.position.set(0, 1, -99);
 
     }
@@ -117,7 +119,7 @@ export class Scene extends EventEmitter {
      * @returns {HMDCamera}
      */
     get HMDCamera() {
-        return this._hmdCamera;
+        return this.avatar.HMDCamera;
     }
 
     /**
