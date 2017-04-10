@@ -7,6 +7,8 @@ import * as CONSTANTS from '../constants';
 import {RodinEvent} from '../rodinEvent';
 import {Sculpt} from '../sculpt';
 import {HMDCamera} from '../camera';
+import {Avatar} from '../avatar';
+
 
 function enforce() {
 }
@@ -66,10 +68,10 @@ export class Scene extends EventEmitter {
          */
         this.cameras = [];
         this._hmdCamera = new HMDCamera();
-        this.addCamera(this._hmdCamera);
-
-        this._controls = new THREE.VRControls(this.HMDCamera._threeCamera);
-        this._controls.standing = true;
+        this.avatar = new Avatar();
+        this.addCamera(this.avatar.HMDCamera);
+        //this._controls = new THREE.VRControls(this.HMDCamera._threeCamera);
+        //this._controls.standing = true;
 
 
         //TODO: get rid of this sh*t. this is to cover the bug with crash on vr exit on mobiles
@@ -341,7 +343,7 @@ export class Scene extends EventEmitter {
         messenger.post(CONSTANTS.RENDER_START, {});
 
         // Update VR headset position and apply to camera.
-        Scene.active._controls.update();
+        //Scene.active._controls.update();
 
         // call all prerender functions
         for (let i = 0; i < preRenderFunctions.length; i++) {

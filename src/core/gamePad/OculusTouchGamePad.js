@@ -4,6 +4,7 @@ import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
 import {Vector3} from '../utils/math';
+import {Avatar} from '../avatar';
 
 /**
  * A controller class for describing Oculus Rift Touch controllers event handlers.

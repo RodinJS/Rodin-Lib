@@ -4,6 +4,7 @@ import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
 import {Vector3} from '../utils/math';
+import {Avatar} from '../avatar';
 
 /**
  * A controller class for describing HTC Vive controllers event handlers.
@@ -29,7 +30,7 @@ export class ViveController extends GamePad {
         messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
         messenger.on(CONST.ACTIVE_SCENE, (scene) => {
-            this.standingMatrix = scene._controls.getStandingMatrix();
+            this.standingMatrix = Avatar.standingMatrix;
         });
     }
 
