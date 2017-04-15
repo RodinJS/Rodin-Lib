@@ -67,7 +67,7 @@ export class OculusTouchGamePad extends GamePad {
      * Set Controller model to Oculus touch controller model.
      * @param {string} [url] - url to .obj model of the controller.
      */
-    initControllerModel(url = `https://cdn.rodin.io/resources/models/OculusTouchController_v4/${this.hand}_oculus_controller.obj`) {
+    initControllerModel(url = `resource/models/controller/OculusTouchController_v4/${this.hand}_oculus_controller.obj`) {
         this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
