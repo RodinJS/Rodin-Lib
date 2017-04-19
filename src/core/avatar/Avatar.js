@@ -124,6 +124,12 @@ export class Avatar extends Sculpt {
         }
 
     }
+
+    static get active() {
+        //TODO: THIS IS NOT RIGHT
+        //TODO: FIX THIS LATER, NO TIME NOW
+        return Avatar.instances[0];
+    }
 }
 
 messenger.on(CONST.RENDER_START, () => {

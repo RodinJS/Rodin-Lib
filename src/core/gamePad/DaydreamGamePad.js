@@ -17,7 +17,7 @@ export class DaydreamController extends GamePad {
          * An array with Button objects.
          * @type {Button[]}
          */
-        this.buttons = [];
+        this.buttons = [Buttons.daydreamTrigger];
 
         this.initControllerModel();
         this.initRaycastingLine();
@@ -35,9 +35,20 @@ export class DaydreamController extends GamePad {
     updateObject() {
         let pose = this.navigatorGamePad.pose;
 
-        if(!pose) return;
+        if (!pose) return;
 
-        this.sculpt.globalPosition.set(0, 1.6, -2);
+        //this.sculpt.globalPosition.set(0, 1.6, -2);
+        let position = Avatar.active.globalPosition.clone();
+        position.y -= Avatar.userHeight / 3;
+
+        const avatarRight = new THREE.Vector3(0.2, 0, -0.15).applyQuaternion(Avatar.active.HMDCamera.globalQuaternion);
+        position = position.add(avatarRight);
+
+        const forearmEffect = new THREE.Vector3(0,0,-0.35).applyQuaternion(new THREE.Quaternion().fromArray(pose.orientation));
+        position = position.add(forearmEffect);
+
+        this.sculpt.globalPosition.copy(position);
+
 
         // todo: check this logic
         //if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
@@ -64,7 +75,7 @@ export class DaydreamController extends GamePad {
      * Set Controller model to HTC Vive controller model.
      * @param {string} [url] - url to .obj model of the controller.
      */
-    initControllerModel(url = 'https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj') {
+    initControllerModel(url = 'https://cdn.rodin.io/resources/models/DaydreamController/daydream_controller.obj') {
         this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
