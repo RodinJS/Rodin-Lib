@@ -23,7 +23,7 @@ export class Box extends Sculpt {
 
         this._width = args.width;
         this._height = args.height;
-        this._depth = args.depth
+        this._depth = args.depth;
     }
 
     /**

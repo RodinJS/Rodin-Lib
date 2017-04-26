@@ -1,6 +1,7 @@
 export * from './Sculpt';
 
 export * from './Box';
+export * from './Plane';
 export * from './Sphere';
 export * from './Cylinder';
 
