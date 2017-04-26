@@ -28,6 +28,7 @@ function enforce() {
  * @param { Number } [ startPositionRandomness.randomness = 1 ]
  */
 
+// TODO: set default value
 export class Particle extends Sculpt {
     constructor(material, lifetime, particleSize, startPosition) {
 
