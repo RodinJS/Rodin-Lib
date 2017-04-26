@@ -47,6 +47,7 @@ const enforce = function () {
  * @param {THREE.SpriteMaterial} [ params.particlesMaterial = new THREE.SpriteMaterial()] - Material for each particle
  */
 
+// TODO: make particle systems more flexible (let change path when you want)
 
 export class ParticleSystem extends Sculpt {
     constructor(params) {
@@ -127,7 +128,7 @@ export class ParticleSystem extends Sculpt {
             }
         });
     }
-
+    // TODO: make particles destroy easier
     destroyParticle(p) {
         p.parent = null;
         this.particles.splice(this.particles.indexOf(p), 1);
