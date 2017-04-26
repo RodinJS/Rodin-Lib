@@ -6,6 +6,7 @@ import {GazePoint} from '../sculpt/GazePoint';
 
 // todo: implement with messenger
 import {Scene} from '../scene';
+import {Avatar} from "../avatar/Avatar";
 
 /**
  * Custom (virtual) navigator gamepad class, for CardboardController.
@@ -138,7 +139,7 @@ export class CardboardGamePad extends GamePad {
      */
     getIntersections() {
         // todo: use our custom camera later
-        this.raycaster.set(Scene.active._camera.getWorldPosition(), Scene.active._camera.getWorldDirection());
+        this.raycaster.set(Avatar.active.HMDCamera.globalPosition, Avatar.active.HMDCamera._threeCamera.getWorldDirection());
         return this.raycaster.raycast(this.raycastLayers);
     }
 }
