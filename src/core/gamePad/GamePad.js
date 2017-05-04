@@ -122,18 +122,18 @@ export class GamePad extends EventEmitter {
             }
         });
 
-        if(this.type === CONST.BOTH || this.type === CONST.NON_VR) {
+        if (this.type === CONST.BOTH || this.type === CONST.NON_VR) {
             this.enable();
         }
 
         window.addEventListener('vrdisplaypresentchange', () => {
-            if(this.type === CONST.BOTH) return;
+            if (this.type === CONST.BOTH) return;
             let re = new RegExp(this.navigatorGamePadId, 'gi');
 
             const hmd = Scene.webVRmanager.hmd;
 
             if (hmd) {
-                if(hmd.isPresenting && this.type === CONST.VR && re.test(hmd.displayName) || !hmd.isPresenting && this.type === CONST.NON_VR) {
+                if (hmd.isPresenting && this.type === CONST.VR && re.test(hmd.displayName) || !hmd.isPresenting && this.type === CONST.NON_VR) {
                     this.enable();
                 } else {
                     this.disable();
@@ -163,14 +163,22 @@ export class GamePad extends EventEmitter {
      * @returns {Object} controller or null
      */
     static getControllerFromNavigator(id, hand = null) {
-        let controllers = [navigator.mouseGamePad, navigator.cardboardGamePad];
+        let gamepads = [navigator.mouseGamePad, navigator.cardboardGamePad];
+        let navigatorGamepads = [];
         try {
-            controllers = controllers.concat(navigator.getGamepads());
+            navigatorGamepads = navigator.getGamepads();
+
         } catch (ex) {
         }
 
-        for (let i = 0; i < controllers.length; i++) {
-            let controller = controllers[i];
+        for (let i = 0; i < navigatorGamepads.length; i++) {
+            if (navigatorGamepads[i] === null)
+                continue;
+            gamepads.push(navigatorGamepads[i]);
+        }
+
+        for (let i = 0; i < gamepads.length; i++) {
+            let controller = gamepads[i];
             if (controller && controller.id && controller.id.match(new RegExp(id, 'gi'))) {
                 if (hand === null || (controller.hand && controller.hand.match(new RegExp(hand, 'gi')))) {
                     return controller;
@@ -201,14 +209,12 @@ export class GamePad extends EventEmitter {
 
         let buttonsToCheck = this.navigatorGamePad.buttons.concat(this.navigatorGamePad.polyfilledButtons || []);
         for (let i = 0; i < buttonsToCheck.length; i++) {
-            if(!this.buttons[i]) continue;
+            if (!this.buttons[i]) continue;
 
             if (this.buttons[i].pressed !== buttonsToCheck[i].pressed) {
                 this.buttons[i].pressed = buttonsToCheck[i].pressed;
                 this.buttons[i].pressed ? this.buttonDown(this.buttons[i]) : this.buttonUp(this.buttons[i]);
                 this.buttons[i].pressed ? buttonDownDetected = true : buttonUpDetected = true;
-
-                buttonsPressed.push(this.buttons[i]);
             }
 
             if (this.buttons[i].value !== buttonsToCheck[i].value) {
@@ -250,10 +256,9 @@ export class GamePad extends EventEmitter {
         });
 
 
-
         this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER_OUT, null);
-        if(hoveredOutSculpts.length > 0) {
-           this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
+        if (hoveredOutSculpts.length > 0) {
+            this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
         }
 
         this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
@@ -271,18 +276,19 @@ export class GamePad extends EventEmitter {
 
         this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER, null);
         if (hoveredSculpts.length > 0) {
-           this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
+            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
         }
 
         this.intersected = [...intersections];
     }
+
     /**
      * Updates controller object in scene, updates position and rotation.
      */
     updateObject() {
         let pose = this.navigatorGamePad.pose;
 
-        if(!pose) return;
+        if (!pose) return;
 
         // todo: check this logic
         if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
@@ -310,7 +316,8 @@ export class GamePad extends EventEmitter {
         if (objects.length === 0)
             return;
 
-        let currentEvent = new RodinEvent(objects[0].sculpt, {domEvent: DOMEvent, button: button, gamepad: this});;
+        let currentEvent = new RodinEvent(objects[0].sculpt, {domEvent: DOMEvent, button: button, gamepad: this});
+        ;
         let i = 0;
         do {
             currentEvent.target = objects[i].sculpt;
@@ -348,6 +355,7 @@ export class GamePad extends EventEmitter {
      */
     buttonUp(button) {
         buttonsUp.push(button);
+        buttonsPressed.splice(buttonsPressed.indexOf(button), 1)
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_UP, null, button, this);
     }
 

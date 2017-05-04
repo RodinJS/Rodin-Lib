@@ -3,7 +3,7 @@ import {Scene} from '../scene';
 let allChildren = (obj) => {
     // todo: fix this with one loop
     let currChilds = obj.children.filter(i => i.isReady).map(i => i._threeObject);
-    for(let i = 0; i < obj.children.length; i ++) {
+    for (let i = 0; i < obj.children.length; i++) {
         currChilds = currChilds.concat(allChildren(obj.children[i]));
     }
 
@@ -37,7 +37,7 @@ export class Raycaster extends THREE.Raycaster {
                 centerObj = centerObj.parent;
             }
 
-            if(centerObj.Sculpt.globalVisible && centerObj.Sculpt.gamepadVisible){
+            if (centerObj.Sculpt.globalVisible && centerObj.Sculpt.gamepadVisible) {
                 ret.push({
                     sculpt: centerObj.Sculpt,
                     uv: intersects[i].uv,
@@ -51,8 +51,12 @@ export class Raycaster extends THREE.Raycaster {
             uv: null,
             distance: Infinity
         });
-        if(ret.length > depth)  ret.splice(depth,ret.length-1-depth);
+        if (ret.length > depth) ret.splice(depth, ret.length - 1 - depth);
 
         return ret;
+    }
+
+    setFromCamera(vec, camera) {
+        super.setFromCamera(vec, camera._threeCamera);
     }
 }

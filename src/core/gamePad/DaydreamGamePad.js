@@ -10,19 +10,14 @@ import {Avatar} from '../avatar';
  * A controller class for describing HTC Vive controllers event handlers.
  * @param {string} hand Required - "left" or "right".
  */
-export class ViveController extends GamePad {
-    constructor(hand) {
-        super('openvr', hand, CONST.VR);
+export class DaydreamController extends GamePad {
+    constructor() {
+        super('Daydream', null, CONST.VR);
         /**
          * An array with Button objects.
          * @type {Button[]}
          */
-        this.buttons = [];
-        if (hand === CONST.LEFT) {
-            this.buttons = [Buttons.viveLeftTrackpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
-        } else {
-            this.buttons = [Buttons.viveRightTrackpad, Buttons.viveRightTrigger, Buttons.viveRightGrip, Buttons.viveRightMenu];
-        }
+        this.buttons = [Buttons.daydreamTrigger];
 
         this.initControllerModel();
         this.initRaycastingLine();
@@ -32,6 +27,37 @@ export class ViveController extends GamePad {
         messenger.on(CONST.ACTIVE_SCENE, (scene) => {
             this.standingMatrix = Avatar.standingMatrix;
         });
+    }
+
+    /**
+     * Updates controller object in scene, updates position and rotation.
+     */
+    updateObject() {
+        let pose = this.navigatorGamePad.pose;
+
+        if (!pose) return;
+
+        //this.sculpt.globalPosition.set(0, 1.6, -2);
+        let position = Avatar.active.globalPosition.clone();
+        position.y -= Avatar.userHeight / 3;
+
+        const avatarRight = new THREE.Vector3(0.2, 0, -0.15).applyQuaternion(Avatar.active.HMDCamera.globalQuaternion);
+        position = position.add(avatarRight);
+
+        const forearmEffect = new THREE.Vector3(0,0,-0.35).applyQuaternion(new THREE.Quaternion().fromArray(pose.orientation));
+        position = position.add(forearmEffect);
+
+        this.sculpt.globalPosition.copy(position);
+
+
+        // todo: check this logic
+        //if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
+        if (pose.orientation !== null) this.sculpt.quaternion.fromArray(pose.orientation);
+        this.sculpt.matrix.compose(this.sculpt._threeObject.position, this.sculpt.quaternion, this.sculpt.scale);
+        this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(this.standingMatrix, this.sculpt._threeObject.matrix);
+        this.sculpt._threeObject.matrixWorldNeedsUpdate = true;
+
+
     }
 
     /**
@@ -49,7 +75,7 @@ export class ViveController extends GamePad {
      * Set Controller model to HTC Vive controller model.
      * @param {string} [url] - url to .obj model of the controller.
      */
-    initControllerModel(url = 'https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj') {
+    initControllerModel(url = 'https://cdn.rodin.io/resources/models/DaydreamController/daydream_controller.obj') {
         this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
@@ -84,6 +110,5 @@ export class ViveController extends GamePad {
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
 messenger.once(CONST.RODIN_STARTED, () => {
-    GamePad.viveLeft = new ViveController(CONST.LEFT);
-    GamePad.viveRight = new ViveController(CONST.RIGHT);
+    GamePad.daydream = new DaydreamController();
 });
