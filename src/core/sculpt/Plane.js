@@ -6,7 +6,7 @@ const constructorScheme = {
     height: AScheme.number().default('$width'),
     widthSegments: AScheme.number().default(1),
     heightSegments: AScheme.number().default(1),
-    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
+    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 0x336699}))
 };
 
 // TODO Aram: ete mi parametri default values urishic a veGalum, mihat jogenq et vong grenq docum. senc ok a ?
