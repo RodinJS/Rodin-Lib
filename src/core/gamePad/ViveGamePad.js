@@ -20,7 +20,7 @@ export class ViveController extends GamePad {
         if (hand === CONST.LEFT) {
             this.buttons = [Buttons.viveLeftTrackpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
         } else {
-            this.buttons = [Buttons.viveRightTrackpad, Buttons.viveRightTrigger, Buttons.viverightGrip, Buttons.viverightMenu];
+            this.buttons = [Buttons.viveRightTrackpad, Buttons.viveRightTrigger, Buttons.viveRightGrip, Buttons.viveRightMenu];
         }
 
         this.initControllerModel();

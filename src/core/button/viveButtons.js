@@ -9,5 +9,5 @@ export const viveLeftMenu = new Button(CONST.VIVE_LEFT_MENU);
 
 export const viveRightTrackpad = new Joystick(CONST.VIVE_RIGHT_TRACKPAD);
 export const viveRightTrigger = new Button(CONST.VIVE_RIGHT_TRIGGER);
-export const viverightGrip = new Button(CONST.VIVE_RIGHT_GRIP);
-export const viverightMenu = new Button(CONST.VIVE_RIGHT_MENU);
+export const viveRightGrip = new Button(CONST.VIVE_RIGHT_GRIP);
+export const viveRightMenu = new Button(CONST.VIVE_RIGHT_MENU);
