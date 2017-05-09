@@ -71,7 +71,7 @@ export class GamePad extends EventEmitter {
          * Objects currently intersected by this gamepad.
          * @type {Set.<Sculpt>}
          */
-        this.intersected = new Set();
+        this.intersected = [];
         /**
          * Raycaster object used to pick/select items with current controller.
          * @type {Raycaster}
