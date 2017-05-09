@@ -2,7 +2,6 @@ import {EventEmitter} from '../eventEmitter';
 import {messenger} from '../messenger';
 import * as CONST from '../constants';
 import {Sculpt} from '../sculpt';
-import {Set} from '../set';
 import {RodinEvent} from '../rodinEvent';
 import {Raycaster} from '../raycaster';
 import {Scene} from '../scene';
@@ -16,9 +15,9 @@ let buttonsUp = new Set();
 let buttonsChanged = new Set();
 
 messenger.on(CONST.RENDER_START, () => {
-    buttonsChanged = new Set();
-    buttonsDown = new Set();
-    buttonsUp = new Set();
+    buttonsChanged.clear();
+    buttonsDown.clear();
+    buttonsUp.clear();
 });
 
 /**
@@ -72,7 +71,7 @@ export class GamePad extends EventEmitter {
          * Objects currently intersected by this gamepad.
          * @type {Set.<Sculpt>}
          */
-        this.intersected = new Set();
+        this.intersected = [];
         /**
          * Raycaster object used to pick/select items with current controller.
          * @type {Raycaster}
@@ -100,7 +99,6 @@ export class GamePad extends EventEmitter {
             messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
             messenger.on(CONST.ACTIVE_SCENE, () => {
-                // Scene.active.add(this.sculpt);
                 this.sculpt.parent = Scene.active;
             });
         });
@@ -344,8 +342,8 @@ export class GamePad extends EventEmitter {
      * @param {object} button
      */
     buttonDown(button) {
-        buttonsDown.push(button);
-        buttonsPressed.push(button);
+        buttonsDown.add(button);
+        buttonsPressed.add(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_DOWN, null, button, this);
     }
 
@@ -354,8 +352,8 @@ export class GamePad extends EventEmitter {
      * @param {object} button
      */
     buttonUp(button) {
-        buttonsUp.push(button);
-        buttonsPressed.splice(buttonsPressed.indexOf(button), 1)
+        buttonsUp.add(button);
+        buttonsPressed.delete(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_UP, null, button, this);
     }
 
@@ -373,42 +371,42 @@ export class GamePad extends EventEmitter {
      * @param {object} button
      */
     valueChange(button) {
-        buttonsChanged.push(button);
+        buttonsChanged.add(button);
         this.emitIntersected(enforce, CONST.GAMEPAD_BUTTON_CHANGE, null, button, this);
     }
 
     /**
      * Shows if the provided button was pressed
      * between previous and current frames
-     * @returns {boolrean}
+     * @returns {boolean}
      */
     static getButtonDown(btn) {
-        return buttonsDown.indexOf(btn) !== -1;
+        return buttonsDown.has(btn);
     }
 
     /**
      * Shows if the provided button was released
      * between previous and current frames
-     * @returns {boolrean}
+     * @returns {boolean}
      */
     static getButtonUp(btn) {
-        return buttonsUp.indexOf(btn) !== -1;
+        return buttonsUp.has(btn);
     }
 
     /**
      * Shows if the provided button is currently pressed
-     * @returns {boolrean}
+     * @returns {boolean}
      */
     static getButton(btn) {
-        return buttonsPressed.indexOf(btn) !== -1;
+        return buttonsPressed.has(btn);
     }
 
     /**
      * Shows if the state of provided button has changed
      * between previous and current frames.
-     * @returns {boolrean}
+     * @returns {boolean}
      */
     static getButtonChanged(btn) {
-        return buttonsChanged.indexOf(btn) !== -1;
+        return buttonsChanged.has(btn);
     }
 }
