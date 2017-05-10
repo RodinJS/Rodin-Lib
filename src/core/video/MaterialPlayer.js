@@ -1,5 +1,75 @@
-import {Sculpt} from '../sculpt/Sculpt';
 import {Time} from '../time/Time';
+import {AScheme} from '../utils/AScheme';
+
+const constructorScheme = {
+    url: AScheme.any(),
+    stereoscopic: AScheme.bool().default(false),
+    fps: AScheme.number().default(25),
+    crossOrigin: AScheme.string().default('use-credentials')
+};
+
+export class VideoMaterial {
+    constructor(...args) {
+        args = AScheme.validate(args, constructorScheme);
+
+        if((typeof args.url) === 'string') {
+            args.url = {
+                0: url,
+                default: 0
+            }
+        }
+
+        this._bufferCounter = 0;
+        this._lastTime = 0;
+        this._speed = 1;
+        this._currDelta = 0;
+        this._frameDuration = 1000 / fps;
+        this._userPaused = true;
+
+        this._video = document.createElement('video');
+        this._source = document.createElement("source");
+
+        this.framesToLoader = 30;
+        this.isBuffering = false;
+
+        source.type = "video/" + format;
+        source.src = url[url.default];
+        video.appendChild(source);
+        video.width = 512;
+        video.height = 256;
+        video.autoplay = false;
+        video.loop = true;
+        video.preload = "auto";
+        video.setAttribute('crossOrigin', 'Anonymous');
+        video.setAttribute('playsinline', 'playsinline');
+        video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+        video.load();
+        let textureL = new THREE.Texture(video);
+        textureL.minFilter = textureL.magFilter = THREE.LinearFilter;
+        textureL.format = THREE.RGBFormat;
+        textureL.generateMipmaps = false;
+        /**
+         * The currently playing video url source key
+         * @type {string}
+         */
+        this.currentSource = url.default;
+
+        let textureR = null;
+
+        if (stereoscopic) {
+            //textureL.wrapS = textureL.wrapT = THREE.RepeatWrapping;
+            textureL.repeat.set(1, 0.5);
+            textureL.offset.set(0, 0.5);
+
+            textureR = new THREE.Texture(video);
+            textureR.minFilter = textureR.magFilter = THREE.LinearFilter;
+            textureR.format = THREE.RGBFormat;
+            textureR.generateMipmaps = false;
+            //textureR.wrapS = textureR.wrapT = THREE.RepeatWrapping;
+            textureR.repeat.set(1, 0.5);
+        }
+    }
+}
 
 /**
  * Video player (on Material) Class

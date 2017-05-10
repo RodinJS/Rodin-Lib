@@ -7,6 +7,7 @@ const constructorScheme = {
     depth: AScheme.number().default('$width'),
     material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 0x336699}))
 };
+
 /**
  * Simple Box
  * @param width {number} box width
