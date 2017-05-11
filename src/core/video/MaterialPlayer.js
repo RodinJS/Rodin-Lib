@@ -1,75 +1,4 @@
 import {Time} from '../time/Time';
-import {AScheme} from '../utils/AScheme';
-
-const constructorScheme = {
-    url: AScheme.any(),
-    stereoscopic: AScheme.bool().default(false),
-    fps: AScheme.number().default(25),
-    crossOrigin: AScheme.string().default('use-credentials')
-};
-
-export class VideoMaterial {
-    constructor(...args) {
-        args = AScheme.validate(args, constructorScheme);
-
-        if((typeof args.url) === 'string') {
-            args.url = {
-                0: url,
-                default: 0
-            }
-        }
-
-        this._bufferCounter = 0;
-        this._lastTime = 0;
-        this._speed = 1;
-        this._currDelta = 0;
-        this._frameDuration = 1000 / fps;
-        this._userPaused = true;
-
-        this._video = document.createElement('video');
-        this._source = document.createElement("source");
-
-        this.framesToLoader = 30;
-        this.isBuffering = false;
-
-        source.type = "video/" + format;
-        source.src = url[url.default];
-        video.appendChild(source);
-        video.width = 512;
-        video.height = 256;
-        video.autoplay = false;
-        video.loop = true;
-        video.preload = "auto";
-        video.setAttribute('crossOrigin', 'Anonymous');
-        video.setAttribute('playsinline', 'playsinline');
-        video.setAttribute('webkit-playsinline', 'webkit-playsinline');
-        video.load();
-        let textureL = new THREE.Texture(video);
-        textureL.minFilter = textureL.magFilter = THREE.LinearFilter;
-        textureL.format = THREE.RGBFormat;
-        textureL.generateMipmaps = false;
-        /**
-         * The currently playing video url source key
-         * @type {string}
-         */
-        this.currentSource = url.default;
-
-        let textureR = null;
-
-        if (stereoscopic) {
-            //textureL.wrapS = textureL.wrapT = THREE.RepeatWrapping;
-            textureL.repeat.set(1, 0.5);
-            textureL.offset.set(0, 0.5);
-
-            textureR = new THREE.Texture(video);
-            textureR.minFilter = textureR.magFilter = THREE.LinearFilter;
-            textureR.format = THREE.RGBFormat;
-            textureR.generateMipmaps = false;
-            //textureR.wrapS = textureR.wrapT = THREE.RepeatWrapping;
-            textureR.repeat.set(1, 0.5);
-        }
-    }
-}
 
 /**
  * Video player (on Material) Class
@@ -79,7 +8,11 @@ export class VideoMaterial {
  * @param {number} [fps = 25] - the desired playback frame rate
  */
 export class MaterialPlayer {
-    constructor(url, stereoscopic = false, format = "mp4", fps = 25) {
+    constructor(url, stereoscopic = false, fps = 25, crossOrigin = 'use-credentials') {
+        if(['anonymous', 'use-credentials'].indexOf(crossOrigin) === -1) {
+            throw new Error(`Invalid crossOrigin method ${crossOrigin}`);
+        }
+
         if ((typeof url) === "string") {
             url = {
                 0: url,
@@ -97,7 +30,9 @@ export class MaterialPlayer {
         let currDelta = 0;
         let frameDuration = 1000 / fps;
         let userPaused = true;
-        source.type = "video/" + format;
+
+        let urlSplited = url[url.default].split('.');
+        source.type = "video/" + urlSplited[urlSplited.length - 1];
         source.src = url[url.default];
         video.appendChild(source);
         video.width = 512;
@@ -105,7 +40,7 @@ export class MaterialPlayer {
         video.autoplay = false;
         video.loop = true;
         video.preload = "auto";
-        video.setAttribute('crossOrigin', 'Anonymous');
+        video.setAttribute('crossOrigin', crossOrigin);
         video.setAttribute('playsinline', 'playsinline');
         video.setAttribute('webkit-playsinline', 'webkit-playsinline');
         video.load();
@@ -152,7 +87,8 @@ export class MaterialPlayer {
             video.innerHTML = "";
 
             let source = document.createElement("source");
-            source.type = "video/" + format;
+            const urlSplited = url[key].split('.');
+            source.type = "video/" + urlSplited[urlSplited.length - 1];
             source.src = url[key];
 
             video.appendChild(source);
