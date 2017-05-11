@@ -1,15 +1,16 @@
-import {Sculpt} from '../sculpt/Sculpt';
 import {Time} from '../time/Time';
 
 /**
  * Video player (on Material) Class
  * @param {string|object} url - the video file url or an object with urls and default url {0: "test1.mp4", 1: "test2.mp4", default: "0"}
  * @param {boolean} [stereoscopic = false] - set true if video is Up&Down stereoscopic
- * @param {string} [format = "mp4"] - the video file format
  * @param {number} [fps = 25] - the desired playback frame rate
+ * @param {string} [anonymous = false] - if true crossOrigin attrubute is set to 'anonymous' if false, set to 'use-credentials'
  */
 export class MaterialPlayer {
-    constructor(url, stereoscopic = false, format = "mp4", fps = 25) {
+    constructor(url, stereoscopic = false, fps = 25, anonymous = false) {
+        const crossOrigin = anonymous ? 'anonymous' : 'use-credentials';
+
         if ((typeof url) === "string") {
             url = {
                 0: url,
@@ -27,7 +28,9 @@ export class MaterialPlayer {
         let currDelta = 0;
         let frameDuration = 1000 / fps;
         let userPaused = true;
-        source.type = "video/" + format;
+
+        let urlSplited = url[url.default].split('.');
+        source.type = "video/" + urlSplited[urlSplited.length - 1];
         source.src = url[url.default];
         video.appendChild(source);
         video.width = 512;
@@ -35,7 +38,8 @@ export class MaterialPlayer {
         video.autoplay = false;
         video.loop = true;
         video.preload = "auto";
-        video.setAttribute('crossOrigin', 'Anonymous');
+        video.setAttribute('crossOrigin', crossOrigin);
+        console.log(crossOrigin);
         video.setAttribute('playsinline', 'playsinline');
         video.setAttribute('webkit-playsinline', 'webkit-playsinline');
         video.load();
@@ -82,7 +86,8 @@ export class MaterialPlayer {
             video.innerHTML = "";
 
             let source = document.createElement("source");
-            source.type = "video/" + format;
+            const urlSplited = url[key].split('.');
+            source.type = "video/" + urlSplited[urlSplited.length - 1];
             source.src = url[key];
 
             video.appendChild(source);
