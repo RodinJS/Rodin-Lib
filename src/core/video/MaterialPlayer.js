@@ -4,14 +4,12 @@ import {Time} from '../time/Time';
  * Video player (on Material) Class
  * @param {string|object} url - the video file url or an object with urls and default url {0: "test1.mp4", 1: "test2.mp4", default: "0"}
  * @param {boolean} [stereoscopic = false] - set true if video is Up&Down stereoscopic
- * @param {string} [format = "mp4"] - the video file format
  * @param {number} [fps = 25] - the desired playback frame rate
+ * @param {string} [anonymous = false] - if true crossOrigin attrubute is set to 'anonymous' if false, set to 'use-credentials'
  */
 export class MaterialPlayer {
-    constructor(url, stereoscopic = false, fps = 25, crossOrigin = 'use-credentials') {
-        if(['anonymous', 'use-credentials'].indexOf(crossOrigin) === -1) {
-            throw new Error(`Invalid crossOrigin method ${crossOrigin}`);
-        }
+    constructor(url, stereoscopic = false, fps = 25, anonymous = false) {
+        const crossOrigin = anonymous ? 'anonymous' : 'use-credentials';
 
         if ((typeof url) === "string") {
             url = {
@@ -41,6 +39,7 @@ export class MaterialPlayer {
         video.loop = true;
         video.preload = "auto";
         video.setAttribute('crossOrigin', crossOrigin);
+        console.log(crossOrigin);
         video.setAttribute('playsinline', 'playsinline');
         video.setAttribute('webkit-playsinline', 'webkit-playsinline');
         video.load();
