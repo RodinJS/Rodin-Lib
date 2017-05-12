@@ -28,4 +28,4 @@ export {
     utils
 };
 
-export let v = '0.0.2';
+export let v = '0.0.6';
