@@ -1,9 +1,9 @@
-import {ErrorBadValueParameter, ErrorProtectedMethodCall, ErrorPluginAlreadyInstalled} from '../error';
+import {ErrorBadValueParameter, ErrorPluginAlreadyInstalled} from '../error';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {Vector3, Euler, Quaternion} from '../utils';
+import {Vector3, Euler, Quaternion} from '../math';
 import {AnimationPlugin} from '../animation';
 import {Loader} from '../loader';
 
