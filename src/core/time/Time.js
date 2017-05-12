@@ -22,7 +22,7 @@ export class Time {
             throw new ErrorProtectedClassInstance('Time');
         }
 
-        this.speed = 1;
+        this._speed = 1;
         this.delta = 0;
 
         this.lastTeak = 0;
@@ -36,15 +36,31 @@ export class Time {
      * Call this function on each render. It resets the this.delta value
      */
     tick () {
-        this.delta = this.now() - this.lastTeak;
-        this.lastTeak = this.now();
+        this.delta = this.now - this.lastTeak;
+        this.lastTeak = this.now;
     }
 
     /**
      * @returns {number} - milliseconds with speeds
      */
-    now () {
+    get now() {
         return (Date.now() - this.lastSpeedChange) * this.speed + this.msBeforeLastSpeedChange;
+    }
+
+    /**
+     * @return {number}
+     */
+    get speed () {
+        return this._speed;
+    }
+
+    /**
+     * @param value {number}
+     */
+    set speed (value) {
+        this.msBeforeLastSpeedChange = this.now;
+        this._speed = value;
+        this.lastSpeedChange = Date.now();
     }
 
     /**
@@ -63,7 +79,7 @@ export class Time {
      * @type {number}
      */
     static get now() {
-        return activeTime.now();
+        return activeTime.now;
     }
 
     /**

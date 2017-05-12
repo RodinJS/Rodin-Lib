@@ -6,6 +6,9 @@ import * as utils from '../utils';
 import * as CONSTANTS from '../constants';
 import {RodinEvent} from '../rodinEvent';
 import {Sculpt} from '../sculpt';
+import {HMDCamera} from '../camera';
+import {Avatar} from '../avatar';
+
 
 function enforce() {
 }
@@ -33,10 +36,8 @@ export class Scene extends EventEmitter {
         super();
 
         this._scene = new THREE.Scene();
-        this._camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
-        this._scene.add(this._camera);
-        this._controls = new THREE.VRControls(this._camera);
-        this._controls.standing = true;
+
+
         /**
          * Scene name.
          * @type {string}
@@ -60,10 +61,25 @@ export class Scene extends EventEmitter {
 
         this._scene.add(new THREE.AmbientLight());
 
+
+        /**
+         * Array of cameras of the scene
+         * @type {Array}
+         */
+        this.cameras = [];
+        this.avatar = new Avatar();
+        this.add(this.avatar);
+        Avatar.standing = true;
+        //this.addCamera(this.avatar.HMDCamera);
+        //this._controls = new THREE.VRControls(this.HMDCamera._threeCamera);
+        //this._controls.standing = true;
+
+
         //TODO: get rid of this sh*t. this is to cover the bug with crash on vr exit on mobiles
 
-        let x = new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial());
-        this._camera.add(x);
+        let x = new Sculpt(new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial()));
+        this.avatar.HMDCamera.add(x);
+
         x.position.set(0, 1, -99);
 
     }
@@ -74,11 +90,12 @@ export class Scene extends EventEmitter {
      */
     static get sceneNames() {
         let names = [];
-        for(let si = 0; si < instances.length; si++){
+        for (let si = 0; si < instances.length; si++) {
             names.push(instances[si].name);
         }
         return names;
     }
+
     /**
      * Gets current scene instances in the creation order.
      * NOTE!!! avoid making changes in scenes using this getter,
@@ -98,13 +115,25 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Adds object to scene.
+     * Gets the main camera that renders to the hmd, or the screen
+     * @returns {HMDCamera}
+     */
+    get HMDCamera() {
+        return this.avatar.HMDCamera;
+    }
+
+    /**
+     * Adds sculpts to the scene.
+     * If a sculpt is a camera, addCamera is called
      * Call with one or more arguments of Sculpt objects.
      */
     add() {
-        for(let i = 0; i < arguments.length; i++) {
-            if(!arguments[i].isSculpt) {
+        for (let i = 0; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
+            }
+            if (arguments[i].isCamera) {
+                this.addCamera(arguments[i]);
             }
 
             this.children.push(arguments[i]);
@@ -115,19 +144,46 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Removes objects from scene.
+     * Adds a camera to the scene
+     * @param {R.Camera | R.PerspectiveCamera | HMDCamera} camera
+     */
+    addCamera(camera) {
+        if (!camera.isCamera) {
+            throw new ErrorBadValueParameter('Camera');
+        }
+
+        this.cameras.push(camera);
+    }
+
+    /**
+     * Removes sculpts from scene.
      * Call with one or more arguments of Sculpt objects.
      */
     remove() {
-        for(let i = 0; i < arguments.length; i++) {
-            if(!arguments[i].isSculpt) {
+        for (let i = 0; i < arguments.length; i++) {
+            if (!arguments[i].isSculpt) {
                 throw new ErrorBadValueParameter('Sculpt');
+            }
+            if (arguments[i].isCamera) {
+                this.removeCamera(arguments[i]);
             }
 
             this.children.splice(this.children.indexOf(arguments[i]), 1);
             // this._sculpt.remove(arguments[i]._threeObject);
             arguments[i].parent = null;
         }
+    }
+
+    /**
+     * Removes a camera to the scene
+     * @param {R.Camera | R.PerspectiveCamera | HMDCamera} camera
+     */
+    removeCamera(camera) {
+        if (!camera.isCamera) {
+            throw new ErrorBadValueParameter('Camera');
+        }
+
+        this.cameras.splice(this.cameras.indexOf(camera), 1);
     }
 
     /**
@@ -138,8 +194,8 @@ export class Scene extends EventEmitter {
      */
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
-        this._camera.aspect = window.innerWidth / window.innerHeight;
-        this._camera.updateProjectionMatrix();
+        this.HMDCamera.aspect = window.innerWidth / window.innerHeight;
+        this.HMDCamera.updateProjectionMatrix();
         Scene.renderer.setPixelRatio(window.devicePixelRatio >= 2 ? 2 : window.devicePixelRatio);
     }
 
@@ -152,6 +208,7 @@ export class Scene extends EventEmitter {
         Object.setProperty(this._camera, property, value);
         this._camera.projectionMatrixNeedsUpdate = true;
     }
+
     /**
      * Adds the provided method to a list of methods that are being called before each render call of this scene
      * @param callback {Function}
@@ -190,8 +247,17 @@ export class Scene extends EventEmitter {
      * Gets the rendering camera of the active scene.
      * @returns {THREE.PerspectiveCamera}
      */
-	static get activeCamera() {
+    static get activeCamera() {
         return activeScene._camera;
+    }
+
+    /**
+     * Gets the hmd camera of the active scene
+     * @returns {HMDCamera}
+     * @constructor
+     */
+    static get HMDCamera() {
+        return activeScene.HMDCamera;
     }
 
     /**
@@ -279,43 +345,43 @@ export class Scene extends EventEmitter {
         messenger.post(CONSTANTS.RENDER_START, {});
 
         // Update VR headset position and apply to camera.
-        Scene.active._controls.update();
+        //Scene.active._controls.update();
 
         // call all prerender functions
-        for(let i = 0; i < preRenderFunctions.length; i ++) {
+        for (let i = 0; i < preRenderFunctions.length; i++) {
             preRenderFunctions[i]();
         }
 
         // call all scene specific prerender functions
-        for(let i = 0; i < Scene.active._preRenderFunctions.length; i ++) {
+        for (let i = 0; i < Scene.active._preRenderFunctions.length; i++) {
             Scene.active._preRenderFunctions[i]();
         }
 
         // emit update for all childs
-        for(let i = 0; i < Scene.active.children.length; i ++) {
+        for (let i = 0; i < Scene.active.children.length; i++) {
             const child = Scene.active.children[i];
 
-            if(child.isReady) {
+            if (child.isReady) {
                 child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
             }
         }
-        //TODO: camera needs to be a sculpt object, to avoid sh*t like this
-        Scene.active._camera.children.map(child => {
-            if(child.Sculpt && child.Sculpt.isReady) {
-                child.Sculpt.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
-            }
-        });
+        // //TODO: camera needs to be a sculpt object, to avoid sh*t like this
+        // Scene.active._camera.children.map(child => {
+        //     if (child.Sculpt && child.Sculpt.isReady) {
+        //         child.Sculpt.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
+        //     }
+        // });
 
-        Scene.webVRmanager.render(Scene.active._scene, Scene.active._camera, timestamp);
+        Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
         messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
 
         // call all scene specific postrender functions
-        for(let i = 0; i < Scene.active._postRenderFunctions.length; i ++) {
+        for (let i = 0; i < Scene.active._postRenderFunctions.length; i++) {
             Scene.active._postRenderFunctions[i]();
         }
 
         // call all postrender functions
-        for(let i = 0; i < postRenderFunctions.length; i ++) {
+        for (let i = 0; i < postRenderFunctions.length; i++) {
             postRenderFunctions[i]();
         }
 

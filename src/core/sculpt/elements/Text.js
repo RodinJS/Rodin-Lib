@@ -1,6 +1,6 @@
 import {Sculpt} from '../Sculpt';
 import {utils3D} from '../../utils';
-import {Vector3} from '../../utils/math';
+import {Vector3} from '../../math';
 
 
 /**

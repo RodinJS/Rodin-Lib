@@ -5,6 +5,7 @@ import {number, vector3, object} from '../utils';
 import {ErrorProtectedMethodCall} from '../error';
 import * as CONST from '../constants';
 import {Loader} from '../loader';
+import {Vector3} from '../math';
 
 const enforce = function () {
 };
@@ -47,6 +48,7 @@ const enforce = function () {
  * @param {THREE.SpriteMaterial} [ params.particlesMaterial = new THREE.SpriteMaterial()] - Material for each particle
  */
 
+// TODO: make particle systems more flexible (let change path when you want)
 
 export class ParticleSystem extends Sculpt {
     constructor(params) {
@@ -112,9 +114,9 @@ export class ParticleSystem extends Sculpt {
                 return this.destroyParticle(particle);
             }
 
-            if (this.params.velocity.path instanceof THREE.Vector3) {
-                const noise = new THREE.Vector3().copy(this.params.velocity.randomness).multiplyScalar(Time.delta * .001);
-                let vec = vector3.addNoise(new THREE.Vector3().copy(this.params.velocity.path).multiplyScalar(Time.delta * .001), noise);
+            if (this.params.velocity.path instanceof Vector3) {
+                const noise = new Vector3().copy(this.params.velocity.randomness).multiplyScalar(Time.delta * .001);
+                let vec = vector3.addNoise(new Vector3().copy(this.params.velocity.path).multiplyScalar(Time.delta * .001), noise);
                 particle.position.add(vec);
             } else {
                 let coef = Time.now - particle.bornTime;
@@ -127,7 +129,7 @@ export class ParticleSystem extends Sculpt {
             }
         });
     }
-
+    // TODO: make particles destroy easier
     destroyParticle(p) {
         p.parent = null;
         this.particles.splice(this.particles.indexOf(p), 1);

@@ -28,3 +28,5 @@ export const OCULUS_TOUCH_B = KeyCodes.next();
 export const OCULUS_TOUCH_RIGHT_THUMBSTICK = KeyCodes.next();
 export const OCULUS_TOUCH_RIGHT_GRIP = KeyCodes.next();
 export const OCULUS_TOUCH_RIGHT_TRIGGER = KeyCodes.next();
+
+export const DAYDREAM_TRIGGER = KeyCodes.next();

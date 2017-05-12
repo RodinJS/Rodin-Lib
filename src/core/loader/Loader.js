@@ -5,14 +5,15 @@ const supportedTypes = {
     'obj': loadOBJ
 };
 
+const textureLoader = new THREE.TextureLoader();
+textureLoader.setCrossOrigin('anonymous');
+
+
 /**
  * Loader class.
  * Use for loading 3d models,
  * currently supports only .obj format
  */
-const textureLoader = new THREE.TextureLoader();
-textureLoader.setCrossOrigin('anonymous');
-
 export class Loader {
     constructor() {
         throw new ErrorInstantiationFailed('Loader');
