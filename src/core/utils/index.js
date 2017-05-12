@@ -15,4 +15,3 @@ export {
 }
 
 export * from './AScheme';
-export * from './math';
