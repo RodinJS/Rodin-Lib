@@ -1,3 +1,5 @@
+import {localTransport} from '../transport/LocalTransport';
+
 /**
  * Messenger for collaborating classes
  */
@@ -7,21 +9,22 @@ export class Messenger {
     }
 
     /**
+     * TODO: @serg fix comments
      * Post a message to a channel
      * @param channel {string} channel to post a message
      * @param body {*} body of the message to post
+     * @param transport {Transport} transport with which send data
      */
-    post(channel, body) {
+    post(channel, body, transport = localTransport) {
         if (!this.channels[channel]) {
             return;
         }
 
-        for (let i = 0; i < this.channels[channel].length; i++) {
-            this.channels[channel][i](body);
-        }
+        transport.sendData({channel, body});
     }
 
     /**
+     * TODO: @serg fix comments
      * Post a message to a channel async
      * @param channel
      * @param body
@@ -34,6 +37,20 @@ export class Messenger {
         setTimeout(() => {
             this.post(channel, body);
         }, 0);
+    }
+
+
+    /**
+     * TODO: @serg fix comments
+     * Receive function
+     * @param channel
+     * @param body
+     * @param transport
+     */
+    receive(channel, body, transport) {
+        for (let i = 0; i < this.channels[channel].length; i++) {
+            this.channels[channel][i](body, transport);
+        }
     }
 
     /**
