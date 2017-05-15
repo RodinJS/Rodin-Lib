@@ -16,17 +16,21 @@ export class Messenger {
             return;
         }
 
-        for(let i = 0; i < this.channels[channel].length; i ++) {
+        for (let i = 0; i < this.channels[channel].length; i++) {
             this.channels[channel][i](body);
         }
     }
 
+    /**
+     * Post a message to a channel async
+     * @param channel
+     * @param body
+     */
     postAsync(channel, body) {
         if (!this.channels[channel]) {
             return;
         }
 
-        // todo: implement this with out timer
         setTimeout(() => {
             this.post(channel, body);
         }, 0);
@@ -53,7 +57,7 @@ export class Messenger {
     once(channel, callback) {
         const tmp = () => {
             callback();
-            this.channels[channel].splice(this.channels[channel].indexOf(callback), 1);
+            this.channels[channel].splice(this.channels[channel].indexOf(tmp), 1);
         };
 
         this.on(channel, tmp);
