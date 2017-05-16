@@ -1,6 +1,5 @@
 import {EventEmitter} from '../eventEmitter';
 import {messenger} from '../messenger';
-import {Set} from '../set';
 import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
 import * as utils from '../utils';
 import * as CONST from '../constants';
@@ -16,10 +15,10 @@ let activeScene = null;
 let doRender = true;
 let renderRequested = false;
 
-const preRenderFunctions = new Set();
-const postRenderFunctions = new Set();
+const preRenderFunctions = [];
+const postRenderFunctions = [];
 
-const instances = new Set();
+const instances = [];
 
 export class Scene extends EventEmitter {
     /**
@@ -43,15 +42,15 @@ export class Scene extends EventEmitter {
          */
         this.name = name;
 
-        this._preRenderFunctions = new Set();
-        this._postRenderFunctions = new Set();
+        this._preRenderFunctions = [];
+        this._postRenderFunctions = [];
 
         instances.push(this);
         /**
          * Child sculpt objects of the scene
          * @type {Set.<Sculpt>}
          */
-        this.children = new Set();
+        this.children = [];
 
         this._sculpt = new Sculpt();
         this._sculpt.on(CONST.READY, () => {
