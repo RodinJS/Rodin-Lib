@@ -8,7 +8,11 @@ export class Transport {
         this.name = name;
     }
 
-    sendData() {
-        throw new Error('Send method is not overloaded');
+    sendPacket() {
+        throw new Error('sendPacket is not overloaded');
+    }
+
+    get isTransport() {
+        return true;
     }
 }

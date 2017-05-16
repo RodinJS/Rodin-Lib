@@ -1,4 +1,5 @@
 import {localTransport} from '../transport/LocalTransport';
+import {UID} from '../utils/string';
 
 /**
  * Messenger for collaborating classes
@@ -9,6 +10,14 @@ export class Messenger {
     }
 
     /**
+     * To check if object is Messenger
+     * @returns {boolean}
+     */
+    get isMessenger() {
+        return true;
+    }
+
+    /**
      * TODO: @serg fix comments
      * Post a message to a channel
      * @param channel {string} channel to post a message
@@ -16,11 +25,7 @@ export class Messenger {
      * @param transport {Transport} transport with which send data
      */
     post(channel, body, transport = localTransport) {
-        if (!this.channels[channel]) {
-            return;
-        }
-
-        transport.sendData({channel, body});
+        transport.sendPacket({channel, body});
     }
 
     /**
@@ -28,17 +33,13 @@ export class Messenger {
      * Post a message to a channel async
      * @param channel
      * @param body
+     * @transport {Transport} transport
      */
-    postAsync(channel, body) {
-        if (!this.channels[channel]) {
-            return;
-        }
-
+    postAsync(channel, body, transport = localTransport) {
         setTimeout(() => {
-            this.post(channel, body);
+            this.post(channel, body, transport);
         }, 0);
     }
-
 
     /**
      * TODO: @serg fix comments
@@ -48,6 +49,10 @@ export class Messenger {
      * @param transport
      */
     receive(channel, body, transport) {
+        if (!this.channels[channel]) {
+            return;
+        }
+
         for (let i = 0; i < this.channels[channel].length; i++) {
             this.channels[channel][i](body, transport);
         }

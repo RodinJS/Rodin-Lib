@@ -15,3 +15,5 @@ export const LOCAL = 'local';
  * @type {string}
  */
 export const POST_MESSAGE = 'postmessage';
+
+export const NEW_CHILD = 'newchild';

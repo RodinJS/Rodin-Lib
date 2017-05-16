@@ -3,10 +3,9 @@ import {messenger} from '../messenger';
 import {Set} from '../set';
 import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
 import * as utils from '../utils';
-import * as CONSTANTS from '../constants';
+import * as CONST from '../constants';
 import {RodinEvent} from '../rodinEvent';
 import {Sculpt} from '../sculpt';
-import {HMDCamera} from '../camera';
 import {Avatar} from '../avatar';
 
 
@@ -55,7 +54,7 @@ export class Scene extends EventEmitter {
         this.children = new Set();
 
         this._sculpt = new Sculpt();
-        this._sculpt.on(CONSTANTS.READY, () => {
+        this._sculpt.on(CONST.READY, () => {
             this._scene.add(this._sculpt._threeObject);
         });
 
@@ -285,7 +284,7 @@ export class Scene extends EventEmitter {
                 throw new ErrorBadValueParameter();
         }
 
-        messenger.post(CONSTANTS.ACTIVE_SCENE, activeScene);
+        messenger.post(CONST.ACTIVE_SCENE, activeScene);
 
         Scene.onResize();
     }
@@ -342,7 +341,7 @@ export class Scene extends EventEmitter {
             throw new ErrorProtectedMethodCall('render');
         }
 
-        messenger.post(CONSTANTS.RENDER_START, {});
+        messenger.post(CONST.RENDER_START, {});
 
         // Update VR headset position and apply to camera.
         //Scene.active._controls.update();
@@ -362,18 +361,18 @@ export class Scene extends EventEmitter {
             const child = Scene.active.children[i];
 
             if (child.isReady) {
-                child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
+                child.emit(CONST.UPDATE, new RodinEvent(child, {}));
             }
         }
         // //TODO: camera needs to be a sculpt object, to avoid sh*t like this
         // Scene.active._camera.children.map(child => {
         //     if (child.Sculpt && child.Sculpt.isReady) {
-        //         child.Sculpt.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
+        //         child.Sculpt.emit(CONST.UPDATE, new RodinEvent(child, {}));
         //     }
         // });
 
         Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
-        messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
+        messenger.post(CONST.RENDER, {realTimestamp: timestamp});
 
         // call all scene specific postrender functions
         for (let i = 0; i < Scene.active._postRenderFunctions.length; i++) {
@@ -387,7 +386,7 @@ export class Scene extends EventEmitter {
 
         Scene.requestFrame(enforce);
 
-        messenger.post(CONSTANTS.RENDER_END, {});
+        messenger.post(CONST.RENDER_END, {});
     }
 
     /**
@@ -467,13 +466,13 @@ if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) 
     this.onResize();
 }
 
-messenger.on(CONSTANTS.REQUEST_ACTIVE_SCENE, () => {
-    messenger.postAsync(CONSTANTS.ACTIVE_SCENE, activeScene);
+messenger.on(CONST.REQUEST_ACTIVE_SCENE, () => {
+    messenger.postAsync(CONST.ACTIVE_SCENE, activeScene);
 });
 
-messenger.post(CONSTANTS.REQUEST_RODIN_STARTED);
+messenger.post(CONST.REQUEST_RODIN_STARTED);
 
-messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
+messenger.once(CONST.RODIN_STARTED, (params) => {
     Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
     document.body.appendChild(Scene.renderer.domElement);
     const mainScene = new Scene('Main');
