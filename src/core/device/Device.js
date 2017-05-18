@@ -10,13 +10,8 @@ class Device extends EventEmitter {
     constructor() {
         super();
 
-        /**
-         * TODO: @serg please review this
-         * karoxa urish dzev es implement arel?
-         */
-        window.addEventListener('vrdisplaypresentchange', () => {
-
-        });
+        this.isVRMode = false;
+        this.readyToCast = false;
     }
 
     get isIPhone() {
