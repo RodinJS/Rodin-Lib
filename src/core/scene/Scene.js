@@ -6,6 +6,7 @@ import * as CONST from '../constants';
 import {RodinEvent} from '../rodinEvent';
 import {Sculpt} from '../sculpt';
 import {Avatar} from '../avatar';
+import {device} from '../device';
 
 
 function enforce() {
@@ -429,6 +430,7 @@ export class Scene extends EventEmitter {
         return activeScene;
     }
 }
+
 /**
  * renderer object
  * @type {THREE.WebGLRenderer}
@@ -437,19 +439,19 @@ export class Scene extends EventEmitter {
 Scene.renderer = new THREE.WebGLRenderer({
     antialias: window.devicePixelRatio < 2
 });
+
 /**
  * VREffect plugin from three.js
  * @type {THREE.VREffect}
  * @static
  */
-
 Scene.effect = new THREE.VREffect(Scene.renderer);
+
 /**
  * web VR Manager plugin
  * @type {Object}
  * @static
  */
-
 Scene.webVRmanager = null;
 
 Scene.renderer.setPixelRatio(window.devicePixelRatio);
@@ -460,7 +462,7 @@ window.addEventListener('vrdisplaypresentchange', Scene.onResize, false);
 
 
 // TODO: fix this when webkit fixes growing canvas bug
-if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)) {
+if (device.isIframe && device.isIOS) {
     this.renderer.domElement.style.position = 'fixed';
     this.onResize();
 }
@@ -471,7 +473,7 @@ messenger.on(CONST.REQUEST_ACTIVE_SCENE, () => {
 
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
-messenger.once(CONST.RODIN_STARTED, (params) => {
+messenger.once(CONST.RODIN_STARTED, () => {
     Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
     document.body.appendChild(Scene.renderer.domElement);
     const mainScene = new Scene('Main');
@@ -479,7 +481,7 @@ messenger.once(CONST.RODIN_STARTED, (params) => {
     Scene.start();
 
     // TODO: fix this after fixing webVRManager
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    if (device.isIOS) {
         Scene.webVRmanager.vrCallback = () => {
             Scene.webVRmanager.enterVRMode_();
             Scene.webVRmanager.hmd.resetPose();

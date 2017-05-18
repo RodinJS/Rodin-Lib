@@ -73,7 +73,7 @@ class Device extends EventEmitter {
      * @param deviceName
      * @returns {boolean}
      */
-    test(deviceName) {
+    is(deviceName) {
         switch (deviceName) {
             case CONST.IPHONE:
                 return this.isIPhone;
