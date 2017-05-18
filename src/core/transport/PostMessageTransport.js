@@ -2,6 +2,7 @@ import {Transport} from './Transport';
 import * as CONST from '../constants';
 import {messenger} from '../messenger';
 import {RODIN_ID} from '../initializer';
+import {device} from '../device';
 
 /**
  * TODO: @serg fix comments
@@ -13,14 +14,17 @@ export class PostMessageTransport extends Transport {
     }
 
     sendPacket(packet) {
-        if(!packet.path) {
+        if (!packet.path) {
             packet.path = [];
         }
 
-        packet.path.add(RODIN_ID);
+        packet.path.push(RODIN_ID);
 
-        for(let child in PostMessateTransport.children) {
-            child.postMessage(packet, '*');
+        if (device.isIframe)
+            PostMessageTransport.parent.postMessage(packet, '*');
+
+        for (let childId in PostMessageTransport.children) {
+            PostMessageTransport.children[childId].postMessage(packet, '*');
         }
     }
 
@@ -29,14 +33,13 @@ export class PostMessageTransport extends Transport {
     }
 
     static parent = window.parent;
-    static hasParent = window.parent && window.parent !== window;
     static children = {}
 }
 
 export const postMessageTransport = new PostMessageTransport();
 
 window.addEventListener("message", (evt) => {
-    if(evt.data && evt.data.body === CONST.NEW_CHILD) {
+    if (evt.data && evt.data.body === CONST.NEW_CHILD) {
         PostMessageTransport.children[evt.data.childId] = evt.source;
         return;
     }
@@ -50,7 +53,7 @@ window.addEventListener("message", (evt) => {
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
 messenger.once(CONST.RODIN_STARTED, () => {
-    if(PostMessageTransport.hasParent) {
+    if (device.isIframe) {
         postMessageTransport.sendPacket({
             childId: RODIN_ID,
             body: CONST.NEW_CHILD

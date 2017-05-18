@@ -22,6 +22,7 @@ export * from './eventEmitter';
 export * from './avatar';
 export * from './math';
 export * from './transport';
+export * from './device';
 
 export {
     CONST,
