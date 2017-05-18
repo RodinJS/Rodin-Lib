@@ -1,7 +1,7 @@
 import {UID} from '../utils/string';
 
 /**
- * TODO: @serg fix comments
+ * Unique id for each RODIN session
  * @type {string}
  */
 export const RODIN_ID = UID();

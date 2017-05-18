@@ -5,8 +5,7 @@ import {RODIN_ID} from '../initializer';
 import {device} from '../device';
 
 /**
- * TODO: @serg fix comments
- * TODO: @serg gidem vor comment chka chases sra inch@ fixem ? :D
+ * A transport for sending message through iframes using postMessage function
  */
 export class PostMessageTransport extends Transport {
     constructor() {

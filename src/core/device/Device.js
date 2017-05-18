@@ -5,40 +5,56 @@ import {messenger} from '../messenger';
 import {localTransport} from '../transport';
 
 /**
- * TODO: @serg fix comments
- * Class for getting current device information and ee
+ * Class for getting current device information such as
+ * checking device type, vr mode, ...
+ * This class should not be instantiated
  */
 class Device extends EventEmitter {
     constructor() {
         super();
-
         this._isVR = false;
     }
 
+    /**
+     * Checks if the current device is an iPhone
+     * @returns {boolean}
+     */
     get isIPhone() {
         return /iPhone/.test(navigator.userAgent) && !window.MSStream
     }
 
+    /**
+     * Checks if the current device is an iPad
+     * @returns {boolean}
+     */
     get isIPad() {
         return /iPad/.test(navigator.userAgent) && !window.MSStream
     }
 
+    /**
+     * Checks if the current device is an iPod
+     * @returns {boolean}
+     */
     get isIPod() {
         return /iPod/.test(navigator.userAgent) && !window.MSStream
     }
 
+    /**
+     * Checks if the current device runs iOS (iPhone, iPad, iPod)
+     * @returns {boolean}
+     */
     get isIOS() {
         return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     }
 
     /**
-     * Get version of IOS
-     * @returns {string|boolean}
+     * Gets the current version of iOS
+     * returns null if not iOS
+     * @returns {string|null}
      */
-
     get iOSVersion() {
         if (!this.isIOS)
-            return false;
+            return null;
 
         if (!!window.indexedDB)
             return CONST.IOS8PLUS;
@@ -56,6 +72,10 @@ class Device extends EventEmitter {
             return CONST.IOS4;
     }
 
+    /**
+     * Checks if we are running inside an iframe
+     * @returns {boolean}
+     */
     get isIframe() {
         try {
             return window.self !== window.top;
@@ -106,11 +126,19 @@ class Device extends EventEmitter {
         }
     }
 
+    /**
+     * Checks if current session is in VR mode
+     * @returns {boolean}
+     */
     get isVR() {
         return this._isVR;
     }
 }
 
+/**
+ * Main and only instance of Device class
+ * @type {Device}
+ */
 export const device = new Device();
 
 messenger.on(CONST.VR_DISPLAY_PRESENT_CHANGE, (data, transport) => {

@@ -10,7 +10,7 @@ export class Messenger {
     }
 
     /**
-     * To check if object is Messenger
+     * Checks if object is a Messenger
      * @returns {boolean}
      */
     get isMessenger() {
@@ -18,7 +18,6 @@ export class Messenger {
     }
 
     /**
-     * TODO: @serg fix comments
      * Post a message to a channel
      * @param channel {string} channel to post a message
      * @param body {*} body of the message to post
@@ -29,11 +28,10 @@ export class Messenger {
     }
 
     /**
-     * TODO: @serg fix comments
-     * Post a message to a channel async
-     * @param channel
-     * @param body
-     * @transport {Transport} transport
+     * Post a message to a channel asynchronously
+     * @param channel {string} channel to post a message
+     * @param body {*} body of the message to post
+     * @param transport {Transport} transport with which send data
      */
     postAsync(channel, body, transport = localTransport) {
         setTimeout(() => {
@@ -42,12 +40,13 @@ export class Messenger {
     }
 
     /**
-     * TODO: @serg fix comments
-     * Receive function
+     * Function to inject messages into the messenger
+     * Should not be called outside of RODIN
      * @param channel
      * @param body
      * @param transport
      */
+    // TODO: @Gor rename to _recieve
     receive(channel, body, transport) {
         if (!this.channels[channel]) {
             return;

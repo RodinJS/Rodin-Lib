@@ -3,9 +3,7 @@ import * as CONST from '../constants';
 import {messenger} from '../messenger';
 
 /**
- * TODO: @serg fix comments
- * Local Transport
- * Use it to send data inside Rodin
+ * A transport for sending messages inside a single session
  */
 export class LocalTransport extends Transport {
     constructor() {

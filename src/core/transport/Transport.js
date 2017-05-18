@@ -1,10 +1,14 @@
+import {ErrorAbstractClassInstance} from '../error';
+
 /**
- * Transport class
- * Use it for sending messages with messenger.
- * Pass instance as parameter
+ * Use it for sending messages with messenger
  */
 export class Transport {
     constructor(name) {
+        if(this.constructor === Transport) {
+            throw new ErrorAbstractClassInstance('Transport');
+        }
+
         this.name = name;
     }
 
