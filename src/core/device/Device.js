@@ -1,6 +1,8 @@
 import {EventEmitter} from '../eventEmitter';
 import * as CONST from '../constants';
 import {ErrorUnknownDevice} from '../error';
+import {messenger} from '../messenger';
+import {localTransport} from '../transport';
 
 /**
  * TODO: @serg fix comments
@@ -10,8 +12,7 @@ class Device extends EventEmitter {
     constructor() {
         super();
 
-        this.isVRMode = false;
-        this.readyToCast = false;
+        this._isVR = false;
     }
 
     get isIPhone() {
@@ -104,6 +105,15 @@ class Device extends EventEmitter {
                 throw new ErrorUnknownDevice(deviceName);
         }
     }
+
+    get isVR() {
+        return this._isVR;
+    }
 }
 
 export const device = new Device();
+
+messenger.on(CONST.VR_DISPLAY_PRESENT_CHANGE, (data, transport) => {
+    if(transport === localTransport)
+        device._isVR = data;
+});

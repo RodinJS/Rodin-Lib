@@ -457,8 +457,11 @@ Scene.webVRmanager = null;
 Scene.renderer.setPixelRatio(window.devicePixelRatio);
 Scene.effect.setSize(window.innerWidth, window.innerHeight);
 
-window.addEventListener('resize', Scene.onResize, false);
-window.addEventListener('vrdisplaypresentchange', Scene.onResize, false);
+window.addEventListener(CONST.RESIZE, Scene.onResize, false);
+window.addEventListener(CONST.VR_DISPLAY_PRESENT_CHANGE, () => {
+    Scene.onResize();
+    messenger.post(CONST.VR_DISPLAY_PRESENT_CHANGE, Scene.webVRmanager.hmd.isPresenting);
+}, false);
 
 
 // TODO: fix this when webkit fixes growing canvas bug
