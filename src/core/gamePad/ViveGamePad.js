@@ -19,9 +19,9 @@ export class ViveController extends GamePad {
          */
         this.buttons = [];
         if (hand === CONST.LEFT) {
-            this.buttons = [Buttons.viveLeftTrackpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
+            this.buttons = [Buttons.viveLeftTouchpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
         } else {
-            this.buttons = [Buttons.viveRightTrackpad, Buttons.viveRightTrigger, Buttons.viveRightGrip, Buttons.viveRightMenu];
+            this.buttons = [Buttons.viveRightTouchpad, Buttons.viveRightTrigger, Buttons.viveRightGrip, Buttons.viveRightMenu];
         }
 
         this.initControllerModel();
@@ -29,7 +29,7 @@ export class ViveController extends GamePad {
 
         messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
-        messenger.on(CONST.ACTIVE_SCENE, (scene) => {
+        messenger.on(CONST.ACTIVE_SCENE, () => {
             this.standingMatrix = Avatar.standingMatrix;
         });
     }

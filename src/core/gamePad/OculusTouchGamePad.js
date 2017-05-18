@@ -18,9 +18,9 @@ export class OculusTouchGamePad extends GamePad {
          */
         this.buttons = [];
         if (hand === CONST.LEFT) {
-            this.buttons = [Buttons.oculusTouchLeftThumbstick, Buttons.oculusTouchX, Buttons.oculusTouchY, Buttons.oculusTouchLeftGrip, Buttons.oculusTouchLeftTrigger];
+            this.buttons = [Buttons.oculusTouchLeftThumbstick, Buttons.oculusTouchX, Buttons.oculusTouchY, Buttons.oculusTouchLeftTrigger, Buttons.oculusTouchLeftGrip];
         } else {
-            this.buttons = [Buttons.oculusTouchRightThumbstick, Buttons.oculusTouchA, Buttons.oculusTouchB, Buttons.oculusTouchRightGrip, Buttons.oculusTouchRightTrigger];
+            this.buttons = [Buttons.oculusTouchRightThumbstick, Buttons.oculusTouchA, Buttons.oculusTouchB, Buttons.oculusTouchRightTrigger, Buttons.oculusTouchRightGrip];
         }
 
         this.on(CONST.UPDATE, () => {
