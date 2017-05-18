@@ -102,8 +102,11 @@ export class Avatar extends Sculpt {
 
         if (Avatar.standing) {
             if (Avatar._vrDisplay.stageParameters) {
-                const standingMatrix = new THREE.Matrix4().fromArray(Avatar._vrDisplay.stageParameters.sittingToStandingTransform);
-                Avatar.trackingSculpt.matrix.multiplyMatrices(standingMatrix, Avatar.trackingSculpt.matrix);
+                Avatar.standingMatrix = new THREE.Matrix4().fromArray(Avatar._vrDisplay.stageParameters.sittingToStandingTransform);
+
+                Avatar.trackingSculpt.matrix.compose(Avatar.trackingSculpt._threeObject.position, Avatar.trackingSculpt.quaternion, Avatar.trackingSculpt.scale);
+                Avatar.trackingSculpt.matrix = Avatar.trackingSculpt.matrix.multiplyMatrices(Avatar.standingMatrix, Avatar.trackingSculpt._threeObject.matrix);
+                Avatar.trackingSculpt._threeObject.matrixWorldNeedsUpdate = true;
             } else {
                 Avatar.trackingSculpt.position.y += Avatar.userHeight;
             }

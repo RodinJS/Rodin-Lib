@@ -3,6 +3,7 @@ import {Time} from '../time';
 import {number, vector3} from '../utils';
 import * as CONST from '../constants';
 import {ErrorProtectedMethodCall} from '../error';
+import {Vector3} from '../math';
 
 function enforce() {
 }
@@ -41,12 +42,12 @@ export class Particle extends Sculpt {
         startPosition.randomness = vector3.toVector3(startPosition.randomness);
 
         // set particle random size
-        this.scale.copy(vector3.addNoise(particleSize.value, particleSize.randomness));
+        this.scale = new Vector3().copy(particleSize.value).addNoise(particleSize.randomness);
 
         // set particle random position
-        let initial = new THREE.Vector3().copy(vector3.addNoise(new THREE.Vector3(0, 0, 0), startPosition.randomness));
+        let initial = new Vector3().addNoise(startPosition.randomness);
         this.position.copy(initial);
-        this.initialPosition = new THREE.Vector3().copy(initial);
+        this.initialPosition = new Vector3().copy(initial);
 
         this.on(CONST.UPDATE, () => {
             this.update(enforce);
