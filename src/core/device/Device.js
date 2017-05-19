@@ -8,8 +8,6 @@ import {localTransport} from '../transport';
  * Class for getting current device information such as
  * checking device type, vr mode, ...
  * This class should not be instantiated
- *
- * @events VR_MODE_CHANGE ENTER_VR
  */
 class Device extends EventEmitter {
     constructor() {

@@ -13,7 +13,7 @@ export class Transport {
     }
 
     sendPacket() {
-        throw new Error('sendPacket is not overloaded');
+        throw new Error('sendPacket is not overridden');
     }
 
     get isTransport() {
