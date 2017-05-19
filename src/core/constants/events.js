@@ -15,3 +15,7 @@ export const GAMEPAD_BUTTON_CHANGE = 'gamepadbuttonchange';
 
 export const VR_DISPLAY_PRESENT_CHANGE = 'vrdisplaypresentchange';
 export const RESIZE = 'resize';
+
+export const ENTER_VR = 'entervr';
+export const EXIT_VR = 'exitvr';
+export const VR_MODE_CHANGE = 'vrmodechange';

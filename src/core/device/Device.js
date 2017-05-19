@@ -8,11 +8,23 @@ import {localTransport} from '../transport';
  * Class for getting current device information such as
  * checking device type, vr mode, ...
  * This class should not be instantiated
+ *
+ * @events VR_MODE_CHANGE ENTER_VR
  */
 class Device extends EventEmitter {
     constructor() {
         super();
         this._isVR = false;
+
+        this.on(CONST.ENTER_VR, (evt) => {
+            this._isVR = true;
+            this.emit(CONST.VR_MODE_CHANGE, evt);
+        });
+
+        this.on(CONST.EXIT_VR, (evt) => {
+            this._isVR = false;
+            this.emit(CONST.VR_MODE_CHANGE, evt);
+        });
     }
 
     /**
@@ -142,6 +154,11 @@ class Device extends EventEmitter {
 export const device = new Device();
 
 messenger.on(CONST.VR_DISPLAY_PRESENT_CHANGE, (data, transport) => {
-    if(transport === localTransport)
+    if(transport === localTransport && device._isVR !== data) {
         device._isVR = data;
+        if(device._isVR)
+            this.emit(CONST.ENTER_VR, new RodinEvent(this));
+        else
+            this.emit(CONST.EXIT_VR, new RodinEvent(this));
+    }
 });
