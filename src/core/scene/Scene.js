@@ -105,6 +105,14 @@ export class Scene extends EventEmitter {
         return instances;
     }
 
+    static getByName(name) {
+        const filteredScene = instances.filter(_scene => _scene.name === name);
+        if (filteredScene && filteredScene[0])
+            return filteredScene[0];
+
+        return null;
+    }
+
     /**
      * Checks if your instance is scene.
      * @returns {boolean} always true
