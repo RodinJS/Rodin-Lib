@@ -252,14 +252,6 @@ export class Scene extends EventEmitter {
     }
 
     /**
-     * Gets the rendering camera of the active scene.
-     * @returns {THREE.PerspectiveCamera}
-     */
-    static get activeCamera() {
-        return activeScene._camera;
-    }
-
-    /**
      * Gets the hmd camera of the active scene
      * @returns {HMDCamera}
      * @constructor
@@ -286,7 +278,7 @@ export class Scene extends EventEmitter {
             case true:
                 const filteredScene = instances.filter(_scene => _scene.name === scene);
                 if (filteredScene && filteredScene[0]) {
-                    activeScene = filteredScene;
+                    activeScene = filteredScene[0];
                     break;
                 }
             default:

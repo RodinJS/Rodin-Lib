@@ -7,7 +7,7 @@ import * as CONST from "../constants/";
 const constructorScheme = {
     trackPosition: AScheme.bool().default(true),
     trackRotation: AScheme.bool().default('$trackPosition'),
-    HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(new HMDCamera)
+    HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(() => new HMDCamera())
 };
 
 export class Avatar extends Sculpt {
