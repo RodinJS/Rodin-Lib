@@ -16,4 +16,9 @@ export const LOCAL = 'local';
  */
 export const POST_MESSAGE = 'postmessage';
 
-export const NEW_CHILD = 'newchild';
+export const HELLO_FROM_CHILD = 'hellofromchild';
+export const HELLO_FROM_PARENT = 'hellofromparent';
+
+export const ALL = 'all';
+export const CHILDREN = 'children';
+export const PARENT = 'parent';

@@ -1,5 +1,8 @@
 import {Scene} from '../scene';
 import {device} from '../device';
+import {messenger} from '../messenger';
+import * as CONST from '../constants';
+import {postMessageTransport} from '../transport';
 
 /**
  * Enters VR mode
@@ -24,3 +27,19 @@ export const exitVR = () => {
     Scene.webVRmanager.hmd.exitPresent();
     return true;
 };
+
+/**
+ * Enter VR when someone asks
+ */
+messenger.on(CONST.ENTER_VR, (data, transport) => {
+    if (transport === postMessageTransport)
+        enterVR();
+});
+
+/**
+ * Exit VR when someone asks
+ */
+messenger.on(CONST.EXIT_VR, (data, transport) => {
+    if(transport === postMessageTransport)
+        exitVR();
+});
