@@ -12,14 +12,14 @@ export const getId = (object) => {
 
     return object["__uid__"];
 };
+
 /**
  *
  * @param obj
  * @param prop
  * @returns {*}
  */
-export const getProperty
-= (obj, prop) => {
+export const getProperty = (obj, prop) => {
     let props = prop.split('.');
     let tmp = obj;
 

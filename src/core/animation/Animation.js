@@ -1,6 +1,5 @@
 import {AnimationClip} from './AnimationClip';
 import {SculptPlugin} from '../plugin';
-import {Set} from '../set';
 import * as CONST from '../constants';
 import {object} from '../utils';
 
@@ -22,7 +21,7 @@ export class Animation {
          * A Set of clips to be played.
          * @type {Set.<AnimationClip>}
          */
-        this.clips = new Set();
+        this.clips = [];
     }
 
     /**
