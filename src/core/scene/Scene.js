@@ -351,9 +351,6 @@ export class Scene extends EventEmitter {
 
         messenger.post(CONST.RENDER_START, {});
 
-        // Update VR headset position and apply to camera.
-        //Scene.active._controls.update();
-
         // call all prerender functions
         for (let i = 0; i < preRenderFunctions.length; i++) {
             preRenderFunctions[i]();
@@ -372,12 +369,6 @@ export class Scene extends EventEmitter {
                 child.emit(CONST.UPDATE, new RodinEvent(child, {}));
             }
         }
-        // //TODO: camera needs to be a sculpt object, to avoid sh*t like this
-        // Scene.active._camera.children.map(child => {
-        //     if (child.Sculpt && child.Sculpt.isReady) {
-        //         child.Sculpt.emit(CONST.UPDATE, new RodinEvent(child, {}));
-        //     }
-        // });
 
         Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
         messenger.post(CONST.RENDER, {realTimestamp: timestamp});
@@ -475,7 +466,8 @@ window.addEventListener(CONST.VR_DISPLAY_PRESENT_CHANGE, () => {
 // TODO: fix this when webkit fixes growing canvas bug
 if (device.isIframe && device.isIOS) {
     Scene.renderer.domElement.style.position = 'fixed';
-    Scene.onResize();
+    if(Scene.active)
+        Scene.onResize();
 }
 
 messenger.on(CONST.REQUEST_ACTIVE_SCENE, () => {
