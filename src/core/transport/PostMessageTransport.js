@@ -101,11 +101,13 @@ export class PostMessageTransport extends Transport {
 
 export const postMessageTransport = new PostMessageTransport();
 
+let parentAnswered = false;
+
 window.addEventListener("message", (evt) => {
     if (!evt.data.isRodin) return;
 
-    if (evt.data.channel === 'connection' && evt.data.body.message === CONST.HELLO_FROM_CHILD) {
-        console.log('hello from child ', evt.data.body.childId);
+    // sending a hello message to each new, unique, child
+    if (evt.data.channel === 'connection' && evt.data.body.message === CONST.HELLO_FROM_CHILD && !PostMessageTransport.children[evt.data.body.childId]) {
         PostMessageTransport.children[evt.data.body.childId] = evt.source;
         messenger.post('connection', {
             parentId: RODIN_ID,
@@ -115,26 +117,45 @@ window.addEventListener("message", (evt) => {
         return;
     }
 
-    if (evt.data.channel === 'connection' && evt.data.body.message === CONST.HELLO_FROM_PARENT) {
-        console.log('hello from parent ', evt.data.body.parentId);
+    // registering parent after we got a hello, sending a message through a messenger to inform others
+    if (evt.data.channel === 'connection' && evt.data.body.message === CONST.HELLO_FROM_PARENT && !parentAnswered) {
         PostMessageTransport.parentId = evt.data.body.parentId;
+        parentAnswered = true;
+        messenger.post(CONST.POST_MESSAGE_TRANSPORT_PARENT_ID, {parentId: PostMessageTransport.parentId});
         return;
     }
 
-    messenger.receive(evt.data.channel, evt.data.body, postMessageTransport);
+    messenger.receive(evt.data.channel, evt.data, postMessageTransport);
 }, false);
 
 /**
  * Notify parent when Rodin is ready
  */
 messenger.post(CONST.REQUEST_RODIN_STARTED);
-
+/**
+ * ping parent every 100ms until it pings back
+ */
 messenger.once(CONST.RODIN_STARTED, () => {
     if (device.isIframe) {
-        messenger.post('connection', {
-            childId: RODIN_ID,
-            message: CONST.HELLO_FROM_CHILD,
-            destination: CONST.PARENT
-        }, postMessageTransport);
+
+        const pingParent = () => {
+            messenger.post('connection', {
+                childId: RODIN_ID,
+                message: CONST.HELLO_FROM_CHILD,
+                destination: CONST.PARENT
+            }, postMessageTransport);
+        };
+
+        let timeout = null;
+        const timoutCallback = () => {
+            if(!parentAnswered) {
+                clearTimeout(timeout);
+                pingParent();
+                setTimeout(timoutCallback, 100);
+            }
+        };
+
+        timeout = setTimeout(timoutCallback, 100);
+        pingParent();
     }
 });
