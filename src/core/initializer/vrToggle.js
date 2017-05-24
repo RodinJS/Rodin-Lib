@@ -29,7 +29,7 @@ export const exitVR = () => {
 };
 
 /**
- * Enter VR when someone asks
+ * Enter VR when someone requests
  */
 messenger.on(CONST.ENTER_VR, (data, transport) => {
     if (transport === postMessageTransport)
@@ -37,7 +37,7 @@ messenger.on(CONST.ENTER_VR, (data, transport) => {
 });
 
 /**
- * Exit VR when someone asks
+ * Exit VR when someone requests
  */
 messenger.on(CONST.EXIT_VR, (data, transport) => {
     if(transport === postMessageTransport)
