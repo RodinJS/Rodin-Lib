@@ -474,8 +474,8 @@ window.addEventListener(CONST.VR_DISPLAY_PRESENT_CHANGE, () => {
 
 // TODO: fix this when webkit fixes growing canvas bug
 if (device.isIframe && device.isIOS) {
-    this.renderer.domElement.style.position = 'fixed';
-    this.onResize();
+    Scene.renderer.domElement.style.position = 'fixed';
+    Scene.onResize();
 }
 
 messenger.on(CONST.REQUEST_ACTIVE_SCENE, () => {
