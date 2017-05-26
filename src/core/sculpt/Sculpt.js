@@ -170,7 +170,6 @@ export class Sculpt extends EventEmitter {
             case !!args.sculpt:
                 this.copy(args.sculpt);
                 this._ready = true;
-                this._threeObject.Sculpt = this;
                 !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
@@ -178,7 +177,6 @@ export class Sculpt extends EventEmitter {
                 this._threeObject = args.threeObject;
                 this._syncWithThree();
                 this._ready = true;
-                this._threeObject.Sculpt = this;
                 !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
@@ -187,7 +185,6 @@ export class Sculpt extends EventEmitter {
                     this._threeObject = mesh;
                     this._syncWithThree();
                     this._ready = true;
-                    this._threeObject.Sculpt = this;
                     !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 });
                 break;

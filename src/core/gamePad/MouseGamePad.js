@@ -100,7 +100,7 @@ class MouseNavigatorGamePad {
 
         let mouseDown = (event) => {
             if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
-            if(this.buttons[event.button]) {
+            if (this.buttons[event.button]) {
                 this.buttons[event.button].pressed = true
             }
 
@@ -111,7 +111,7 @@ class MouseNavigatorGamePad {
 
         let mouseUp = (event) => {
             if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
-            if(this.buttons[event.button]) {
+            if (this.buttons[event.button]) {
                 this.buttons[event.button].pressed = false
             }
 
@@ -132,13 +132,13 @@ class MouseNavigatorGamePad {
         document.body.addEventListener('mousedown', mouseDown, false);
         document.body.addEventListener('mouseup', mouseUp, false);
 
-        document.body.addEventListener('touchmove', (evt)=> {
+        document.body.addEventListener('touchmove', (evt) => {
             if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             evt.clientX = evt.touches[0].clientX;
             evt.clientY = evt.touches[0].clientY;
             mouseMove(evt);
         }, false);
-        document.body.addEventListener('touchstart', (evt)=> {
+        document.body.addEventListener('touchstart', (evt) => {
             if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             evt.button = 0;
             evt.clientX = evt.touches[0].clientX;
@@ -146,7 +146,7 @@ class MouseNavigatorGamePad {
             mouseMove(evt);
             mouseDown(evt);
         }, false);
-        document.body.addEventListener('touchend', (evt)=> {
+        document.body.addEventListener('touchend', (evt) => {
             if (Scene.webVRmanager.hmd && Scene.webVRmanager.hmd.isPresenting) return;
             evt.button = 0;
             mouseUp(evt);
@@ -160,8 +160,8 @@ class MouseNavigatorGamePad {
     }
 }
 /**
-* Mouse Gamepad class, overrides buttons and intersecting method.
-*/
+ * Mouse Gamepad class, overrides buttons and intersecting method.
+ */
 export class MouseGamePad extends GamePad {
     constructor() {
         super('mouse', null, CONST.NON_VR);
@@ -170,6 +170,10 @@ export class MouseGamePad extends GamePad {
          * @type {Button[]}
          */
         this.buttons = [Buttons.mouseLeft, Buttons.mouseWheel, Buttons.mouseRight];
+    }
+
+    get isMouseGamepad() {
+        return true;
     }
 
     /**

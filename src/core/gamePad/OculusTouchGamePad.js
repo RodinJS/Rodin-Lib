@@ -49,6 +49,7 @@ export class OculusTouchGamePad extends GamePad {
      * @returns {boolean} - true
      */
     get isOculusTouchGamePad() {
+        //todo: raname GamePad to Gamepad with lower case p
         return true;
     }
 
