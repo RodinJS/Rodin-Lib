@@ -3,6 +3,7 @@ import * as CONST from '../constants';
 import {ErrorUnknownDevice} from '../error';
 import {messenger} from '../messenger';
 import {localTransport} from '../transport';
+import {RodinEvent} from '../rodinEvent';
 
 /**
  * Class for getting current device information such as
@@ -155,8 +156,8 @@ messenger.on(CONST.VR_DISPLAY_PRESENT_CHANGE, (data, transport) => {
     if(transport === localTransport && device._isVR !== data) {
         device._isVR = data;
         if(device._isVR)
-            this.emit(CONST.ENTER_VR, new RodinEvent(this));
+            device.emit(CONST.ENTER_VR, new RodinEvent(this));
         else
-            this.emit(CONST.EXIT_VR, new RodinEvent(this));
+            device.emit(CONST.EXIT_VR, new RodinEvent(this));
     }
 });
