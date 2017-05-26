@@ -6,11 +6,14 @@ import {Scene} from '../scene';
 
 export class HorizontalGrid extends Grid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5) {
+        // switched places of width and hight again because of the
+        // same issue as above
         super(new Plane(width * cellWidth * 2, height * cellHeight, 1, 1, new THREE.MeshBasicMaterial({
             color: 0xffffff,
             transparent: true,
             opacity: 0
-        })), width, height, cellWidth, cellHeight);
+            // wireframe: true
+        })), height, width, cellHeight, cellWidth);
 
 
         Scene.active.on(CONST.GAMEPAD_BUTTON_UP, () => {
@@ -48,6 +51,6 @@ export class HorizontalGrid extends Grid {
      * @returns {Vector3}
      */
     getIndexPosition(i, j, centerPos) {
-        return new Vector3(i * this._cellWidth - centerPos.y, j * this._cellHeight - centerPos.x, 0);
+        return new Vector3(i * this._cellWidth - centerPos.y, centerPos.x - j * this._cellHeight, 0);
     }
 }
