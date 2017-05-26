@@ -1,6 +1,7 @@
 import {Sculpt} from '../sculpt/Sculpt'
 import * as CONST from '../constants';
-import {Vector3} from '../math'
+import {Vector3} from '../math';
+import {Time} from '../time';
 
 export class Grid {
     constructor(sculpt = new Sculpt(), width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5) {
@@ -11,7 +12,7 @@ export class Grid {
 
         this.sculpt.on(CONST.GAMEPAD_BUTTON_CHANGE, (evt) => {
             if (evt.gamepad.isMouseGamepad && evt.keyCode === CONST.MOUSE_WHEEL) {
-                this.scroll(Math.sign(this._lastScroll - evt.button.value));
+                this.scroll(-Math.sign(this._lastScroll - evt.button.value));
                 this._lastScroll = evt.button.value;
             }
         });
@@ -52,6 +53,10 @@ export class Grid {
 
         this._minHorizontalScroll = 1;
         this._minVerticalScroll = 1;
+
+        this._shouldUpdate = true;
+
+        this._scrollStackSize = 0;
 
     }
 
@@ -113,6 +118,10 @@ export class Grid {
     }
 
     update() {
+        if (!this._shouldUpdate)
+            return;
+        let changedCount = 0;
+
         const pWidth = this._width + this._verticalPadLength * 2;
         const pHeight = this._height + this._horizontalPadLength * 2;
 
@@ -120,28 +129,35 @@ export class Grid {
             for (let j = 0; j < pWidth; j++) {
 
                 const index = (i * pWidth) + j + this.start;
-                const elem = this.getElement(index);
                 if (!this._targetPositions[index] || this._targetPositions[index].reached) {
                     continue;
                 }
+                changedCount++;
+                const elem = this.getElement(index);
 
                 const dist = elem.position.distanceTo(this._targetPositions[index]);
-                elem.position.lerp(this._targetPositions[index], 0.1);
+                elem.position.lerp(this._targetPositions[index], 0.1 * Time.delta / 10);
 
                 this.move && this.move(elem, index, this._targetPositions[index]);
 
-                if (dist < 0.0002) {
+                if (dist < 0.02) {
                     this._targetPositions[index].reached = true;
                 }
 
             }
         }
+        if (changedCount === 0) {
+            this._shouldUpdate = false;
+        }
     }
 
     updateTargetPositions() {
+        if (this._scrollStackSize > 10) {
+            return;
+        }
         const pWidth = this._width + this._verticalPadLength * 2;
         const pHeight = this._height + this._horizontalPadLength * 2;
-        const centerPos = new Vector3(pWidth / 2 * this._cellWidth - this._cellWidth / 2 + this._horizontalOffset, pHeight / 2 * this._cellHeight - this._cellHeight / 2 + this._verticalOffset, 0);
+        const centerPos = new Vector3(pWidth * this._cellWidth / 2 - this._cellWidth / 2 + this._horizontalOffset, pHeight * this._cellHeight / 2 - this._cellHeight / 2 + this._verticalOffset, 0);
 
         const updated = [];
         const missingRows = new Array(pHeight).fill(true);
@@ -184,6 +200,7 @@ export class Grid {
         if (missingRows.every(i => i)) {
             const lastScrollDirection = Math.sign(this._oldCenter - this.center);
             //console.log(lastScrollDirection);
+            this._scrollStackSize++;
             this.scroll(lastScrollDirection * this._height);
             return;
         }
@@ -192,6 +209,7 @@ export class Grid {
             let m = 0;
             while (missingRows[m++]) {
             }
+            this._scrollStackSize++;
             this.scroll(m - 1);
             return;
         }
@@ -200,6 +218,7 @@ export class Grid {
             let m = 0;
             while (missingRows[m++]) {
             }
+            this._scrollStackSize++;
             this.scroll(-m + 1);
             return;
         }
@@ -216,6 +235,7 @@ export class Grid {
         }
 
         this._prevUpdated = [...updated];
+        this._shouldUpdate = true;
     }
 
 }

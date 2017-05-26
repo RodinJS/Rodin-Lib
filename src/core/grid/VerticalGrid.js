@@ -10,11 +10,8 @@ export class VerticalGrid extends Grid {
             color: 0xffffff,
             transparent: true,
             opacity: 0
+            // wireframe: true
         })), width, height, cellWidth, cellHeight);
-
-        this.sculpt.transparent = true;
-        this.sculpt.opacity = 0;
-
 
         Scene.active.on(CONST.GAMEPAD_BUTTON_UP, () => {
             this.dragUV = null;
@@ -29,10 +26,9 @@ export class VerticalGrid extends Grid {
             // check the case when things are already moving,
             // then you press again
             if (this.dragUV) {
-                this.verticalOffset = this.sculpt.height * (this.dragUV.y - evt.uv.y);
+                this.verticalOffset = this.sculpt.height * (evt.uv.y - this.dragUV.y);
             }
         });
-
     }
 
     set minScroll(val) {
@@ -40,7 +36,6 @@ export class VerticalGrid extends Grid {
     }
 
     getIndexPosition(i, j, centerPos) {
-        return new Vector3(j * this._cellWidth - centerPos.x, i * this._cellHeight - centerPos.y, 0);
+        return new Vector3(j * this._cellWidth - centerPos.x, centerPos.y - i * this._cellHeight, 0);
     }
-
 }
