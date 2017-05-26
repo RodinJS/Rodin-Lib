@@ -43,11 +43,10 @@ export class Raycaster extends THREE.Raycaster {
             let centerObj = intersects[i].object;
             if (!centerObj) continue;
 
-            while (centerObj && !centerObj.Sculpt && !centerObj.parent.isScene) {
+            while (centerObj && !centerObj.Sculpt && (centerObj.parent && !centerObj.parent.isScene)) {
                 centerObj = centerObj.parent;
             }
-
-            if (centerObj.Sculpt.globalVisible && centerObj.Sculpt.gamepadVisible && !used[utils.object.getId(centerObj.Sculpt)]) {
+            if (centerObj.Sculpt && centerObj.Sculpt.globalVisible && centerObj.Sculpt.gamepadVisible && !used[utils.object.getId(centerObj.Sculpt)]) {
                 used[utils.object.getId(centerObj.Sculpt)] = true;
                 ret.push({
                     sculpt: centerObj.Sculpt,
