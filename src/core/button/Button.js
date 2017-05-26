@@ -34,4 +34,8 @@ export class Button {
          */
         this.value = 0;
     }
+
+    get isButton(){
+        return true;
+    }
 }

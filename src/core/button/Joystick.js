@@ -15,4 +15,8 @@ export class Joystick extends Button {
             y: 0
         }
     }
+
+    get isJoystick() {
+        return true;
+    }
 }
