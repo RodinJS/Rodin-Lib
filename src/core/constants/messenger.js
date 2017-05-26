@@ -43,3 +43,8 @@ export const ACTIVE_SCENE = 'activescene';
  * @type {string}
  */
 export const REQUEST_ACTIVE_SCENE = 'requestactivescene';
+
+export const REQUEST_HMD_POSE = 'requesthmdpose';
+export const HMD_POSE = 'hmdpose';
+
+export const POST_MESSAGE_TRANSPORT_PARENT_ID = 'postmessagetransportparentid';

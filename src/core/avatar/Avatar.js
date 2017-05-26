@@ -3,12 +3,18 @@ import {HMDCamera} from '../camera'
 import {messenger} from '../messenger';
 import {AScheme} from '../utils/AScheme'
 import * as CONST from "../constants/";
+import {device} from '../device';
+import {postMessageTransport} from '../transport';
 
 const constructorScheme = {
     trackPosition: AScheme.bool().default(true),
     trackRotation: AScheme.bool().default('$trackPosition'),
     HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(() => new HMDCamera())
 };
+
+let useWebVRPose = true;
+let pose = null;
+let poseRequesters = [];
 
 export class Avatar extends Sculpt {
     constructor(...args) {
@@ -80,15 +86,20 @@ export class Avatar extends Sculpt {
             return;
         }
 
-        let pose = null;
+        if (useWebVRPose) {
+            pose = null;
 
-        // to support different versions of webvr api
-        if (Avatar._vrDisplay.getFrameData) {
-            Avatar._vrDisplay.getFrameData(Avatar._frameData);
-            pose = Avatar._frameData.pose;
-        } else if (Avatar._vrDisplay.getPose) {
-            pose = Avatar._vrDisplay.getPose();
+            // to support different versions of webvr api
+            if (Avatar._vrDisplay.getFrameData) {
+                Avatar._vrDisplay.getFrameData(Avatar._frameData);
+                pose = Avatar._frameData.pose;
+            } else if (Avatar._vrDisplay.getPose) {
+                pose = Avatar._vrDisplay.getPose();
+            }
         }
+
+        if (!pose)
+            return;
 
         if (pose.orientation !== null) {
             Avatar.trackingSculpt.quaternion.fromArray(pose.orientation);
@@ -137,7 +148,53 @@ export class Avatar extends Sculpt {
 
 messenger.on(CONST.RENDER_START, () => {
     Avatar.update();
+
+    if (useWebVRPose && poseRequesters.length !== 0) {
+        messenger.post(CONST.HMD_POSE, {
+            destination: poseRequesters,
+            pose: {
+                position: pose.position ? Array.from(pose.position) : null,
+                orientation: pose.orientation ? Array.from(pose.orientation) : null
+            }
+        }, postMessageTransport);
+    }
 });
 
 Avatar.init();
 Avatar.isRunning = true;
+
+/**
+ * if a child is requesting position
+ * register it to send updates later
+ */
+messenger.on(CONST.REQUEST_HMD_POSE, (data, transport) => {
+    if (transport === postMessageTransport) {
+        poseRequesters.push(data.path[data.path.length - 1]);
+    }
+});
+
+/**
+ * if we are on ios and inside an iframe
+ * orientation change events dont work
+ * so we request hmd pose from parent iframe
+ */
+if (device.isIOS && device.isIframe) {
+    useWebVRPose = false;
+
+    // requesting updates on position and orientation
+    messenger.on(CONST.POST_MESSAGE_TRANSPORT_PARENT_ID, () => {
+        messenger.post(CONST.REQUEST_HMD_POSE, {destination: CONST.PARENT}, postMessageTransport);
+    });
+
+    // processing updates
+    messenger.on(CONST.HMD_POSE, (data, transport) => {
+        if (transport === postMessageTransport) {
+            pose = data.body.pose;
+            messenger.post(CONST.HMD_POSE, {
+                destination: poseRequesters,
+                pose: pose
+            }, postMessageTransport);
+        }
+    });
+}
+
