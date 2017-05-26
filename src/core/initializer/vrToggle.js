@@ -32,14 +32,26 @@ export const exitVR = () => {
  * Enter VR when someone requests
  */
 messenger.on(CONST.ENTER_VR, (data, transport) => {
-    if (transport === postMessageTransport)
-        enterVR();
+    if (transport === postMessageTransport) {
+        const status = enterVR();
+        const channel = status ? CONST.ENTER_VR_SUCCESS : CONST.ENTER_VR_ERROR;
+        messenger.post(channel, {
+            destination: [data.path[data.path.length - 1]],
+            timestamp: Date.now()
+        }, postMessageTransport);
+    }
 });
 
 /**
  * Exit VR when someone requests
  */
 messenger.on(CONST.EXIT_VR, (data, transport) => {
-    if(transport === postMessageTransport)
-        exitVR();
+    if(transport === postMessageTransport) {
+        const status = exitVR();
+        const channel = status ? CONST.EXIT_VR_SUCCESS : CONST.EXIT_VR_ERROR;
+        messenger.post(channel, {
+            destination: [data.path[data.path.length - 1]],
+            timestamp: Date.now()
+        }, postMessageTransport);
+    }
 });

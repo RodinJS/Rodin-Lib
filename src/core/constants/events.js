@@ -19,3 +19,9 @@ export const RESIZE = 'resize';
 export const ENTER_VR = 'entervr';
 export const EXIT_VR = 'exitvr';
 export const VR_MODE_CHANGE = 'vrmodechange';
+
+export const ENTER_VR_SUCCESS = 'entervrsuccess';
+export const EXIT_VR_SUCCESS = 'exitvrsuccess';
+
+export const ENTER_VR_ERROR = 'entervrerror';
+export const EXIT_VR_ERROR = 'exitvrerror';
