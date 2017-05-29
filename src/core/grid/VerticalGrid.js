@@ -5,13 +5,16 @@ import {Plane} from '../sculpt'
 import {Scene} from '../scene';
 
 export class VerticalGrid extends Grid {
-    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5) {
-        super(new Plane(width * cellWidth, height * cellHeight * 2, 1, 1, new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0
-            // wireframe: true
-        })), width, height, cellWidth, cellHeight);
+    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
+
+        sculpt = sculpt || new Plane(width * cellWidth, height * cellHeight * 2, 1, 1, new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0
+                // wireframe: true
+            }));
+
+        super(width, height, cellWidth, cellHeight, sculpt);
 
         Scene.active.on(CONST.GAMEPAD_BUTTON_UP, () => {
             this.dragUV = null;
@@ -35,7 +38,9 @@ export class VerticalGrid extends Grid {
         this._minVerticalScroll = val;
     }
 
-    getIndexPosition(i, j, centerPos) {
-        return new Vector3(j * this._cellWidth - centerPos.x, centerPos.y - i * this._cellHeight, 0);
+    getIndexProperties(i, j, centerPos) {
+        return {
+            position: new Vector3(j * this._cellWidth - centerPos.x, centerPos.y - i * this._cellHeight, 0)
+        };
     }
 }

@@ -4,29 +4,21 @@ import {Vector3} from '../math';
 import {Time} from '../time';
 
 export class Grid {
-    constructor(sculpt = new Sculpt(), width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5) {
-        this.sculpt = sculpt;
-        this.sculpt._threeObject.renderOrder = 1;
+    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt = this._getMainSculpt()) {
 
-        this._lastScroll = 0;
-
-        this.sculpt.on(CONST.GAMEPAD_BUTTON_CHANGE, (evt) => {
-            if (evt.gamepad.isMouseGamepad && evt.keyCode === CONST.MOUSE_WHEEL) {
-                this.scroll(-Math.sign(this._lastScroll - evt.button.value));
-                this._lastScroll = evt.button.value;
-            }
-        });
-
-        this.sculpt.on(CONST.GAMEPAD_BUTTON_DOWN, (evt) => {
-            this.dragUV = evt.uv;
-            navigator.mouseGamePad.stopPropagationOnMouseMove = true;
-        });
-
-
+        // we need to set width height first, so _getMainSculpt can use those
         this._width = width;
         this._height = height;
         this._cellWidth = cellWidth;
         this._cellHeight = cellHeight;
+
+        this._lastScroll = 0;
+
+        sculpt = sculpt || new Sculpt();
+
+        this.sculpt = sculpt;
+
+        this._initEvents();
 
         this._horizontalPadLength = 0;
         this._verticalPadLength = 0;
@@ -38,6 +30,7 @@ export class Grid {
         window.sculpt = this.sculpt;
 
         this._targetPositions = [];
+        this._targetQuaternions = [];
 
         this._center = width * height / 2;
         this._oldCenter = this._center;
@@ -59,6 +52,23 @@ export class Grid {
         this._scrollStackSize = 0;
 
     }
+
+    _initEvents() {
+        this.sculpt._threeObject.renderOrder = 1;
+
+        this.sculpt.on(CONST.GAMEPAD_BUTTON_CHANGE, (evt) => {
+            if (evt.gamepad.isMouseGamepad && evt.keyCode === CONST.MOUSE_WHEEL) {
+                this.scroll(-Math.sign(this._lastScroll - evt.button.value));
+                this._lastScroll = evt.button.value;
+            }
+        });
+
+        this.sculpt.on(CONST.GAMEPAD_BUTTON_DOWN, (evt) => {
+            this.dragUV = evt.uv;
+            navigator.mouseGamePad.stopPropagationOnMouseMove = true;
+        });
+    }
+
 
     setGetElement(fcn) {
         this.getElement = fcn;
@@ -138,6 +148,12 @@ export class Grid {
                 const dist = elem.position.distanceTo(this._targetPositions[index]);
                 elem.position.lerp(this._targetPositions[index], 0.1 * Time.delta / 10);
 
+                // we shouldn't implement each changable parameter in this parent class
+                // TODO: expose a method and use it in children
+                if (this._targetQuaternions[index]) {
+                    elem.quaternion.slerp(this._targetQuaternions[index], 0.1 * Time.delta / 10);
+                }
+
                 this.move && this.move(elem, index, this._targetPositions[index]);
 
                 if (dist < 0.02) {
@@ -152,7 +168,7 @@ export class Grid {
     }
 
     updateTargetPositions() {
-        if (this._scrollStackSize > 10) {
+        if (this._scrollStackSize > 100) {
             return;
         }
         const pWidth = this._width + this._verticalPadLength * 2;
@@ -168,6 +184,8 @@ export class Grid {
         // in order to get stuff working.
         // TODO: fix this later
 
+        // to fix this we need to traverse not by height, width, but by index
+        // no time right now will fix later
         for (let i = 0; i < pHeight; i++) {
             let missingFullRow = true;
 
@@ -184,8 +202,10 @@ export class Grid {
                 if (elem.parent !== this.sculpt) {
                     elem.parent = this.sculpt;
                 }
+                const props = this.getIndexProperties(i, j, centerPos);
+                this._targetPositions[index] = props.position;// this.getIndexPosition(i, j, centerPos);
+                this._targetQuaternions[index] = props.quaternion;
 
-                this._targetPositions[index] = this.getIndexPosition(i, j, centerPos);
                 this._targetPositions[index].reached = false;
 
                 if (i < this._horizontalPadLength || i >= this._height + this._horizontalPadLength) {
@@ -223,6 +243,7 @@ export class Grid {
             return;
         }
 
+        this._scrollStackSize = 0;
 
         const removed = this._prevUpdated.filter(i => updated.indexOf(i) === -1);
         for (let i in removed) {

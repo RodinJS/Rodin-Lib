@@ -6,6 +6,7 @@ import * as CONST from '../constants';
 import {Vector3, Euler, Quaternion} from '../math';
 import {AnimationPlugin} from '../animation';
 import {Loader} from '../loader';
+import {messenger} from '../messenger';
 
 function enforce() {
 }
@@ -36,6 +37,8 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     }, args);
 }
 
+const pendingElements = new Set();
+
 /**
  * Sculpt is a base class for a 3d object in Rodin Lib,
  * Any 3d object should be either a direct Sculpt, or extended from Sculpt
@@ -45,6 +48,14 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
 export class Sculpt extends EventEmitter {
     constructor(args, deferReadyEvent) {
         super();
+
+        // todo: fix this logic later
+        pendingElements.add(this);
+        this.on(CONST.READY, () => {
+            pendingElements.delete(this);
+            if(pendingElements.size === 0)
+                messenger.post(CONST.ALL_SCULPTS_READY, {});
+        });
 
         args = normalizeArguments(args);
 
