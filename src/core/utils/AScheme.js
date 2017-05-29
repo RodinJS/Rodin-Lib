@@ -236,6 +236,7 @@ export class AScheme {
                 if (!scheme.hasOwnProperty(i))
                     continue;
                 arrayRes.push(res[i]);
+                arrayRes[i] = res[i];
             }
             return arrayRes;
         }
