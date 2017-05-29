@@ -152,7 +152,7 @@ export class Grid {
     }
 
     updateTargetPositions() {
-        if (this._scrollStackSize > 10) {
+        if (this._scrollStackSize > 100) {
             return;
         }
         const pWidth = this._width + this._verticalPadLength * 2;
@@ -168,6 +168,8 @@ export class Grid {
         // in order to get stuff working.
         // TODO: fix this later
 
+        // to fix this we need to traverse not by height, width, but by index
+        // no time right now will fix later
         for (let i = 0; i < pHeight; i++) {
             let missingFullRow = true;
 
@@ -223,6 +225,7 @@ export class Grid {
             return;
         }
 
+        this._scrollStackSize = 0;
 
         const removed = this._prevUpdated.filter(i => updated.indexOf(i) === -1);
         for (let i in removed) {
