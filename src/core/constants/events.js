@@ -25,3 +25,6 @@ export const EXIT_VR_SUCCESS = 'exitvrsuccess';
 
 export const ENTER_VR_ERROR = 'entervrerror';
 export const EXIT_VR_ERROR = 'exitvrerror';
+
+export const SCROLL_START = 'scrollstart';
+export const SCROLL_END = 'scrollend';
