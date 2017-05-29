@@ -35,7 +35,7 @@ export class Grid extends EventEmitter {
         this._targetPositions = [];
         this._targetQuaternions = [];
 
-        this._center = width * height / 2;
+        this._center = parseInt(width * height / 2);
         this._oldCenter = this._center;
 
         this._prevUpdated = [];
@@ -128,7 +128,7 @@ export class Grid extends EventEmitter {
     }
 
     get start() {
-        return this._center - this._width * this._height / 2
+        return this._center - parseInt(this._width * this._height / 2);
     }
 
     update() {
