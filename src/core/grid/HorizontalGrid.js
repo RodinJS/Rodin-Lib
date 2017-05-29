@@ -5,16 +5,17 @@ import {Plane} from '../sculpt'
 import {Scene} from '../scene';
 
 export class HorizontalGrid extends Grid {
-    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5) {
+    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
         // switched places of width and hight again because of the
         // same issue as above
-        super(new Plane(width * cellWidth * 2, height * cellHeight, 1, 1, new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0
-            // wireframe: true
-        })), height, width, cellHeight, cellWidth);
+        sculpt = sculpt || new Plane(width * cellWidth * 2, height * cellHeight, 1, 1, new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0
+                // wireframe: true
+            }));
 
+        super(height, width, cellHeight, cellWidth, sculpt);
 
         Scene.active.on(CONST.GAMEPAD_BUTTON_UP, () => {
             this.dragUV = null;
@@ -50,7 +51,9 @@ export class HorizontalGrid extends Grid {
      * @param centerPos
      * @returns {Vector3}
      */
-    getIndexPosition(i, j, centerPos) {
-        return new Vector3(i * this._cellWidth - centerPos.y, centerPos.x - j * this._cellHeight, 0);
+    getIndexProperties(i, j, centerPos) {
+        return {
+            position: new Vector3(i * this._cellWidth - centerPos.y, centerPos.x - j * this._cellHeight, 0)
+        };
     }
 }
