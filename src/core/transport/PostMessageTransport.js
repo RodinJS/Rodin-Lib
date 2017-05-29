@@ -47,7 +47,7 @@ export class PostMessageTransport extends Transport {
 
         if (!packet.isResponse) {
             packet.isResponse = false;
-        } else if(!packet.destination) {
+        } else if (!packet.destination) {
             packet.destination = CONST.ALL;
         }
 
@@ -81,10 +81,10 @@ export class PostMessageTransport extends Transport {
                 break;
 
             case Array.isArray(packet.destination):
-                for(let i of packet.destination) {
-                    if(PostMessageTransport.parentId === i)
+                for (let i of packet.destination) {
+                    if (PostMessageTransport.parentId === i)
                         receivers.push(PostMessageTransport.parent);
-                    else if(PostMessageTransport.children[i])
+                    else if (PostMessageTransport.children[i])
                         receivers.push(PostMessageTransport.children[i]);
                     else
                         throw new Error(`unknown destination ${i}`);
@@ -148,7 +148,7 @@ messenger.once(CONST.RODIN_STARTED, () => {
 
         let timeout = null;
         const timoutCallback = () => {
-            if(!parentAnswered) {
+            if (!parentAnswered) {
                 clearTimeout(timeout);
                 pingParent();
                 setTimeout(timoutCallback, 100);
@@ -158,4 +158,14 @@ messenger.once(CONST.RODIN_STARTED, () => {
         timeout = setTimeout(timoutCallback, 100);
         pingParent();
     }
+});
+
+/**
+ * Notify parent when all sculpts are loaded
+ */
+messenger.on(CONST.ALL_SCULPTS_READY, (data, transport) => {
+    if (transport !== postMessageTransport)
+        messenger.post(CONST.ALL_SCULPTS_READY, {
+            destination: CONST.PARENT
+        }, postMessageTransport);
 });
