@@ -3,6 +3,7 @@ import {Vector3} from '../math'
 import * as CONST from '../constants';
 import {Plane} from '../sculpt'
 import {Scene} from '../scene';
+import {Quaternion} from "../math/Quaternion";
 
 export class HorizontalGrid extends Grid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
@@ -53,7 +54,14 @@ export class HorizontalGrid extends Grid {
      */
     getIndexProperties(i, j, centerPos) {
         return {
-            position: new Vector3(i * this._cellWidth - centerPos.y, centerPos.x - j * this._cellHeight, 0)
+            position: new Vector3(i * this._cellWidth - centerPos.y, centerPos.x - j * this._cellHeight, 0),
+            quaternion: new Quaternion()
         };
+    }
+
+    _getCenterPos(pWidth, pHeight) {
+        //return new Vector3(pHeight * this._cellHeight / 2 - this._cellHeight / 2 + this._verticalOffset, pWidth * this._cellWidth / 2 - this._cellWidth / 2 + this._horizontalOffset, 0);
+        //return new Vector3(0, 0, 0);
+        return new Vector3(pWidth * this._cellHeight / 2 - this._cellHeight / 2 + this._horizontalOffset, pHeight * this._cellWidth / 2 - this._cellWidth / 2 + this._verticalOffset, 0);
     }
 }

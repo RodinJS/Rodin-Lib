@@ -3,6 +3,7 @@ import {Vector3} from '../math'
 import * as CONST from '../constants';
 import {Plane} from '../sculpt'
 import {Scene} from '../scene';
+import {Quaternion} from "../math/Quaternion";
 
 export class VerticalGrid extends Grid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
@@ -40,7 +41,8 @@ export class VerticalGrid extends Grid {
 
     getIndexProperties(i, j, centerPos) {
         return {
-            position: new Vector3(j * this._cellWidth - centerPos.x, centerPos.y - i * this._cellHeight, 0)
+            position: new Vector3(j * this._cellWidth - centerPos.x, centerPos.y - i * this._cellHeight, 0),
+            quaternion: new Quaternion()
         };
     }
 }

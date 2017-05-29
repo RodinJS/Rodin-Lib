@@ -2,10 +2,13 @@ import {Sculpt} from '../sculpt/Sculpt'
 import * as CONST from '../constants';
 import {Vector3} from '../math';
 import {Time} from '../time';
+import {EventEmitter} from '../eventEmitter';
+import {RodinEvent} from '../rodinEvent';
 
-export class Grid {
+
+export class Grid extends EventEmitter {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt = this._getMainSculpt()) {
-
+        super();
         // we need to set width height first, so _getMainSculpt can use those
         this._width = width;
         this._height = height;
@@ -42,6 +45,7 @@ export class Grid {
 
         this.sculpt.on(CONST.UPDATE, (evt) => {
             this.update();
+            //console.log(this.constructor);
         });
 
         this._minHorizontalScroll = 1;
@@ -163,6 +167,7 @@ export class Grid {
             }
         }
         if (changedCount === 0) {
+            this.emit(CONST.SCROLL_END, new RodinEvent(this));
             this._shouldUpdate = false;
         }
     }
@@ -173,7 +178,7 @@ export class Grid {
         }
         const pWidth = this._width + this._verticalPadLength * 2;
         const pHeight = this._height + this._horizontalPadLength * 2;
-        const centerPos = new Vector3(pWidth * this._cellWidth / 2 - this._cellWidth / 2 + this._horizontalOffset, pHeight * this._cellHeight / 2 - this._cellHeight / 2 + this._verticalOffset, 0);
+        const centerPos = this._getCenterPos(pWidth, pHeight);
 
         const updated = [];
         const missingRows = new Array(pHeight).fill(true);
@@ -257,6 +262,13 @@ export class Grid {
 
         this._prevUpdated = [...updated];
         this._shouldUpdate = true;
+
+        this.emit(CONST.SCROLL_START, new RodinEvent(this));
+
+    }
+
+    _getCenterPos(pWidth, pHeight) {
+        return new Vector3(pWidth * this._cellWidth / 2 - this._cellWidth / 2 + this._horizontalOffset, pHeight * this._cellHeight / 2 - this._cellHeight / 2 + this._verticalOffset, 0);
     }
 
 }

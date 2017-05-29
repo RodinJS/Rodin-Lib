@@ -22,7 +22,6 @@ export class VerticalSemiCircleGrid extends VerticalGrid {
     _getMainSculpt() {
         if (this.sculpt)
             return this.sculpt;
-        console.log(this._radius, this._radius, this._width * this._cellWidth);
 
 
         // return new Plane(this._width * this._cellWidth * 2, this._height * this._cellHeight, 1, 1, new THREE.MeshBasicMaterial({
