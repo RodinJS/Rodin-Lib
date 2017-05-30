@@ -18,7 +18,7 @@ export class HorizontalGrid extends Grid {
 
         super(height, width, cellHeight, cellWidth, sculpt);
 
-        Scene.active.on(CONST.GAMEPAD_BUTTON_UP, () => {
+        this.ButtonUpEvent = () => {
             this.dragUV = null;
             navigator.mouseGamePad.stopPropagationOnMouseMove = false;
 
@@ -29,7 +29,9 @@ export class HorizontalGrid extends Grid {
                 this.scroll(this.verticalOffset / this._cellWidth);
             }
             this.verticalOffset = 0;
-        });
+        };
+
+        Scene.active.on(CONST.GAMEPAD_BUTTON_UP, this.ButtonUpEvent);
 
         this.sculpt.on(CONST.GAMEPAD_MOVE, (evt) => {
             // check the case when things are already moving,
