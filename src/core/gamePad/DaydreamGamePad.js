@@ -3,7 +3,7 @@ import * as CONST from '../constants';
 import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
-import {Vector3} from '../math';
+import {Vector3, Quaternion} from '../math';
 import {Avatar} from '../avatar';
 
 /**
@@ -41,10 +41,10 @@ export class DaydreamController extends GamePad {
         let position = Avatar.active.globalPosition.clone();
         position.y -= Avatar.userHeight / 3;
 
-        const avatarRight = new THREE.Vector3(0.2, 0, -0.15).applyQuaternion(Avatar.active.HMDCamera.globalQuaternion);
+        const avatarRight = new Vector3(0.15, 0, -0.15).applyQuaternion(Avatar.active.HMDCamera.globalQuaternion);
         position = position.add(avatarRight);
 
-        const forearmEffect = new THREE.Vector3(0,0,-0.35).applyQuaternion(new THREE.Quaternion().fromArray(pose.orientation));
+        const forearmEffect = new Vector3(0,0,-0.35).applyQuaternion(new Quaternion().fromArray(pose.orientation));
         position = position.add(forearmEffect);
 
         this.sculpt.globalPosition.copy(position);
