@@ -96,6 +96,31 @@ export class MaterialPlayer {
             this.currentSource = key;
         };
         /**
+         *
+         */
+        this.loadVideo = function(url_) {
+            if ((typeof url_) === "string") {
+                url_ = {
+                    0: url_,
+                    default: "0"
+                }
+            }
+            url = url_;
+            this.pause();
+
+            video.innerHTML = "";
+            let key = url.default;
+            let source = document.createElement("source");
+            const urlSplited = url[key].split('.');
+            source.type = "video/" + urlSplited[urlSplited.length - 1];
+            source.src = url[key];
+
+            video.appendChild(source);
+            video.load();
+            video.currentTime = 0;
+            this.currentSource = key;
+        };
+        /**
          * A customizable function call on buffering end.
          */
         this.onBufferEnd = function () {
