@@ -59,6 +59,14 @@ class Device extends EventEmitter {
     }
 
     /**
+     * Checks if the current device is mobile (Android, webOS, iPhone, iPad, iPod, BlackBerry, Windows Phone)
+     * @returns {boolean}
+     */
+    get isMobile() {
+        return navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i);
+    }
+
+    /**
      * Gets the current version of iOS
      * returns null if not iOS
      * @returns {string|null}
