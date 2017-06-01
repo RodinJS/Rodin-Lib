@@ -35,10 +35,10 @@ export class VerticalSemiCircleGrid extends VerticalGrid {
     getIndexProperties(i, j, centerPos) {
         const pwidth = this._width + this._verticalPadLength * 2;
 
-        j = (j / pwidth - 1) * Math.PI * 2;
+        j = (j / (pwidth - 1) - 1) * Math.PI - Math.PI / 2;
 
-        const alpha = j * this._cellWidth - centerPos.x;
-        const x = this._radius * Math.sin(-alpha);
+        const alpha = j;// * this._cellWidth - centerPos.x;
+        const x = this._radius * Math.sin(-alpha);// + centerPos.x;
         const y = centerPos.y - i * this._cellHeight;
 
 

@@ -6,7 +6,7 @@ import {EventEmitter} from '../eventEmitter';
 import {RodinEvent} from '../rodinEvent';
 
 
-export class Grid extends EventEmitter {
+export class ListView extends EventEmitter {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt = this._getMainSculpt()) {
         super();
         // we need to set width height first, so _getMainSculpt can use those
@@ -29,7 +29,6 @@ export class Grid extends EventEmitter {
         this._pWidth = this._width + this._verticalPadLength * 2;
         this._pHeight = this._height + this._horizontalPadLength * 2;
 
-        console.log(this.sculpt);
         window.sculpt = this.sculpt;
 
         this._targetPositions = [];
@@ -139,31 +138,27 @@ export class Grid extends EventEmitter {
         const pWidth = this._width + this._verticalPadLength * 2;
         const pHeight = this._height + this._horizontalPadLength * 2;
 
-        for (let i = 0; i < pHeight; i++) {
-            for (let j = 0; j < pWidth; j++) {
+        for (let i = 0; i < pWidth * pHeight; i++) {
+            const index = i + this.start;
+            if (!this._targetPositions[index] || this._targetPositions[index].reached) {
+                continue;
+            }
+            changedCount++;
+            const elem = this.getElement(index);
 
-                const index = (i * pWidth) + j + this.start;
-                if (!this._targetPositions[index] || this._targetPositions[index].reached) {
-                    continue;
-                }
-                changedCount++;
-                const elem = this.getElement(index);
+            const dist = elem.position.distanceTo(this._targetPositions[index]);
+            elem.position.lerp(this._targetPositions[index], 0.1 * Time.delta / 10);
 
-                const dist = elem.position.distanceTo(this._targetPositions[index]);
-                elem.position.lerp(this._targetPositions[index], 0.1 * Time.delta / 10);
+            // we shouldn't implement each changable parameter in this parent class
+            // TODO: expose a method and use it in children
+            if (this._targetQuaternions[index]) {
+                elem.quaternion.slerp(this._targetQuaternions[index], 0.1 * Time.delta / 10);
+            }
 
-                // we shouldn't implement each changable parameter in this parent class
-                // TODO: expose a method and use it in children
-                if (this._targetQuaternions[index]) {
-                    elem.quaternion.slerp(this._targetQuaternions[index], 0.1 * Time.delta / 10);
-                }
+            this.move && this.move(elem, index, this._targetPositions[index]);
 
-                this.move && this.move(elem, index, this._targetPositions[index]);
-
-                if (dist < 0.02) {
-                    this._targetPositions[index].reached = true;
-                }
-
+            if (dist < 0.02) {
+                this._targetPositions[index].reached = true;
             }
         }
         if (changedCount === 0) {
