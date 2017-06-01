@@ -34,7 +34,7 @@ export class ListView extends EventEmitter {
         this._targetPositions = [];
         this._targetQuaternions = [];
 
-        this._center = parseInt(width * height / 2);
+        this._center = Math.floor(width * height / 2);
         this._oldCenter = this._center;
 
         this._prevUpdated = [];
@@ -127,7 +127,12 @@ export class ListView extends EventEmitter {
     }
 
     get start() {
-        return this._center - parseInt(this._width * this._height / 2);
+        return this._center - Math.floor(this._width * this._height / 2);
+    }
+
+    get end() {
+        return this._center + Math.ceil(this._width * this._height / 2);
+
     }
 
     update() {
