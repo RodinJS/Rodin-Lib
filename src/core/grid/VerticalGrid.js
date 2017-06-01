@@ -1,11 +1,11 @@
-import {Grid} from './Grid'
+import {ListView} from './listView'
 import {Vector3} from '../math'
 import * as CONST from '../constants';
 import {Plane} from '../sculpt'
 import {Scene} from '../scene';
 import {Quaternion} from "../math/Quaternion";
 
-export class VerticalGrid extends Grid {
+export class VerticalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
 
         sculpt = sculpt || new Plane(width * cellWidth, height * cellHeight * 2, 1, 1, new THREE.MeshBasicMaterial({
