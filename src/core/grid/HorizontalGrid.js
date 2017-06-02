@@ -9,7 +9,7 @@ export class HorizontalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
         // switched places of width and hight again because of the
         // same issue as above
-        sculpt = sculpt || new Plane(width * cellWidth * 2, height * cellHeight, 1, 1, new THREE.MeshBasicMaterial({
+        sculpt = sculpt || new Plane(width * cellHeight * 1.5, height * cellWidth, 1, 1, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
                 opacity: 0
@@ -25,8 +25,9 @@ export class HorizontalGrid extends ListView {
             // again mixed vertical and horizontal, should be horizontal here, but since
             // the cycles in grid.js are in wrong order cant get it done any way
             // more efficiently. fix that, then come back here later
-            if (Math.abs(this.verticalOffset / this._cellWidth) >= this._minHorizontalScroll) {
-                this.scroll(this.verticalOffset / this._cellWidth);
+            if (Math.abs(this.verticalOffset / this._cellWidth) - this._minHorizontalScroll >= -0.7) {
+                const absVal = Math.abs(this.verticalOffset / this._cellWidth);
+                this.scroll(Math.sign(this.verticalOffset) * Math.ceil(absVal));
             }
             this.verticalOffset = 0;
         };
