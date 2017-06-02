@@ -146,7 +146,7 @@ export class Avatar extends Sculpt {
     }
 }
 
-messenger.on(CONST.RENDER_START, () => {
+messenger.on(CONST.TICK, () => {
     Avatar.update();
 
     if (useWebVRPose && poseRequesters.length !== 0) {
