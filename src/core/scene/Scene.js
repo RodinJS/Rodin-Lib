@@ -13,8 +13,8 @@ function enforce() {
 }
 
 let activeScene = null;
-let doRender = true;
-let renderRequested = false;
+let doRequestFrame = true;
+let frameRequested = false;
 
 const preRenderFunctions = [];
 const postRenderFunctions = [];
@@ -35,7 +35,7 @@ export class Scene extends EventEmitter {
         super();
 
         this._scene = new THREE.Scene();
-
+        this._isRendering = true;
 
         /**
          * Scene name.
@@ -237,8 +237,8 @@ export class Scene extends EventEmitter {
      * Starts rendering the active scene.
      */
     static start() {
-        doRender = true;
-        if (!renderRequested) {
+        doRequestFrame = true;
+        if (!frameRequested) {
             Scene.requestFrame(enforce);
         }
     }
@@ -247,7 +247,22 @@ export class Scene extends EventEmitter {
      * Stops rendering the active scene.
      */
     static stop() {
-        doRender = false;
+        doRequestFrame = false;
+    }
+
+    /**
+     * Pauses rendering
+     * stops emmiting renderStart, renderEnd and render events
+     */
+    static pauseRender() {
+        Scene.active._isRendering = false;
+    }
+
+    /**
+     * Resumes rendering
+     */
+    static resumeRender() {
+        Scene.active._isRendering = true;
     }
 
     /**
@@ -341,43 +356,47 @@ export class Scene extends EventEmitter {
             throw new ErrorProtectedMethodCall('render');
         }
 
-        messenger.post(CONST.RENDER_START, {});
+        messenger.post(CONST.TICK, {});
 
-        // call all prerender functions
-        for (let i = 0; i < preRenderFunctions.length; i++) {
-            preRenderFunctions[i]();
-        }
+        if (Scene.active._isRendering) {
+            messenger.post(CONST.RENDER_START, {});
 
-        // call all scene specific prerender functions
-        for (let i = 0; i < Scene.active._preRenderFunctions.length; i++) {
-            Scene.active._preRenderFunctions[i]();
-        }
-
-        // emit update for all childs
-        for (let i = 0; i < Scene.active.children.length; i++) {
-            const child = Scene.active.children[i];
-
-            if (child.isReady) {
-                child.emit(CONST.UPDATE, new RodinEvent(child, {}));
+            // call all prerender functions
+            for (let i = 0; i < preRenderFunctions.length; i++) {
+                preRenderFunctions[i]();
             }
-        }
 
-        Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
-        messenger.post(CONST.RENDER, {realTimestamp: timestamp});
+            // call all scene specific prerender functions
+            for (let i = 0; i < Scene.active._preRenderFunctions.length; i++) {
+                Scene.active._preRenderFunctions[i]();
+            }
 
-        // call all scene specific postrender functions
-        for (let i = 0; i < Scene.active._postRenderFunctions.length; i++) {
-            Scene.active._postRenderFunctions[i]();
-        }
+            // emit update for all children
+            for (let i = 0; i < Scene.active.children.length; i++) {
+                const child = Scene.active.children[i];
 
-        // call all postrender functions
-        for (let i = 0; i < postRenderFunctions.length; i++) {
-            postRenderFunctions[i]();
+                if (child.isReady) {
+                    child.emit(CONST.UPDATE, new RodinEvent(child, {}));
+                }
+            }
+
+            Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
+            messenger.post(CONST.RENDER, {realTimestamp: timestamp});
+
+            // call all scene specific postrender functions
+            for (let i = 0; i < Scene.active._postRenderFunctions.length; i++) {
+                Scene.active._postRenderFunctions[i]();
+            }
+
+            // call all postrender functions
+            for (let i = 0; i < postRenderFunctions.length; i++) {
+                postRenderFunctions[i]();
+            }
+
+            messenger.post(CONST.RENDER_END, {});
         }
 
         Scene.requestFrame(enforce);
-
-        messenger.post(CONST.RENDER_END, {});
     }
 
     /**
@@ -386,17 +405,17 @@ export class Scene extends EventEmitter {
      * @private
      */
     static requestFrame(e) {
-        // renderRequested becomes false every time
+        // frameRequested becomes false every time
         // render() calls requestFrame(), event if
-        // doRender is false
+        // doRequestFrame is false
 
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('requestFrame');
         }
 
-        renderRequested = false;
+        frameRequested = false;
 
-        if (!doRender) {
+        if (!doRequestFrame) {
             return;
         }
 
@@ -410,7 +429,7 @@ export class Scene extends EventEmitter {
             });
         }
 
-        renderRequested = true;
+        frameRequested = true;
     }
 
     /**
@@ -419,6 +438,10 @@ export class Scene extends EventEmitter {
      */
     static get active() {
         return activeScene;
+    }
+
+    static get isRendering() {
+        return Scene.active._isRendering;
     }
 }
 
@@ -458,7 +481,7 @@ window.addEventListener(CONST.VR_DISPLAY_PRESENT_CHANGE, () => {
 // TODO: fix this when webkit fixes growing canvas bug
 if (device.isIframe && device.isIOS) {
     Scene.renderer.domElement.style.position = 'fixed';
-    if(Scene.active)
+    if (Scene.active)
         Scene.onResize();
 }
 

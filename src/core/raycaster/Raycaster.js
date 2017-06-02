@@ -33,6 +33,10 @@ export class Raycaster extends THREE.Raycaster {
      * @returns {Sculpt[]} all raycasted objects from the gamepadVisibles array, that are children of the scene (directly or not).
      */
     raycast(depth = Infinity) {
+        if(!Scene.isRendering) {
+            return null;
+        }
+
         const ret = [];
         const used = {};
 

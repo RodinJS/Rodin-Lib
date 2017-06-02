@@ -1,5 +1,8 @@
 export const READY = 'ready';
 export const UPDATE = 'update';
+
+export const TICK = 'tick';
+
 export const ANIMATION_START = 'start';
 export const ANIMATION_STOP = 'stop';
 export const ANIMATION_COMPLETE = 'complete';
