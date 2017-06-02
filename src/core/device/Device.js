@@ -63,7 +63,7 @@ class Device extends EventEmitter {
      * @returns {boolean}
      */
     get isMobile() {
-        return navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i);
+        return /Android/i.test(navigator.userAgent) || /webOS/i.test(navigator.userAgent) || /iPhone/i.test(navigator.userAgent) || /iPad/i.test(navigator.userAgent) || /iPod/i.test(navigator.userAgent) || /BlackBerry/i.test(navigator.userAgent) || /Windows Phone/i.test(navigator.userAgent);
     }
 
     /**
@@ -104,6 +104,28 @@ class Device extends EventEmitter {
     }
 
     /**
+     * Checks if the device is Oculus
+     * @returns {boolean}
+     */
+    get isOculus() {
+        if (this.webVRmanager && this.webVRmanager.hmd) {
+            return /oculus/i.test(this.webVRmanager.hmd.displayName);
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the device is HTC Vive
+     * @returns {boolean}
+     */
+    get isVive() {
+        if (this.webVRmanager && this.webVRmanager.hmd) {
+            return /OpenVR/i.test(this.webVRmanager.hmd.displayName);
+        }
+        return null;
+    }
+
+    /**
      * Check device by name
      * @param deviceName
      * @returns {boolean}
@@ -140,6 +162,15 @@ class Device extends EventEmitter {
             case CONST.IFRAME:
                 return this.isIframe;
 
+            case CONST.MOBILE:
+                return this.isMobile;
+
+            case CONST.OCULUS:
+                return this.isOculus;
+
+            case CONST.VIVE:
+                return this.isVive;
+
             default:
                 throw new ErrorUnknownDevice(deviceName);
         }
@@ -161,9 +192,9 @@ class Device extends EventEmitter {
 export const device = new Device();
 
 messenger.on(CONST.VR_DISPLAY_PRESENT_CHANGE, (data, transport) => {
-    if(transport === localTransport && device._isVR !== data) {
+    if (transport === localTransport && device._isVR !== data) {
         device._isVR = data;
-        if(device._isVR)
+        if (device._isVR)
             device.emit(CONST.ENTER_VR, new RodinEvent(this));
         else
             device.emit(CONST.EXIT_VR, new RodinEvent(this));

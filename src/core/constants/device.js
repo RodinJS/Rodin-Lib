@@ -10,3 +10,8 @@ export const IOS7 = 'iOS7';
 export const IOS8PLUS = 'iOS8';
 
 export const IFRAME = 'iframe';
+
+export const MOBILE = 'mobile';
+export const OCULUS = 'oculus';
+export const VIVE = 'vive';
+export const DAYDREAM = 'daydream';

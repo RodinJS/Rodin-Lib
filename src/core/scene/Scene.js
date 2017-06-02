@@ -492,7 +492,9 @@ messenger.on(CONST.REQUEST_ACTIVE_SCENE, () => {
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
 messenger.once(CONST.RODIN_STARTED, () => {
+    //todo: move webVRmanage to device entirely
     Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
+    device.webVRmanager = Scene.webVRmanager;
     document.body.appendChild(Scene.renderer.domElement);
     const mainScene = new Scene('Main');
     Scene.go(mainScene);
