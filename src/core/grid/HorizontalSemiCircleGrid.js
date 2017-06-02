@@ -8,7 +8,7 @@ import {Quaternion} from "../math/Quaternion";
 export class HorizontalSemiCircleGrid extends HorizontalGrid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, radius = 3, sculpt) {
 
-        sculpt = sculpt || new Cylinder(radius, radius, height * cellHeight * 2, width, height, true, -Math.PI / 2, -Math.PI, new THREE.MeshBasicMaterial({
+        sculpt = sculpt || new Cylinder(radius, radius, height * cellWidth, width, height, true, -Math.PI / 2, -Math.PI, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
                 opacity: 0
@@ -31,8 +31,9 @@ export class HorizontalSemiCircleGrid extends HorizontalGrid {
 
             const scrolledElementCount = this._radius * Math.sin(this.horizontalOffset * Math.PI) / this._cellWidth;
 
-            if (Math.abs(scrolledElementCount) >= this._minHorizontalScroll) {
-                this.scroll(scrolledElementCount);
+            if (Math.abs(scrolledElementCount) - this._minHorizontalScroll >= -0.7) {
+                const absVal = Math.abs(scrolledElementCount);
+                this.scroll(Math.sign(scrolledElementCount) * Math.ceil(absVal));
             }
             this.horizontalOffset = 0;
         };

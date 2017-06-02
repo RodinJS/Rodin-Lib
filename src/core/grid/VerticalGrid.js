@@ -8,7 +8,7 @@ import {Quaternion} from "../math/Quaternion";
 export class VerticalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
 
-        sculpt = sculpt || new Plane(width * cellWidth, height * cellHeight * 2, 1, 1, new THREE.MeshBasicMaterial({
+        sculpt = sculpt || new Plane(width * cellWidth, height * cellHeight * 1.5, 1, 1, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
                 opacity: 0
@@ -20,8 +20,9 @@ export class VerticalGrid extends ListView {
         this.ButtonUpEvent = () => {
             this.dragUV = null;
             navigator.mouseGamePad.stopPropagationOnMouseMove = false;
-            if (Math.abs(this.verticalOffset / this._cellHeight) >= this._minVerticalScroll) {
-                this.scroll(this.verticalOffset / this._cellHeight);
+            if (Math.abs(this.verticalOffset / this._cellHeight) - this._minVerticalScroll >= -0.7) {
+                const absVal = Math.abs(this.verticalOffset / this._cellHeight);
+                this.scroll(Math.sign(this.verticalOffset) * Math.ceil(absVal));
             }
             this.verticalOffset = 0;
         };
