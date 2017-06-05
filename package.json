@@ -44,9 +44,10 @@
     "gulp-removelogs": "^0.1.0",
     "gulp-size": "^2.1.0",
     "gulp-sourcemaps": "^2.4.0",
-    "gulp-uglify": "^2.0.1",
+    "gulp-uglify": "^3.0.0",
     "mocha": "^3.2.0",
     "mochawesome": "^2.0.2",
-    "run-sequence": "^1.2.2"
+    "run-sequence": "^1.2.2",
+    "uglify-es": "^3.0.13"
   }
 }

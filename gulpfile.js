@@ -1,6 +1,8 @@
 const gulp = require('gulp');
 const babel = require('gulp-babel');
-const uglify = require('gulp-uglify');
+// const uglify = require('gulp-uglify');
+const uglify = require('uglify-es'); 
+const composer = require('gulp-uglify/composer');
 const concat = require('gulp-concat');
 const sequence = require('run-sequence');
 const del = require('del');
@@ -11,6 +13,7 @@ const connect = require('gulp-connect');
 const sourcemaps = require('gulp-sourcemaps');
 const gzip = require('gulp-gzip');
 
+
 const JS = ['src/**/*.js', '!src/vendor/**'];
 const VENDOR = ['src/vendor/joi.min.js', 'src/vendor/three.min.js', 'src/vendor/**/*.js'];
 
@@ -18,10 +21,37 @@ const ERROR_MESSAGE = {
 	errorHandler: notify.onError("Error: <%= error.message %>")
 };
 
+const minify = composer(uglify, console);
+// const UGLIFY_AGRESIVE = {
+//     drop_debugger : true,
+//     mangle: true,
+//     compress: true
+// };
+
 const UGLIFY_AGRESIVE = {
-    drop_debugger : true,
-    mangle: true,
-    compress: true
+    warnings: false,
+    // parse: {
+    //     // parse options
+    // },
+    compress: {
+        drop_debugger: true,
+
+    },
+    // mangle: {
+    //     // mangle options
+
+    //     properties: {
+    //         // mangle property options
+    //     }
+    // },
+    // output: {
+    //     // output options
+    // },
+    // sourceMap: {
+    //     // source map options
+    // },
+    // toplevel: false,
+    // ie8: false,
 };
 
 const GZIP_OPTIONS = {
@@ -33,8 +63,9 @@ gulp.task('js', () => {
 	return gulp.src(JS)
 		.pipe(plumber(ERROR_MESSAGE))
 		.pipe(babel())
+		// .pipe(minify(UGLIFY_AGRESIVE))
 		.pipe(s)
-		// .pipe(gzip())
+		.pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist'))
 		.pipe(notify({
@@ -47,12 +78,12 @@ gulp.task('vendor', () => {
 	const s = size({title: 'JS production -> ', pretty: true});
 	return gulp.src(VENDOR)
 		.pipe(plumber(ERROR_MESSAGE))
-		// .pipe(sourcemaps.init())
-		.pipe(uglify(UGLIFY_AGRESIVE))
+		.pipe(sourcemaps.init())
+		.pipe(minify(UGLIFY_AGRESIVE))
 		.pipe(concat('vendor.js'))
-		// .pipe(sourcemaps.write('.'))
+		.pipe(sourcemaps.write('.'))
 		.pipe(s)
-		// .pipe(gzip())
+		.pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist/vendor'))
 		.pipe(notify({
