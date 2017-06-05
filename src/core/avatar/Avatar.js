@@ -159,6 +159,7 @@ export class Avatar extends Sculpt {
     static get active() {
         //TODO: THIS IS NOT RIGHT
         //TODO: FIX THIS LATER, NO TIME NOW
+        //TODO: FUCK THIS, FUCK THEM, FUCK YOU
         return Avatar.instances[0];
     }
 }

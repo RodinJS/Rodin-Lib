@@ -74,13 +74,13 @@ export class GamePad extends EventEmitter {
         this.intersected = [];
 
         /**
-         * bjects currently intersected by this gamepad.
+         * Objects currently intersected by this gamepad.
          * @type {Array}
          */
         this.currentIntersections = [];
 
         /**
-         * Raycaster object used to pick/select items with current controller.
+         * Raycaster object used to pick/select items with current gamepad.
          * @type {Raycaster}
          */
         this.raycaster = new Raycaster();
@@ -95,7 +95,7 @@ export class GamePad extends EventEmitter {
          */
         this.sculpt = new Sculpt();
         /**
-         * Matrix used to correctly position the controller object (if any) in the scene.
+         * Matrix used to correctly position the gamepad object (if any) in the scene.
          * @type {THREE.Matrix4}
          */
         this.standingMatrix = new THREE.Matrix4().identity();
