@@ -9,7 +9,7 @@ import {Scene} from '../scene';
 import {Avatar} from "../avatar/Avatar";
 
 /**
- * Custom (virtual) navigator gamepad class, for CardboardController.
+ * Custom (virtual) navigator gamepad class, for CardboardGamePad.
  */
 export class CardboardNavigatorGamePad {
 
@@ -85,7 +85,7 @@ export class CardboardNavigatorGamePad {
 }
 
 /**
- * A controller class for describing event handlers for cardboard use. Transfers the mobile screen touch event to the raycasted (gaze point) object.
+ * A gamepad class for describing event handlers for cardboard use. Transfers the mobile screen touch event to the raycasted (gaze point) object.
  */
 export class CardboardGamePad extends GamePad {
     constructor() {
@@ -112,7 +112,7 @@ export class CardboardGamePad extends GamePad {
     }
 
     /**
-     * Enables Cardboard controller, adds the gaze point object to the camera if set.
+     * Enables Cardboard Gamepad, adds the gaze point object to the camera if set.
      */
     enable() {
         super.enable();
@@ -122,7 +122,7 @@ export class CardboardGamePad extends GamePad {
     }
 
     /**
-     * Disables Cardboard controller, removes the gaze point object from the camera if set.
+     * Disables Cardboard gamepad, removes the gaze point object from the camera if set.
      */
     disable() {
         super.disable();

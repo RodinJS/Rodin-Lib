@@ -7,10 +7,10 @@ import {Vector3, Quaternion} from '../math';
 import {Avatar} from '../avatar';
 
 /**
- * A controller class for describing HTC Vive controllers event handlers.
+ * A gamepad class for describing Google DayDream gamepads event handlers.
  * @param {string} hand Required - "left" or "right".
  */
-export class DaydreamController extends GamePad {
+export class DaydreamGamePad extends GamePad {
     constructor() {
         super('Daydream', null, CONST.VR);
         /**
@@ -30,7 +30,7 @@ export class DaydreamController extends GamePad {
     }
 
     /**
-     * Updates controller object in scene, updates position and rotation.
+     * Updates gamepad object in scene, updates position and rotation.
      */
     updateObject() {
         let pose = this.navigatorGamePad.pose;
@@ -61,7 +61,7 @@ export class DaydreamController extends GamePad {
     }
 
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the gamepad's pointer ray.
      * @returns {Sculpt[]}
      */
     getIntersections() {
@@ -72,8 +72,8 @@ export class DaydreamController extends GamePad {
     }
 
     /**
-     * Set Controller model to HTC Vive controller model.
-     * @param {string} [url] - url to .obj model of the controller.
+     * Set Gamepad model to Google DayDream gamepad model.
+     * @param {string} [url] - url to .obj model of the gamepad.
      */
     initControllerModel(url = 'https://cdn.rodin.io/resources/models/DaydreamController/daydream_controller.obj') {
         this.controllerModel = new Sculpt(url);
@@ -84,7 +84,7 @@ export class DaydreamController extends GamePad {
     }
 
     /**
-     * Init raycasting line. Create a line for controller direction
+     * Init raycasting line. Create a line for gamepad direction
      *
      * @param {number} [color=0xff0000]
      */
@@ -110,5 +110,5 @@ export class DaydreamController extends GamePad {
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
 messenger.once(CONST.RODIN_STARTED, () => {
-    GamePad.daydream = new DaydreamController();
+    GamePad.daydream = new DaydreamGamePad();
 });

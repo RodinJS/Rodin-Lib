@@ -5,6 +5,14 @@ import {Plane} from '../sculpt'
 import {Scene} from '../scene';
 import {Quaternion} from "../math/Quaternion";
 
+/**
+ * HorizontalGrid class creates horizontal grid to represent info(thumbs, text etc.) in that grid.
+ * @param [width=5] {Number} height of main grid.
+ * @param [height=5] {Number} width of main grid.
+ * @param [cellWidth=0.5] {Number} width of single cell.
+ * @param [cellHeight=0.5] {Number} height of single cell.
+ * @param sculpt {Sculpt} Sculpt object.
+ */
 export class HorizontalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
         // switched places of width and hight again because of the
@@ -50,15 +58,19 @@ export class HorizontalGrid extends ListView {
 
     }
 
+    /**
+     * Thumbs scrolling speed/quantity.
+     * @param val {Number} Setter for thumbs scrolling speed/quantity.
+     */
     set minScroll(val) {
         this._minHorizontalScroll = val;
     }
 
     /**
      * Not sure why we need to switch x and y places, will look into this later
-     * @param i
-     * @param j
-     * @param centerPos
+     * @param i {Number} index number
+     * @param j {Number} index number
+     * @param centerPos {Number}
      * @returns {Vector3}
      */
     getIndexProperties(i, j, centerPos) {
