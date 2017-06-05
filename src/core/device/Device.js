@@ -200,3 +200,11 @@ messenger.on(CONST.VR_DISPLAY_PRESENT_CHANGE, (data, transport) => {
             device.emit(CONST.EXIT_VR, new RodinEvent(this));
     }
 });
+
+device.on(CONST.ENTER_VR, () => {
+    messenger.post(CONST.ENTER_VR_SUCCESS);
+});
+
+device.on(CONST.EXIT_VR, () => {
+    messenger.post(CONST.EXIT_VR_SUCCESS);
+});

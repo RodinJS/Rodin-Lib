@@ -37,7 +37,8 @@ messenger.on(CONST.ENTER_VR, (data, transport) => {
         const channel = status ? CONST.ENTER_VR_SUCCESS : CONST.ENTER_VR_ERROR;
         messenger.post(channel, {
             destination: [data.path[data.path.length - 1]],
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            isResponse: true
         }, postMessageTransport);
     }
 });
@@ -51,7 +52,8 @@ messenger.on(CONST.EXIT_VR, (data, transport) => {
         const channel = status ? CONST.EXIT_VR_SUCCESS : CONST.EXIT_VR_ERROR;
         messenger.post(channel, {
             destination: [data.path[data.path.length - 1]],
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            isResponse: true
         }, postMessageTransport);
     }
 });

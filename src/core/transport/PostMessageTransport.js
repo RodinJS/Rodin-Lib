@@ -169,3 +169,16 @@ messenger.on(CONST.ALL_SCULPTS_READY, (data, transport) => {
             destination: CONST.PARENT
         }, postMessageTransport);
 });
+
+/**
+ * Notify parent when enter or exit VR
+ */
+messenger.on(CONST.ENTER_VR_SUCCESS, (data, transport) => {
+    if(transport !== postMessageTransport)
+        messenger.post(CONST.ENTER_VR_SUCCESS, {destination: CONST.PARENT}, postMessageTransport);
+});
+
+messenger.on(CONST.EXIT_VR_SUCCESS, (data, transport) => {
+    if(transport !== postMessageTransport)
+        messenger.post(CONST.EXIT_VR_SUCCESS, {destination: CONST.PARENT}, postMessageTransport);
+});
