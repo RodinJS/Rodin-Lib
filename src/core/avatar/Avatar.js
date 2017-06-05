@@ -16,6 +16,13 @@ let useWebVRPose = true;
 let pose = null;
 let poseRequesters = [];
 
+/**
+ * Avatar class represents the user in 3D experience. This helps to refer to the camera as an object in space.
+ * @param trackRotation {boolean} whether or not this avatar should track users rotation.
+ * @param trackPosition {boolean} whether or not this avatar should track users position.
+ * @param HMDCamera {HMDCamera} the camera that renders user perspective.
+ */
+
 export class Avatar extends Sculpt {
     constructor(...args) {
         args = AScheme.validate(args, constructorScheme);
@@ -40,6 +47,10 @@ export class Avatar extends Sculpt {
     static standingMatrix = new THREE.Matrix4();
     static isRunning = false;
 
+    /**
+     * This is the Sculpt object that carries the position and the rotation of the HMDCamera (headset perspective)
+     * @type {Sculpt}
+     */
     static trackingSculpt = new Sculpt();
 
     static isStanding = false;
@@ -55,10 +66,16 @@ export class Avatar extends Sculpt {
         }
     }
 
+    /**
+     * Pauses the tracking of all Avatar instances.
+     */
     static pause() {
         Avatar.isRunning = false;
     }
 
+    /**
+     * Resumes the tracking of all Avatar instances.
+     */
     static resume() {
         Avatar.isRunning = true;
     }
