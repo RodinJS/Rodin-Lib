@@ -57,16 +57,16 @@ export class Element extends Sculpt {
 
 
     constructor({
-        name = "element",
-        width = 0.2,
-        height = 0.15,
-        background = {},
-        border = {},
-        label,
-        image,
-        transparent = true,
-        ppm = 500
-        }) {
+                    name = "element",
+                    width = 0.2,
+                    height = 0.15,
+                    background = {},
+                    border = {},
+                    label,
+                    image,
+                    transparent = true,
+                    ppm = 500
+                }) {
         super(new THREE.Object3D(), true);
         this.name = name;
         this.width = width;
@@ -101,7 +101,11 @@ export class Element extends Sculpt {
         const draw = () => {
             if (!checkImageLoad()) return;
             let buttonShape = new THREE.Shape();
-            utils3D.roundRect(buttonShape, this.width, this.height, this.border.radius);
+            if (typeof this.border.radius === 'object') {
+                utils3D.roundSelectedRect(buttonShape, this.width, this.height, this.border.radius);
+            } else {
+                utils3D.roundRect(buttonShape, this.width, this.height, this.border.radius);
+            }
             let buttonGeo = utils3D.createGeometryFromShape(buttonShape);
 
             let canvas = utils3D.setupCanvas({
