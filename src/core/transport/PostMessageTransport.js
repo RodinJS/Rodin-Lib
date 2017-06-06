@@ -86,13 +86,17 @@ export class PostMessageTransport extends Transport {
                         receivers.push(PostMessageTransport.parent);
                     else if (PostMessageTransport.children[i])
                         receivers.push(PostMessageTransport.children[i]);
-                    else
-                        throw new Error(`unknown destination ${i}`);
+                    else {
+                        //todo: restore the new Error when logic is fixed
+                        console.warn(`unknown destination ${i}`);
+                        //throw new Error(`unknown destination ${i}`);
+                    }
+
                 }
                 break;
 
             default:
-                throw new Error('unknown destination for packet');
+                throw new Error('unknown destination for package');
         }
 
         return receivers;
