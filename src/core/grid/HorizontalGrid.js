@@ -11,11 +11,10 @@ import {Quaternion} from "../math/Quaternion";
  * @param [height=5] {Number} width of main grid.
  * @param [cellWidth=0.5] {Number} width of single cell.
  * @param [cellHeight=0.5] {Number} height of single cell.
- * @param sculpt {Sculpt} Sculpt object.
  */
 export class HorizontalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
-        // switched places of width and hight again because of the
+        // switched places of width and height again because of the
         // same issue as above
         sculpt = sculpt || new Plane(width * cellHeight * 1.5, height * cellWidth, 1, 1, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
