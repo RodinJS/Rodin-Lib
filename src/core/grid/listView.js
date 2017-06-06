@@ -54,6 +54,7 @@ export class ListView extends EventEmitter {
 
         this._scrollStackSize = 0;
 
+        this._startEventEmited = false;
     }
 
     _initEvents() {
@@ -79,6 +80,11 @@ export class ListView extends EventEmitter {
     }
 
     scroll(val) {
+        if (!this._shouldUpdate) {
+            this.emit(CONST.SCROLL_START, new RodinEvent(this));
+            this._startEventEmited = true;
+        }
+
         this.center += parseInt(val) * this._pWidth;
     }
 
@@ -167,7 +173,10 @@ export class ListView extends EventEmitter {
             }
         }
         if (changedCount === 0) {
-            this.emit(CONST.SCROLL_END, new RodinEvent(this));
+            if (this._startEventEmited) {
+                this.emit(CONST.SCROLL_END, new RodinEvent(this));
+                this._startEventEmited = false;
+            }
             this._shouldUpdate = false;
         }
     }
@@ -262,9 +271,6 @@ export class ListView extends EventEmitter {
 
         this._prevUpdated = [...updated];
         this._shouldUpdate = true;
-
-        this.emit(CONST.SCROLL_START, new RodinEvent(this));
-
     }
 
     _getCenterPos(pWidth, pHeight) {

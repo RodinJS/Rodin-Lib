@@ -4,14 +4,14 @@ import * as CONST from '../constants';
 import {Plane} from '../sculpt'
 import {Scene} from '../scene';
 import {Quaternion} from "../math/Quaternion";
+import {RodinEvent} from '../rodinEvent';
 
 /**
  * VerticalGrid class creates vertical grid to represent info(thumbs, text etc.) in that grid.
- * @param [width=5] {Number} width of main grid.
- * @param [height=5] {Number} height of main grid.
- * @param [cellWidth=0.5] {Number} width of single cell.
- * @param [cellHeight=0.5] {Number} height of single cell.
- * @param sculpt {Sculpt} Sculpt object.
+ * @param [width=5] {Number} width of the main grid.
+ * @param [height=5] {Number} height of the main grid.
+ * @param [cellWidth=0.5] {Number} width of a single cell.
+ * @param [cellHeight=0.5] {Number} height of a single cell.
  */
 export class VerticalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
@@ -42,6 +42,11 @@ export class VerticalGrid extends ListView {
             // then you press again
             if (this.dragUV) {
                 this.verticalOffset = this.sculpt.height * (evt.uv.y - this.dragUV.y);
+            }
+
+            if (Math.abs(this.verticalOffset) > 0.1 * this._cellWidth && !this._startEventEmited) {
+                this.emit(CONST.SCROLL_START, new RodinEvent(this));
+                this._startEventEmited = true;
             }
         });
     }
