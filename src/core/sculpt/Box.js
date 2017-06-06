@@ -14,6 +14,7 @@ const constructorScheme = {
  * @param height {number} box height
  * @param depth {number} box depth
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
 export class Box extends Sculpt {
     constructor(...args) {

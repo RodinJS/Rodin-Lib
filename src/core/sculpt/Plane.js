@@ -18,6 +18,7 @@ const constructorScheme = {
  * @param widthSegments [number = 1]
  * @param heightSegments [number = 1]
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
 export class Plane extends Sculpt {
     constructor(...args) {
