@@ -44,6 +44,7 @@ const pendingElements = new Set();
  * Any 3d object should be either a direct Sculpt, or extended from Sculpt
  * @param {Sculpt|string|THREE.Object3D} args
  * @param {boolean} [deferReadyEvent=false]
+ * @ignore
  */
 export class Sculpt extends EventEmitter {
     constructor(args, deferReadyEvent) {

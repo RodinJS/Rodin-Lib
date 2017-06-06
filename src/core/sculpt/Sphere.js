@@ -15,6 +15,7 @@ const constructorScheme = {
  * @param widthSegments {number}
  * @param heightSegments {number}
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
 export class Sphere extends Sculpt {
     constructor(...args) {
