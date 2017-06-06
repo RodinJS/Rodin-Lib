@@ -38,8 +38,12 @@ export class Loader {
     /**
      * A static method for loading textures from provided url.
      * @param url {string}
+     * @param onLoad {Function}
+     * @param onProgress {Function}
+     * @param onError {Function}
      */
-    static loadTexture(url) {
-        return textureLoader.load(url);
+    static loadTexture(url, onLoad, onProgress, onError) {
+        // todo: implement with event emitter!!!!!!
+        return textureLoader.load(url, onLoad, onProgress, onError);
     }
 }
