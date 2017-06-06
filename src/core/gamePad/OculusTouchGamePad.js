@@ -6,7 +6,7 @@ import * as Buttons from '../button';
 import {Vector3} from '../math';
 
 /**
- * A controller class for describing Oculus Rift Touch controllers event handlers.
+ * A gamepad class for describing Oculus Rift Touch gamepads event handlers.
  * @param {string} hand Required - "left" or "right".
  */
 export class OculusTouchGamePad extends GamePad {
@@ -54,7 +54,7 @@ export class OculusTouchGamePad extends GamePad {
     }
 
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the gamepad's pointer ray.
      * @returns {Sculpt[]}
      */
     getIntersections() {
@@ -65,8 +65,8 @@ export class OculusTouchGamePad extends GamePad {
     }
 
     /**
-     * Set Controller model to Oculus touch controller model.
-     * @param {string} [url] - url to .obj model of the controller.
+     * Set Gamepad model to Oculus touch gamepad model.
+     * @param {string} [url] - url to .obj model of the gamepad.
      */
     initControllerModel(url = `https://cdn.rodin.io/resources/models/OculusTouchController_v4/${this.hand}_oculus_controller.obj`) {
         this.controllerModel = new Sculpt(url);
@@ -77,7 +77,7 @@ export class OculusTouchGamePad extends GamePad {
     }
 
     /**
-     * Init raycasting line. Create a line for controller direction
+     * Init raycasting line. Create a line for gamepad direction
      *
      * @param {number} [color=0xff0000]
      */

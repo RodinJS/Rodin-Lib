@@ -4,7 +4,16 @@ import * as CONST from '../constants';
 import {Cylinder} from '../sculpt'
 import {Scene} from '../scene';
 import {Quaternion} from "../math/Quaternion";
+import {RodinEvent} from '../rodinEvent';
 
+/**
+ * VerticalSemiCircleGrid class creates vertical semicircle grid to represent info(thumbs, text etc.) in that grid.
+ * @param [width=5] {Number} width of the main grid.
+ * @param [height=5] {Number} height of the main grid.
+ * @param [cellWidth=0.5] {Number} width of a single cell.
+ * @param [cellHeight=0.5] {Number} height of a single cell.
+ * @param [radius=3] {Number} radius of the main grid.
+ */
 export class VerticalSemiCircleGrid extends VerticalGrid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, radius = 3, sculpt) {
 
@@ -32,6 +41,12 @@ export class VerticalSemiCircleGrid extends VerticalGrid {
         // }));
     }
 
+    /**
+     * @param i {Number} index number
+     * @param j {Number} index number
+     * @param centerPos {Number}
+     * @returns {Object} Object which contains Vector3 and Quaternion.
+     */
     getIndexProperties(i, j, centerPos) {
         const pwidth = this._width + this._verticalPadLength * 2;
 

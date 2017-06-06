@@ -4,7 +4,16 @@ import * as CONST from '../constants';
 import {Cylinder} from '../sculpt'
 import {Scene} from '../scene';
 import {Quaternion} from "../math/Quaternion";
+import {RodinEvent} from '../rodinEvent';
 
+/**
+ * HorizontalSemiCircleGrid class creates horizontal semicircle grid to represent info(thumbs, text etc.) in that grid.
+ * @param [width=5] {Number} height of the main grid.
+ * @param [height=5] {Number} width of the main grid.
+ * @param [cellWidth=0.5] {Number} width of a single cell.
+ * @param [cellHeight=0.5] {Number} height of a single cell.
+ * @param [radius=3] {Number} radius of the main grid.
+ */
 export class HorizontalSemiCircleGrid extends HorizontalGrid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, radius = 3, sculpt) {
 
@@ -22,6 +31,11 @@ export class HorizontalSemiCircleGrid extends HorizontalGrid {
             // then you press again
             if (this.dragUV) {
                 this.horizontalOffset = this.dragUV.x - evt.uv.x;
+            }
+
+            if (Math.abs(this.horizontalOffset) > (Math.PI / this._width) * 0.1 && !this._startEventEmited) {
+                this.emit(CONST.SCROLL_START, new RodinEvent(this));
+                this._startEventEmited = true;
             }
         };
 
@@ -54,6 +68,12 @@ export class HorizontalSemiCircleGrid extends HorizontalGrid {
         // }));
     }
 
+    /**
+     * @param i {Number} index number
+     * @param j {Number} index number
+     * @param centerPos {Number}
+     * @returns {Vector3}
+     */
     getIndexProperties(i, j, centerPos) {
         const pheight = this._height + this._horizontalPadLength * 2;
 
