@@ -33,7 +33,7 @@ export class HorizontalSemiCircleGrid extends HorizontalGrid {
                 this.horizontalOffset = this.dragUV.x - evt.uv.x;
             }
 
-            if (Math.abs(this.horizontalOffset) > (Math.PI / this._width) * 0.1 && !this._startEventEmited) {
+            if (Math.abs(this.horizontalOffset) > Math.PI * 0.01 && !this._startEventEmited) {
                 this.emit(CONST.SCROLL_START, new RodinEvent(this));
                 this._startEventEmited = true;
             }
