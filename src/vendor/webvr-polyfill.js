@@ -3832,7 +3832,7 @@ window.WebVRConfig = Util.extend({
 	PREDICTION_TIME_S: 0.040,
 
 	// Flag to enable touch panner. In case you have your own touch controls.
-	TOUCH_PANNER_DISABLED: true,
+	TOUCH_PANNER_DISABLED: false,
 
 	// Flag to disabled the UI in VR Mode.
 	CARDBOARD_UI_DISABLED: false, // Default: false
