@@ -19,6 +19,11 @@ export * from './loader';
 export * from './plugin';
 export * from './particleSystem';
 export * from './eventEmitter';
+export * from './avatar';
+export * from './math';
+export * from './transport';
+export * from './device';
+export * from './grid';
 
 export {
     CONST,
@@ -26,4 +31,4 @@ export {
     utils
 };
 
-export let v = '0.0.2';
+export let v = '0.0.6';

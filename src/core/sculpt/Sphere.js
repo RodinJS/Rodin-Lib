@@ -6,7 +6,7 @@ const constructorScheme = {
     radius: AScheme.number().default(.2),
     widthSegments: AScheme.number().default(10),
     heightSegments: AScheme.number().default(10),
-    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
+    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 0x336699}))
 };
 
 /**
@@ -15,6 +15,7 @@ const constructorScheme = {
  * @param widthSegments {number}
  * @param heightSegments {number}
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
 export class Sphere extends Sculpt {
     constructor(...args) {

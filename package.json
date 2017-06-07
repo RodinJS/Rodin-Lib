@@ -31,6 +31,7 @@
     "babel-plugin-transform-class-properties": "^6.22.0",
     "babel-plugin-transform-es2015-modules-systemjs": "^6.22.0",
     "babel-preset-es2015": "^6.22.0",
+    "babel-preset-es2016": "^6.24.1",
     "connect-gzip-static": "^2.0.0",
     "del": "^2.2.2",
     "gulp": "^3.9.1",

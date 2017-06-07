@@ -5,14 +5,16 @@ const constructorScheme = {
     width: AScheme.number().default(.4),
     height: AScheme.number().default('$width'),
     depth: AScheme.number().default('$width'),
-    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
+    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 0x336699}))
 };
+
 /**
  * Simple Box
  * @param width {number} box width
  * @param height {number} box height
  * @param depth {number} box depth
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
 export class Box extends Sculpt {
     constructor(...args) {
@@ -23,7 +25,7 @@ export class Box extends Sculpt {
 
         this._width = args.width;
         this._height = args.height;
-        this._depth = args.depth
+        this._depth = args.depth;
     }
 
     /**

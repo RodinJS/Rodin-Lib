@@ -3,8 +3,8 @@ export class Button {
     /**
      * Button class.
      * Represents a single physical button on a GamePad (including keyboard and mouse)
-     * @param keyCode
-     * @param navigatorButtonId
+     * @param [keyCode=0] {Number} KeyCode.
+     * @param [navigatorButtonId=0] {Number} Navigator button ID.
      */
     constructor(keyCode = 0, navigatorButtonId = 0) {
         //TODO finish this
@@ -33,5 +33,13 @@ export class Button {
          * @type {number}
          */
         this.value = 0;
+    }
+
+    /**
+     * Checks if current object is Button.
+     * @returns {boolean}
+     */
+    get isButton() {
+        return true;
     }
 }

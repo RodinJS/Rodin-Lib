@@ -17,12 +17,12 @@ let instances = {};
  * You can only access the active scene time using static methods
  */
 export class Time {
-    constructor (e) {
-        if(e !== enforce) {
+    constructor(e) {
+        if (e !== enforce) {
             throw new ErrorProtectedClassInstance('Time');
         }
 
-        this.speed = 1;
+        this._speed = 1;
         this.delta = 0;
 
         this.lastTeak = 0;
@@ -35,16 +35,32 @@ export class Time {
     /**
      * Call this function on each render. It resets the this.delta value
      */
-    tick () {
-        this.delta = this.now() - this.lastTeak;
-        this.lastTeak = this.now();
+    tick() {
+        this.delta = this.now - this.lastTeak;
+        this.lastTeak = this.now;
     }
 
     /**
      * @returns {number} - milliseconds with speeds
      */
-    now () {
+    get now() {
         return (Date.now() - this.lastSpeedChange) * this.speed + this.msBeforeLastSpeedChange;
+    }
+
+    /**
+     * @return {number}
+     */
+    get speed() {
+        return this._speed;
+    }
+
+    /**
+     * @param value {number}
+     */
+    set speed(value) {
+        this.msBeforeLastSpeedChange = this.now;
+        this._speed = value;
+        this.lastSpeedChange = Date.now();
     }
 
     /**
@@ -52,7 +68,7 @@ export class Time {
      * @private
      */
     static tick(e) {
-        if(e !== enforce) {
+        if (e !== enforce) {
             throw new ErrorProtectedMethodCall('tick');
         }
         activeTime.tick();
@@ -63,7 +79,7 @@ export class Time {
      * @type {number}
      */
     static get now() {
-        return activeTime.now();
+        return activeTime.now;
     }
 
     /**
@@ -98,7 +114,7 @@ export class Time {
      * @private
      */
     static setCurrentFrameTimestamp(e, timestamp) {
-        if(e !== enforce) {
+        if (e !== enforce) {
             throw new ErrorProtectedMethodCall('setCurrentFrameTimestamp');
         }
 
@@ -120,14 +136,17 @@ messenger.post(CONSTANTS.REQUEST_ACTIVE_SCENE, {});
 
 messenger.on(CONSTANTS.ACTIVE_SCENE, (scene) => {
     const sceneId = utils.object.getId(scene);
-    if(!instances[sceneId]) {
+    if (!instances[sceneId]) {
         instances[sceneId] = new Time(enforce);
     }
 
     activeTime = instances[sceneId];
 });
 
-messenger.on(CONSTANTS.RENDER_START, () => {
+messenger.on(CONSTANTS.TICK, () => {
     Time.tick(enforce);
+});
+
+messenger.on(CONSTANTS.RENDER_START, () => {
     Time.setCurrentFrameTimestamp(enforce, Time.now);
 });

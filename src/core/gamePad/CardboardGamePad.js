@@ -6,9 +6,10 @@ import {GazePoint} from '../sculpt/GazePoint';
 
 // todo: implement with messenger
 import {Scene} from '../scene';
+import {Avatar} from "../avatar/Avatar";
 
 /**
- * Custom (virtual) navigator gamepad class, for CardboardController.
+ * Custom (virtual) navigator gamepad class, for CardboardGamePad.
  */
 export class CardboardNavigatorGamePad {
 
@@ -84,7 +85,7 @@ export class CardboardNavigatorGamePad {
 }
 
 /**
- * A controller class for describing event handlers for cardboard use. Transfers the mobile screen touch event to the raycasted (gaze point) object.
+ * A gamepad class for describing event handlers for cardboard use. Transfers the mobile screen touch event to the raycasted (gaze point) object.
  */
 export class CardboardGamePad extends GamePad {
     constructor() {
@@ -104,41 +105,39 @@ export class CardboardGamePad extends GamePad {
     setGazePoint(gazePoint) {
         gazePoint.controller = this;
         this.gazePoint = gazePoint;
-        if(Scene.active._camera) {
-            Scene.active._camera.add(this.gazePoint.Sculpt._threeObject);
-        }
+
+        // todo: gazepoint@ tanel scene@ poxeluc
+        // todo: vabshe es gazepoint@ hanel rad anel normal sarqel
+        Scene.HMDCamera.add(this.gazePoint.Sculpt)
     }
 
     /**
-     * Enables Cardboard controller, adds the gaze point object to the camera if set.
+     * Enables Cardboard Gamepad, adds the gaze point object to the camera if set.
      */
     enable() {
         super.enable();
         if(this.gazePoint){
-            if(Scene.active._camera) {
-                Scene.active._camera.add(this.gazePoint.Sculpt._threeObject);
-            }
+            Scene.HMDCamera.add(this.gazePoint.Sculpt)
         }
     }
 
     /**
-     * Disables Cardboard controller, removes the gaze point object from the camera if set.
+     * Disables Cardboard gamepad, removes the gaze point object from the camera if set.
      */
     disable() {
         super.disable();
         if(this.gazePoint){
-            if(Scene.active._camera) {
-                Scene.active._camera.remove(this.gazePoint.Sculpt._threeObject);
-            }
+            Scene.HMDCamera.remove(this.gazePoint.Sculpt)
         }
     }
+
     /**
      * Get raycasted objects ({distance, point, face, faceIndex, indices, object}) that are in camera's center (gaze point).
      * @returns {Sculpt[]}
      */
     getIntersections() {
         // todo: use our custom camera later
-        this.raycaster.set(Scene.active._camera.getWorldPosition(), Scene.active._camera.getWorldDirection());
+        this.raycaster.set(Avatar.active.HMDCamera.globalPosition, Avatar.active.HMDCamera._threeCamera.getWorldDirection());
         return this.raycaster.raycast(this.raycastLayers);
     }
 }

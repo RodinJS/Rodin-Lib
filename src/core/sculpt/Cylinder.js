@@ -10,7 +10,7 @@ const constructorScheme = {
     openEnded: AScheme.bool().default(false),
     thetaStart: AScheme.number().default(0),
     thetaLength: AScheme.number().default(2 * Math.PI),
-    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 336699}))
+    material: AScheme.any().hasProperty('isMaterial').default(() => new THREE.MeshBasicMaterial({color: 0x336699}))
 };
 
 /**
@@ -19,9 +19,8 @@ const constructorScheme = {
  * @param height {number} box height
  * @param depth {number} box depth
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
-
-
 export class Cylinder extends Sculpt {
     constructor(...args) {
         args = AScheme.validate(args, constructorScheme, true);

@@ -1,11 +1,12 @@
-import {ErrorBadValueParameter, ErrorProtectedMethodCall, ErrorPluginAlreadyInstalled} from '../error';
+import {ErrorBadValueParameter, ErrorPluginAlreadyInstalled} from '../error';
 import {EventEmitter} from '../eventEmitter';
 import {string} from '../utils';
 import {RodinEvent} from '../rodinEvent';
 import * as CONST from '../constants';
-import {Vector3, Euler, Quaternion} from '../utils';
+import {Vector3, Euler, Quaternion} from '../math';
 import {AnimationPlugin} from '../animation';
 import {Loader} from '../loader';
+import {messenger} from '../messenger';
 
 function enforce() {
 }
@@ -36,15 +37,26 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     }, args);
 }
 
+const pendingElements = new Set();
+
 /**
  * Sculpt is a base class for a 3d object in Rodin Lib,
  * Any 3d object should be either a direct Sculpt, or extended from Sculpt
  * @param {Sculpt|string|THREE.Object3D} args
  * @param {boolean} [deferReadyEvent=false]
+ * @ignore
  */
 export class Sculpt extends EventEmitter {
     constructor(args, deferReadyEvent) {
         super();
+
+        // todo: fix this logic later
+        pendingElements.add(this);
+        this.on(CONST.READY, () => {
+            pendingElements.delete(this);
+            if(pendingElements.size === 0)
+                messenger.post(CONST.ALL_SCULPTS_READY, {});
+        });
 
         args = normalizeArguments(args);
 
@@ -170,7 +182,6 @@ export class Sculpt extends EventEmitter {
             case !!args.sculpt:
                 this.copy(args.sculpt);
                 this._ready = true;
-                this._threeObject.Sculpt = this;
                 !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
@@ -178,7 +189,6 @@ export class Sculpt extends EventEmitter {
                 this._threeObject = args.threeObject;
                 this._syncWithThree();
                 this._ready = true;
-                this._threeObject.Sculpt = this;
                 !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
@@ -187,7 +197,6 @@ export class Sculpt extends EventEmitter {
                     this._threeObject = mesh;
                     this._syncWithThree();
                     this._ready = true;
-                    this._threeObject.Sculpt = this;
                     !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 });
                 break;
