@@ -333,6 +333,9 @@ export class GamePad extends EventEmitter {
             currentEvent.target = objects[i].sculpt;
             currentEvent.distance = objects[i].distance;
             currentEvent.uv = objects[i].uv;
+            currentEvent.face = objects[i].face;
+            currentEvent.faceIndex = objects[i].faceIndex;
+            currentEvent.point = objects[i].point;
             objects[i].sculpt.emit(eventName, currentEvent);
             i++;
         } while (currentEvent.propagation && i < objects.length);
