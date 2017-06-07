@@ -49,7 +49,7 @@ export class ViveGamePad extends GamePad {
      * Set GamePad model to HTC Vive gamepad model.
      * @param {string} [url] - url to .obj model of the gamepad.
      */
-    initControllerModel(url = 'public/resource/models/controller/ViveController_v2/controller.obj') {
+    initControllerModel(url = 'https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj') {
         this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
