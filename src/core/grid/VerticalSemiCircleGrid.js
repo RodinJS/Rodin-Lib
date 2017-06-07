@@ -17,7 +17,7 @@ import {RodinEvent} from '../rodinEvent';
 export class VerticalSemiCircleGrid extends VerticalGrid {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, radius = 3, sculpt) {
 
-        sculpt = sculpt || new Cylinder(radius, radius, height * cellHeight * 2, width, height, true, -Math.PI / 2, -Math.PI, new THREE.MeshBasicMaterial({
+        sculpt = sculpt || new Cylinder(radius, radius, height * cellHeight * 1.2, width, height, true, -Math.PI / 2, -Math.PI, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
                 opacity: 0
