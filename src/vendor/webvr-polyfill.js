@@ -1753,10 +1753,8 @@ CardboardVRDisplay.prototype.onResize_ = function (e) {
 		// hide the URL bar unless content is bigger than the screen.
 		// This will not be visible as long as the container element (e.g. body)
 		// is set to 'overflow: hidden'.
-		if (Util.isIOS)
-			cssProperties.push('padding: 0 10px 10px 0');
-		else
-			cssProperties.push('padding: 0 0 0 0');
+
+        cssProperties.push('padding: 0 0 0 0');
 
 		gl.canvas.setAttribute('style', cssProperties.join('; ') + ';');
 
@@ -5551,7 +5549,7 @@ var Emitter = _dereq_('./emitter.js');
 var Util = _dereq_('./util.js');
 var DeviceInfo = _dereq_('./device-info.js');
 
-var DEFAULT_VIEWER = 'CardboardV1';
+var DEFAULT_VIEWER = 'CardboardV2';
 var VIEWER_KEY = 'WEBVR_CARDBOARD_VIEWER';
 var CLASS_NAME = 'webvr-polyfill-viewer-selector';
 
