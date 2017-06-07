@@ -16,7 +16,7 @@ import {RodinEvent} from '../rodinEvent';
 export class VerticalGrid extends ListView {
     constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
 
-        sculpt = sculpt || new Plane(width * cellWidth, height * cellHeight * 1.5, 1, 1, new THREE.MeshBasicMaterial({
+        sculpt = sculpt || new Plane(width * cellWidth, height * cellHeight * 1.2, 1, 1, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
                 opacity: 0
