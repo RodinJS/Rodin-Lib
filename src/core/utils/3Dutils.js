@@ -79,6 +79,29 @@ export function roundRectCanvas(ctx, width, height, radius) {
 
     ctx.arc(radius, radius, radius, Math.PI, 1.5 * Math.PI);
 }
+
+export function roundSelectedRectCanvas(ctx, width, height, radius, ppm) {
+    let {leftTop = 0.0000001* ppm, leftBottom = 0.0000001* ppm, rightTop = 0.0000001* ppm, rightBottom = 0.0000001* ppm} = radius;
+
+    ctx.moveTo(leftBottom, 0.0000001);
+
+    ctx.lineTo(width - rightBottom, 0.0000001);
+
+    ctx.arc(width - rightBottom, rightBottom, rightBottom, -Math.PI / 2, 0);
+
+    ctx.lineTo(width, height - rightTop);
+
+    ctx.arc(width - rightTop, height - rightTop, rightTop, 0, Math.PI / 2);
+
+    ctx.lineTo(leftTop, height);
+
+    ctx.arc(leftTop, height - leftTop, leftTop, Math.PI / 2, Math.PI);
+
+    ctx.lineTo(0.0000001, leftBottom);
+
+    ctx.arc(leftBottom, leftBottom, leftBottom, Math.PI, 1.5 * Math.PI);
+}
+
 export function roundSelectedRect(ctx, width, height, radius) {
     let {leftTop = 0.0000001, leftBottom = 0.0000001, rightTop = 0.0000001, rightBottom = 0.0000001} = radius;
 
