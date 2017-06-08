@@ -11,6 +11,7 @@ const constructorScheme = {
 
 /**
  * Simple Sphere
+ * @extends Sculpt
  * @param radius {number} sphere radius
  * @param widthSegments {number}
  * @param heightSegments {number}

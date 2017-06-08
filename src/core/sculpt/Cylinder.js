@@ -15,6 +15,7 @@ const constructorScheme = {
 
 /**
  * Simple Box
+ * @extends Sculpt
  * @param width {number} box width
  * @param height {number} box height
  * @param depth {number} box depth

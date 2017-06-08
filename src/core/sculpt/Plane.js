@@ -13,6 +13,7 @@ const constructorScheme = {
 
 /**
  * Simple Plane
+ * @extends Sculpt
  * @param width [number = 4] plane width
  * @param height [number = '$width'] plane height
  * @param widthSegments [number = 1]

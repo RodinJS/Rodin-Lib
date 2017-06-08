@@ -7,7 +7,7 @@ import {RodinEvent} from '../rodinEvent';
 
 
 export class ListView extends EventEmitter {
-    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt = this._getMainSculpt()) {
+    constructor(width = 5, height = 5, cellWidth = 0.5, cellHeight = 0.5, sculpt) {
         super();
         // we need to set width height first, so _getMainSculpt can use those
         this._width = width;
