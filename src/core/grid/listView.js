@@ -53,6 +53,8 @@ export class ListView extends EventEmitter {
         this._shouldUpdate = true;
 
         this._scrollStackSize = 0;
+        this._lastGoodCenter = this._center;
+
 
         this._startEventEmited = false;
     }
@@ -183,6 +185,7 @@ export class ListView extends EventEmitter {
 
     updateTargetPositions() {
         if (this._scrollStackSize > 100) {
+            this._center = this._lastGoodCenter;
             return;
         }
         const pWidth = this._width + this._verticalPadLength * 2;
@@ -233,7 +236,6 @@ export class ListView extends EventEmitter {
 
         if (missingRows.every(i => i)) {
             const lastScrollDirection = Math.sign(this._oldCenter - this.center);
-            //console.log(lastScrollDirection);
             this._scrollStackSize++;
             this.scroll(lastScrollDirection * this._height);
             return;
@@ -258,6 +260,7 @@ export class ListView extends EventEmitter {
         }
 
         this._scrollStackSize = 0;
+        this._lastGoodCenter = this.center;
 
         const removed = this._prevUpdated.filter(i => updated.indexOf(i) === -1);
         for (let i in removed) {
