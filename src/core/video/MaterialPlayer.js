@@ -98,11 +98,17 @@ export class MaterialPlayer {
         /**
          *
          */
-        this.loadVideo = function(url_) {
+        this.loadVideo = function (url_) {
             if ((typeof url_) === "string") {
                 url_ = {
                     0: url_,
                     default: "0"
+                }
+            } else if (typeof url_ === "object") {
+                url_ = {
+                    HD: url_.HD,
+                    SD: url_.SD,
+                    default: "HD"
                 }
             }
             url = url_;
@@ -205,15 +211,15 @@ export class MaterialPlayer {
         };
 
         this.update = (delta) => {
-/*            if (Time.speed  * speed !== video.playbackRate) {
-                video.playbackRate = Time.speed * speed;
-            }
+            /*            if (Time.speed  * speed !== video.playbackRate) {
+             video.playbackRate = Time.speed * speed;
+             }
 
-            currDelta += delta;
-            if (currDelta < frameDuration) {
-                return;
-            }
-            currDelta -= frameDuration;*/
+             currDelta += delta;
+             if (currDelta < frameDuration) {
+             return;
+             }
+             currDelta -= frameDuration;*/
 
 
             if (bufferCounter == 0 && !this.isBuffering && this.isPlaying()) {
