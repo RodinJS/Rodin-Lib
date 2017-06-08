@@ -228,7 +228,11 @@ export class Element extends Sculpt {
                 let ctx = this.canvas.getContext("2d");
                 ctx.globalAlpha = 1;
                 ctx.beginPath();
-                utils3D.roundRectCanvas(ctx, this.width * this.ppm, this.height * this.ppm, this.border.radius * this.ppm);
+                if (typeof this.border.radius === 'object') {
+                    utils3D.roundSelectedRectCanvas(ctx, this.width * this.ppm, this.height * this.ppm, this.border.radius, this.ppm);
+                } else {
+                    utils3D.roundRectCanvas(ctx, this.width * this.ppm, this.height * this.ppm, this.border.radius * this.ppm);
+                }
                 ctx.closePath();
                 ctx.lineWidth = this.border.width * 2 * this.ppm;
                 let rgb = utils3D.hexToRgb(this.border.color);
