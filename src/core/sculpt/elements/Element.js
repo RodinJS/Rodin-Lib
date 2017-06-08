@@ -261,6 +261,8 @@ export class Element extends Sculpt {
                 let tex = new THREE.Texture(inMemCanvas);
                 tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
                 tex.repeat.set(1 / this.width, 1 / this.height);
+                //tex.magFilter = THREE.NearestFilter;
+                tex.minFilter = THREE.LinearMipMapNearestFilter;
 
                 buttonMat = new THREE.MeshBasicMaterial({
                     side: THREE.DoubleSide,

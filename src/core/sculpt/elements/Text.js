@@ -89,6 +89,7 @@ export class Text extends Sculpt {
         else{
             this.texture.image = inMemCanvas;
         }
+        this.texture.minFilter = THREE.LinearMipMapNearestFilter;
         if(!this.textMat){
             this.textMat = new THREE.MeshBasicMaterial({
                 side: THREE.DoubleSide,
