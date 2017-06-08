@@ -89,7 +89,9 @@ export class DynamicText extends Sculpt {
         else{
             this.texture.image = inMemCanvas;
         }
-        this.texture.minFilter = THREE.LinearMipMapNearestFilter;
+        //this.texture.minFilter = THREE.LinearMipMapNearestFilter;
+        this.texture.anisotropy = 16;
+
         if(!this.textMat){
             this.textMat = new THREE.MeshBasicMaterial({
                 side: THREE.DoubleSide,
