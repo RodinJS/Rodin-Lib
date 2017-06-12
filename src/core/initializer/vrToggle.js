@@ -13,7 +13,6 @@ export const enterVR = () => {
 
     window.mustShowRotateInstructions = false;
     Scene.webVRmanager.enterVRMode_();
-    Scene.webVRmanager.hmd.resetPose();
     return true;
 };
 
