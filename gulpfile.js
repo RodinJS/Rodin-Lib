@@ -33,9 +33,8 @@ gulp.task('js', () => {
 	return gulp.src(JS)
 		.pipe(plumber(ERROR_MESSAGE))
 		.pipe(babel())
-		// .pipe(uglify(UGLIFY_AGRESIVE))
 		.pipe(s)
-		.pipe(gzip())
+		// .pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist'))
 		.pipe(notify({
@@ -48,12 +47,12 @@ gulp.task('vendor', () => {
 	const s = size({title: 'JS production -> ', pretty: true});
 	return gulp.src(VENDOR)
 		.pipe(plumber(ERROR_MESSAGE))
-		.pipe(sourcemaps.init())
-		// .pipe(uglify(UGLIFY_AGRESIVE))
+		// .pipe(sourcemaps.init())
+		.pipe(uglify(UGLIFY_AGRESIVE))
 		.pipe(concat('vendor.js'))
-		.pipe(sourcemaps.write('.'))
+		// .pipe(sourcemaps.write('.'))
 		.pipe(s)
-		.pipe(gzip())
+		// .pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist/vendor'))
 		.pipe(notify({
