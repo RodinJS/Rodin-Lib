@@ -21,8 +21,8 @@ export class HorizontalCircularGrid extends HorizontalGrid {
         sculpt = sculpt || new Cylinder(radius, radius, height * cellHeight, width, height, true, angle / 2 - Math.PI, -angle, new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
-                //opacity: 0
-                wireframe: true
+                opacity: 0
+                //wireframe: true
             }));
 
         super(width, height, cellHeight, cellWidth, sculpt);
