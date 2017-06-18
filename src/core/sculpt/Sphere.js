@@ -11,10 +11,12 @@ const constructorScheme = {
 
 /**
  * Simple Sphere
+ * @extends Sculpt
  * @param radius {number} sphere radius
  * @param widthSegments {number}
  * @param heightSegments {number}
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
 export class Sphere extends Sculpt {
     constructor(...args) {

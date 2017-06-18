@@ -1753,10 +1753,8 @@ CardboardVRDisplay.prototype.onResize_ = function (e) {
 		// hide the URL bar unless content is bigger than the screen.
 		// This will not be visible as long as the container element (e.g. body)
 		// is set to 'overflow: hidden'.
-		if (Util.isIOS)
-			cssProperties.push('padding: 0 10px 10px 0');
-		else
-			cssProperties.push('padding: 0 0 0 0');
+
+        cssProperties.push('padding: 0 0 0 0');
 
 		gl.canvas.setAttribute('style', cssProperties.join('; ') + ';');
 
@@ -3832,7 +3830,7 @@ window.WebVRConfig = Util.extend({
 	PREDICTION_TIME_S: 0.040,
 
 	// Flag to enable touch panner. In case you have your own touch controls.
-	TOUCH_PANNER_DISABLED: true,
+	TOUCH_PANNER_DISABLED: false,
 
 	// Flag to disabled the UI in VR Mode.
 	CARDBOARD_UI_DISABLED: false, // Default: false
@@ -5551,7 +5549,7 @@ var Emitter = _dereq_('./emitter.js');
 var Util = _dereq_('./util.js');
 var DeviceInfo = _dereq_('./device-info.js');
 
-var DEFAULT_VIEWER = 'CardboardV1';
+var DEFAULT_VIEWER = 'CardboardV2';
 var VIEWER_KEY = 'WEBVR_CARDBOARD_VIEWER';
 var CLASS_NAME = 'webvr-polyfill-viewer-selector';
 

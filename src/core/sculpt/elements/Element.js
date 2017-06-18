@@ -57,16 +57,16 @@ export class Element extends Sculpt {
 
 
     constructor({
-        name = "element",
-        width = 0.2,
-        height = 0.15,
-        background = {},
-        border = {},
-        label,
-        image,
-        transparent = true,
-        ppm = 500
-        }) {
+                    name = "element",
+                    width = 0.2,
+                    height = 0.15,
+                    background = {},
+                    border = {},
+                    label,
+                    image,
+                    transparent = true,
+                    ppm = 500
+                }) {
         super(new THREE.Object3D(), true);
         this.name = name;
         this.width = width;
@@ -101,7 +101,11 @@ export class Element extends Sculpt {
         const draw = () => {
             if (!checkImageLoad()) return;
             let buttonShape = new THREE.Shape();
-            utils3D.roundRect(buttonShape, this.width, this.height, this.border.radius);
+            if (typeof this.border.radius === 'object') {
+                utils3D.roundSelectedRect(buttonShape, this.width, this.height, this.border.radius);
+            } else {
+                utils3D.roundRect(buttonShape, this.width, this.height, this.border.radius);
+            }
             let buttonGeo = utils3D.createGeometryFromShape(buttonShape);
 
             let canvas = utils3D.setupCanvas({
@@ -224,7 +228,11 @@ export class Element extends Sculpt {
                 let ctx = this.canvas.getContext("2d");
                 ctx.globalAlpha = 1;
                 ctx.beginPath();
-                utils3D.roundRectCanvas(ctx, this.width * this.ppm, this.height * this.ppm, this.border.radius * this.ppm);
+                if (typeof this.border.radius === 'object') {
+                    utils3D.roundSelectedRectCanvas(ctx, this.width * this.ppm, this.height * this.ppm, this.border.radius, this.ppm);
+                } else {
+                    utils3D.roundRectCanvas(ctx, this.width * this.ppm, this.height * this.ppm, this.border.radius * this.ppm);
+                }
                 ctx.closePath();
                 ctx.lineWidth = this.border.width * 2 * this.ppm;
                 let rgb = utils3D.hexToRgb(this.border.color);
@@ -257,6 +265,9 @@ export class Element extends Sculpt {
                 let tex = new THREE.Texture(inMemCanvas);
                 tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
                 tex.repeat.set(1 / this.width, 1 / this.height);
+                //tex.magFilter = THREE.NearestFilter;
+                //tex.minFilter = THREE.LinearMipMapNearestFilter;
+                tex.anisotropy = 16;
 
                 buttonMat = new THREE.MeshBasicMaterial({
                     side: THREE.DoubleSide,

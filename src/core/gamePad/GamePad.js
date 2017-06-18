@@ -14,7 +14,7 @@ let buttonsDown = new Set();
 let buttonsUp = new Set();
 let buttonsChanged = new Set();
 
-messenger.on(CONST.RENDER_START, () => {
+messenger.on(CONST.TICK, () => {
     buttonsChanged.clear();
     buttonsDown.clear();
     buttonsUp.clear();
@@ -68,12 +68,19 @@ export class GamePad extends EventEmitter {
         this.raycastLayers = Infinity;
 
         /**
-         * Objects currently intersected by this gamepad.
+         * Objects intersected by this gamepad at the time of last rendered frame.
          * @type {Set.<Sculpt>}
          */
         this.intersected = [];
+
         /**
-         * Raycaster object used to pick/select items with current controller.
+         * Objects currently intersected by this gamepad.
+         * @type {Array}
+         */
+        this.currentIntersections = [];
+
+        /**
+         * Raycaster object used to pick/select items with current gamepad.
          * @type {Raycaster}
          */
         this.raycaster = new Raycaster();
@@ -88,7 +95,7 @@ export class GamePad extends EventEmitter {
          */
         this.sculpt = new Sculpt();
         /**
-         * Matrix used to correctly position the controller object (if any) in the scene.
+         * Matrix used to correctly position the gamepad object (if any) in the scene.
          * @type {THREE.Matrix4}
          */
         this.standingMatrix = new THREE.Matrix4().identity();
@@ -114,7 +121,7 @@ export class GamePad extends EventEmitter {
             }
         });
 
-        messenger.on(CONST.RENDER_START, () => {
+        messenger.on(CONST.TICK, () => {
             if (this._enabled) {
                 this.update();
             }
@@ -201,9 +208,9 @@ export class GamePad extends EventEmitter {
 
         this.intersectObjects();
 
-        let buttonDownDetected = false;
-        let valueChangeDetected = false;
-        let buttonUpDetected = false;
+        let buttonDownDetected = [];
+        let valueChangeDetected = [];
+        let buttonUpDetected = [];
 
         let buttonsToCheck = this.navigatorGamePad.buttons.concat(this.navigatorGamePad.polyfilledButtons || []);
         for (let i = 0; i < buttonsToCheck.length; i++) {
@@ -212,13 +219,13 @@ export class GamePad extends EventEmitter {
             if (this.buttons[i].pressed !== buttonsToCheck[i].pressed) {
                 this.buttons[i].pressed = buttonsToCheck[i].pressed;
                 this.buttons[i].pressed ? this.buttonDown(this.buttons[i]) : this.buttonUp(this.buttons[i]);
-                this.buttons[i].pressed ? buttonDownDetected = true : buttonUpDetected = true;
+                this.buttons[i].pressed ? buttonDownDetected.push(this.buttons[i]) : buttonUpDetected.push(this.buttons[i]);
             }
 
             if (this.buttons[i].value !== buttonsToCheck[i].value) {
                 this.valueChange(this.buttons[i]);
                 this.buttons[i].value = buttonsToCheck[i].value;
-                valueChangeDetected = true;
+                valueChangeDetected.push(this.buttons[i]);
             }
 
             if (this.buttons[i].touched !== buttonsToCheck[i].touched) {
@@ -227,9 +234,9 @@ export class GamePad extends EventEmitter {
             }
         }
 
-        buttonDownDetected && this.emit(CONST.GAMEPAD_BUTTON_DOWN, new RodinEvent(this));
-        valueChangeDetected && this.emit(CONST.GAMEPAD_BUTTON_CHANGE, new RodinEvent(this));
-        buttonUpDetected && this.emit(CONST.GAMEPAD_BUTTON_UP, new RodinEvent(this));
+        buttonDownDetected.length > 0 && this.emit(CONST.GAMEPAD_BUTTON_DOWN, new RodinEvent(this, {button: buttonDownDetected}));
+        valueChangeDetected.length > 0 && this.emit(CONST.GAMEPAD_BUTTON_CHANGE, new RodinEvent(this, {button: valueChangeDetected}));
+        buttonUpDetected.length > 0 && this.emit(CONST.GAMEPAD_BUTTON_UP, new RodinEvent(this, {button: buttonUpDetected}));
     }
 
     /**
@@ -241,7 +248,12 @@ export class GamePad extends EventEmitter {
             return [];
         }
 
-        let intersections = this.getIntersections();
+        this.currentIntersections = this.getIntersections();
+        if(this.currentIntersections === null) {
+            return;
+        }
+
+        let intersections = this.currentIntersections;
 
         let hoveredOutSculpts = this.intersected.filter(intersect => {
             for (let i = 0; i < intersections.length; i++) {
@@ -315,12 +327,15 @@ export class GamePad extends EventEmitter {
             return;
 
         let currentEvent = new RodinEvent(objects[0].sculpt, {domEvent: DOMEvent, button: button, gamepad: this});
-        ;
+
         let i = 0;
         do {
             currentEvent.target = objects[i].sculpt;
             currentEvent.distance = objects[i].distance;
             currentEvent.uv = objects[i].uv;
+            currentEvent.face = objects[i].face;
+            currentEvent.faceIndex = objects[i].faceIndex;
+            currentEvent.point = objects[i].point;
             objects[i].sculpt.emit(eventName, currentEvent);
             i++;
         } while (currentEvent.propagation && i < objects.length);
@@ -334,7 +349,8 @@ export class GamePad extends EventEmitter {
      * @param button
      */
     emitIntersected(e, eventName, DOMEvent, button) {
-        this.emitAll(e, this.intersected, eventName, DOMEvent, button)
+        if(this.currentIntersections !== null)
+            this.emitAll(e, this.intersected, eventName, DOMEvent, button)
     }
 
     /**

@@ -1,26 +1,25 @@
 import {EventEmitter} from '../eventEmitter';
 import {messenger} from '../messenger';
-import {Set} from '../set';
 import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
 import * as utils from '../utils';
-import * as CONSTANTS from '../constants';
+import * as CONST from '../constants';
 import {RodinEvent} from '../rodinEvent';
 import {Sculpt} from '../sculpt';
-import {HMDCamera} from '../camera';
 import {Avatar} from '../avatar';
+import {device} from '../device';
 
 
 function enforce() {
 }
 
 let activeScene = null;
-let doRender = true;
-let renderRequested = false;
+let doRequestFrame = true;
+let frameRequested = false;
 
-const preRenderFunctions = new Set();
-const postRenderFunctions = new Set();
+const preRenderFunctions = [];
+const postRenderFunctions = [];
 
-const instances = new Set();
+const instances = [];
 
 export class Scene extends EventEmitter {
     /**
@@ -36,7 +35,7 @@ export class Scene extends EventEmitter {
         super();
 
         this._scene = new THREE.Scene();
-
+        this._isRendering = true;
 
         /**
          * Scene name.
@@ -44,18 +43,18 @@ export class Scene extends EventEmitter {
          */
         this.name = name;
 
-        this._preRenderFunctions = new Set();
-        this._postRenderFunctions = new Set();
+        this._preRenderFunctions = [];
+        this._postRenderFunctions = [];
 
         instances.push(this);
         /**
          * Child sculpt objects of the scene
          * @type {Set.<Sculpt>}
          */
-        this.children = new Set();
+        this.children = [];
 
         this._sculpt = new Sculpt();
-        this._sculpt.on(CONSTANTS.READY, () => {
+        this._sculpt.on(CONST.READY, () => {
             this._scene.add(this._sculpt._threeObject);
         });
 
@@ -104,6 +103,14 @@ export class Scene extends EventEmitter {
      */
     static get scenes() {
         return instances;
+    }
+
+    static getByName(name) {
+        const filteredScene = instances.filter(_scene => _scene.name === name);
+        if (filteredScene && filteredScene[0])
+            return filteredScene[0];
+
+        return null;
     }
 
     /**
@@ -230,8 +237,8 @@ export class Scene extends EventEmitter {
      * Starts rendering the active scene.
      */
     static start() {
-        doRender = true;
-        if (!renderRequested) {
+        doRequestFrame = true;
+        if (!frameRequested) {
             Scene.requestFrame(enforce);
         }
     }
@@ -240,15 +247,22 @@ export class Scene extends EventEmitter {
      * Stops rendering the active scene.
      */
     static stop() {
-        doRender = false;
+        doRequestFrame = false;
     }
 
     /**
-     * Gets the rendering camera of the active scene.
-     * @returns {THREE.PerspectiveCamera}
+     * Pauses rendering
+     * stops emmiting renderStart, renderEnd and render events
      */
-    static get activeCamera() {
-        return activeScene._camera;
+    static pauseRender() {
+        Scene.active._isRendering = false;
+    }
+
+    /**
+     * Resumes rendering
+     */
+    static resumeRender() {
+        Scene.active._isRendering = true;
     }
 
     /**
@@ -278,14 +292,14 @@ export class Scene extends EventEmitter {
             case true:
                 const filteredScene = instances.filter(_scene => _scene.name === scene);
                 if (filteredScene && filteredScene[0]) {
-                    activeScene = filteredScene;
+                    activeScene = filteredScene[0];
                     break;
                 }
             default:
                 throw new ErrorBadValueParameter();
         }
 
-        messenger.post(CONSTANTS.ACTIVE_SCENE, activeScene);
+        messenger.post(CONST.ACTIVE_SCENE, activeScene);
 
         Scene.onResize();
     }
@@ -342,52 +356,47 @@ export class Scene extends EventEmitter {
             throw new ErrorProtectedMethodCall('render');
         }
 
-        messenger.post(CONSTANTS.RENDER_START, {});
+        messenger.post(CONST.TICK, {});
 
-        // Update VR headset position and apply to camera.
-        //Scene.active._controls.update();
+        if (Scene.active._isRendering) {
+            messenger.post(CONST.RENDER_START, {});
 
-        // call all prerender functions
-        for (let i = 0; i < preRenderFunctions.length; i++) {
-            preRenderFunctions[i]();
-        }
-
-        // call all scene specific prerender functions
-        for (let i = 0; i < Scene.active._preRenderFunctions.length; i++) {
-            Scene.active._preRenderFunctions[i]();
-        }
-
-        // emit update for all childs
-        for (let i = 0; i < Scene.active.children.length; i++) {
-            const child = Scene.active.children[i];
-
-            if (child.isReady) {
-                child.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
+            // call all prerender functions
+            for (let i = 0; i < preRenderFunctions.length; i++) {
+                preRenderFunctions[i]();
             }
-        }
-        // //TODO: camera needs to be a sculpt object, to avoid sh*t like this
-        // Scene.active._camera.children.map(child => {
-        //     if (child.Sculpt && child.Sculpt.isReady) {
-        //         child.Sculpt.emit(CONSTANTS.UPDATE, new RodinEvent(child, {}));
-        //     }
-        // });
 
-        Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
-        messenger.post(CONSTANTS.RENDER, {realTimestamp: timestamp});
+            // call all scene specific prerender functions
+            for (let i = 0; i < Scene.active._preRenderFunctions.length; i++) {
+                Scene.active._preRenderFunctions[i]();
+            }
 
-        // call all scene specific postrender functions
-        for (let i = 0; i < Scene.active._postRenderFunctions.length; i++) {
-            Scene.active._postRenderFunctions[i]();
-        }
+            // emit update for all children
+            for (let i = 0; i < Scene.active.children.length; i++) {
+                const child = Scene.active.children[i];
 
-        // call all postrender functions
-        for (let i = 0; i < postRenderFunctions.length; i++) {
-            postRenderFunctions[i]();
+                if (child.isReady) {
+                    child.emit(CONST.UPDATE, new RodinEvent(child, {}));
+                }
+            }
+
+            Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
+            messenger.post(CONST.RENDER, {realTimestamp: timestamp});
+
+            // call all scene specific postrender functions
+            for (let i = 0; i < Scene.active._postRenderFunctions.length; i++) {
+                Scene.active._postRenderFunctions[i]();
+            }
+
+            // call all postrender functions
+            for (let i = 0; i < postRenderFunctions.length; i++) {
+                postRenderFunctions[i]();
+            }
+
+            messenger.post(CONST.RENDER_END, {});
         }
 
         Scene.requestFrame(enforce);
-
-        messenger.post(CONSTANTS.RENDER_END, {});
     }
 
     /**
@@ -396,17 +405,17 @@ export class Scene extends EventEmitter {
      * @private
      */
     static requestFrame(e) {
-        // renderRequested becomes false every time
+        // frameRequested becomes false every time
         // render() calls requestFrame(), event if
-        // doRender is false
+        // doRequestFrame is false
 
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('requestFrame');
         }
 
-        renderRequested = false;
+        frameRequested = false;
 
-        if (!doRender) {
+        if (!doRequestFrame) {
             return;
         }
 
@@ -420,7 +429,7 @@ export class Scene extends EventEmitter {
             });
         }
 
-        renderRequested = true;
+        frameRequested = true;
     }
 
     /**
@@ -430,7 +439,12 @@ export class Scene extends EventEmitter {
     static get active() {
         return activeScene;
     }
+
+    static get isRendering() {
+        return Scene.active._isRendering;
+    }
 }
+
 /**
  * renderer object
  * @type {THREE.WebGLRenderer}
@@ -439,49 +453,55 @@ export class Scene extends EventEmitter {
 Scene.renderer = new THREE.WebGLRenderer({
     antialias: window.devicePixelRatio < 2
 });
+
 /**
  * VREffect plugin from three.js
  * @type {THREE.VREffect}
  * @static
  */
-
 Scene.effect = new THREE.VREffect(Scene.renderer);
+
 /**
  * web VR Manager plugin
  * @type {Object}
  * @static
  */
-
 Scene.webVRmanager = null;
 
 Scene.renderer.setPixelRatio(window.devicePixelRatio);
 Scene.effect.setSize(window.innerWidth, window.innerHeight);
 
-window.addEventListener('resize', Scene.onResize, false);
-window.addEventListener('vrdisplaypresentchange', Scene.onResize, false);
+window.addEventListener(CONST.RESIZE, Scene.onResize, false);
+window.addEventListener(CONST.VR_DISPLAY_PRESENT_CHANGE, () => {
+    Scene.onResize();
+    messenger.post(CONST.VR_DISPLAY_PRESENT_CHANGE, Scene.webVRmanager.hmd.isPresenting);
+}, false);
 
 
 // TODO: fix this when webkit fixes growing canvas bug
-if (window.parent !== window && navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/)) {
-    this.renderer.domElement.style.position = 'fixed';
-    this.onResize();
+if (device.isIframe && device.isIOS) {
+    Scene.renderer.domElement.style.position = 'fixed';
+    if (Scene.active)
+        Scene.onResize();
 }
 
-messenger.on(CONSTANTS.REQUEST_ACTIVE_SCENE, () => {
-    messenger.postAsync(CONSTANTS.ACTIVE_SCENE, activeScene);
+messenger.on(CONST.REQUEST_ACTIVE_SCENE, () => {
+    messenger.postAsync(CONST.ACTIVE_SCENE, activeScene);
 });
 
-messenger.post(CONSTANTS.REQUEST_RODIN_STARTED);
+messenger.post(CONST.REQUEST_RODIN_STARTED);
 
-messenger.once(CONSTANTS.RODIN_STARTED, (params) => {
+messenger.once(CONST.RODIN_STARTED, () => {
+    //todo: move webVRmanage to device entirely
     Scene.webVRmanager = new WebVRManager(Scene.renderer, Scene.effect, {hideButton: false, isUndistorted: false});
+    device.webVRmanager = Scene.webVRmanager;
     document.body.appendChild(Scene.renderer.domElement);
     const mainScene = new Scene('Main');
     Scene.go(mainScene);
     Scene.start();
 
     // TODO: fix this after fixing webVRManager
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    if (device.isIOS) {
         Scene.webVRmanager.vrCallback = () => {
             Scene.webVRmanager.enterVRMode_();
             Scene.webVRmanager.hmd.resetPose();

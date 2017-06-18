@@ -6,20 +6,22 @@ import {UID} from './string';
  * @returns {string} object's unique id
  */
 export const getId = (object) => {
-    if(!object["__uid__"]) {
+    if (object === null)
+        return 'null';
+    if (!object["__uid__"]) {
         object["__uid__"] = UID();
     }
 
     return object["__uid__"];
 };
+
 /**
  *
  * @param obj
  * @param prop
  * @returns {*}
  */
-export const getProperty
-= (obj, prop) => {
+export const getProperty = (obj, prop) => {
     let props = prop.split('.');
     let tmp = obj;
 
@@ -40,7 +42,7 @@ export const getProperty
  * @param prop
  * @param val
  */
-export const setProperty =  (obj, prop, val) => {
+export const setProperty = (obj, prop, val) => {
     let props = prop.split('.');
     let tmp = obj;
 
@@ -86,7 +88,7 @@ export const clone = obj => {
 export const joinParams = (obj, skip = []) => {
     let res = {};
     for (let i in obj) {
-        if (obj[i].constructor === Object){
+        if (obj[i].constructor === Object) {
             let cur = joinParams(obj[i], skip);
             for (let j in cur) {
                 if (!skip.includes(j)) {

@@ -3,12 +3,25 @@ import {HMDCamera} from '../camera'
 import {messenger} from '../messenger';
 import {AScheme} from '../utils/AScheme'
 import * as CONST from "../constants/";
+import {device} from '../device';
+import {postMessageTransport} from '../transport';
 
 const constructorScheme = {
     trackPosition: AScheme.bool().default(true),
     trackRotation: AScheme.bool().default('$trackPosition'),
-    HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(new HMDCamera)
+    HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(() => new HMDCamera())
 };
+
+let useWebVRPose = true;
+let pose = null;
+let poseRequesters = [];
+
+/**
+ * Avatar class represents the user in 3D experience. This helps to refer to the camera as an object in space.
+ * @param trackRotation {boolean} whether or not this avatar should track users rotation.
+ * @param trackPosition {boolean} whether or not this avatar should track users position.
+ * @param HMDCamera {HMDCamera} the camera that renders user perspective.
+ */
 
 export class Avatar extends Sculpt {
     constructor(...args) {
@@ -34,6 +47,10 @@ export class Avatar extends Sculpt {
     static standingMatrix = new THREE.Matrix4();
     static isRunning = false;
 
+    /**
+     * This is the Sculpt object that carries the position and the rotation of the HMDCamera (headset perspective)
+     * @type {Sculpt}
+     */
     static trackingSculpt = new Sculpt();
 
     static isStanding = false;
@@ -49,10 +66,16 @@ export class Avatar extends Sculpt {
         }
     }
 
+    /**
+     * Pauses the tracking of all Avatar instances.
+     */
     static pause() {
         Avatar.isRunning = false;
     }
 
+    /**
+     * Resumes the tracking of all Avatar instances.
+     */
     static resume() {
         Avatar.isRunning = true;
     }
@@ -80,15 +103,20 @@ export class Avatar extends Sculpt {
             return;
         }
 
-        let pose = null;
+        if (useWebVRPose) {
+            pose = null;
 
-        // to support different versions of webvr api
-        if (Avatar._vrDisplay.getFrameData) {
-            Avatar._vrDisplay.getFrameData(Avatar._frameData);
-            pose = Avatar._frameData.pose;
-        } else if (Avatar._vrDisplay.getPose) {
-            pose = Avatar._vrDisplay.getPose();
+            // to support different versions of webvr api
+            if (Avatar._vrDisplay.getFrameData) {
+                Avatar._vrDisplay.getFrameData(Avatar._frameData);
+                pose = Avatar._frameData.pose;
+            } else if (Avatar._vrDisplay.getPose) {
+                pose = Avatar._vrDisplay.getPose();
+            }
         }
+
+        if (!pose)
+            return;
 
         if (pose.orientation !== null) {
             Avatar.trackingSculpt.quaternion.fromArray(pose.orientation);
@@ -131,13 +159,60 @@ export class Avatar extends Sculpt {
     static get active() {
         //TODO: THIS IS NOT RIGHT
         //TODO: FIX THIS LATER, NO TIME NOW
+        //TODO: FUCK THIS, FUCK THEM, FUCK YOU
         return Avatar.instances[0];
     }
 }
 
-messenger.on(CONST.RENDER_START, () => {
+messenger.on(CONST.TICK, () => {
     Avatar.update();
+
+    if (useWebVRPose && poseRequesters.length !== 0) {
+        messenger.post(CONST.HMD_POSE, {
+            destination: poseRequesters,
+            pose: {
+                position: pose.position ? Array.from(pose.position) : null,
+                orientation: pose.orientation ? Array.from(pose.orientation) : null
+            }
+        }, postMessageTransport);
+    }
 });
 
 Avatar.init();
 Avatar.isRunning = true;
+
+/**
+ * if a child is requesting position
+ * register it to send updates later
+ */
+messenger.on(CONST.REQUEST_HMD_POSE, (data, transport) => {
+    if (transport === postMessageTransport) {
+        poseRequesters.push(data.path[data.path.length - 1]);
+    }
+});
+
+/**
+ * if we are on ios and inside an iframe
+ * orientation change events dont work
+ * so we request hmd pose from parent iframe
+ */
+if (device.isIOS && device.isIframe) {
+    useWebVRPose = false;
+
+    // requesting updates on position and orientation
+    messenger.on(CONST.POST_MESSAGE_TRANSPORT_PARENT_ID, () => {
+        messenger.post(CONST.REQUEST_HMD_POSE, {destination: CONST.PARENT}, postMessageTransport);
+    });
+
+    // processing updates
+    messenger.on(CONST.HMD_POSE, (data, transport) => {
+        if (transport === postMessageTransport) {
+            pose = data.body.pose;
+            messenger.post(CONST.HMD_POSE, {
+                destination: poseRequesters,
+                pose: pose
+            }, postMessageTransport);
+        }
+    });
+}
+

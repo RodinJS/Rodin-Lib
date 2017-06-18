@@ -6,6 +6,7 @@ import * as CONST from '../constants';
 import {Vector3, Euler, Quaternion} from '../math';
 import {AnimationPlugin} from '../animation';
 import {Loader} from '../loader';
+import {messenger} from '../messenger';
 
 function enforce() {
 }
@@ -36,15 +37,25 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     }, args);
 }
 
+const pendingElements = new Set();
+
 /**
  * Sculpt is a base class for a 3d object in Rodin Lib,
  * Any 3d object should be either a direct Sculpt, or extended from Sculpt
- * @param {Sculpt|string|THREE.Object3D} args
- * @param {boolean} [deferReadyEvent=false]
+ * @param {Sculpt|String|THREE.Object3D} args
+ * @param {Boolean} [deferReadyEvent=false] deferReadyEvent
  */
 export class Sculpt extends EventEmitter {
     constructor(args, deferReadyEvent) {
         super();
+
+        // todo: fix this logic later
+        pendingElements.add(this);
+        this.on(CONST.READY, () => {
+            pendingElements.delete(this);
+            if(pendingElements.size === 0)
+                messenger.post(CONST.ALL_SCULPTS_READY, {});
+        });
 
         args = normalizeArguments(args);
 
@@ -64,7 +75,7 @@ export class Sculpt extends EventEmitter {
 
         /**
          * Is this object gamepadVisible
-         * @type {boolean}
+         * @type {Boolean}
          * @private
          */
         this._gamepadVisible = true;
@@ -78,7 +89,7 @@ export class Sculpt extends EventEmitter {
 
         /**
          * name
-         * @type {string}
+         * @type {String}
          */
         this.name = args.name;
 
@@ -170,7 +181,6 @@ export class Sculpt extends EventEmitter {
             case !!args.sculpt:
                 this.copy(args.sculpt);
                 this._ready = true;
-                this._threeObject.Sculpt = this;
                 !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
@@ -178,7 +188,6 @@ export class Sculpt extends EventEmitter {
                 this._threeObject = args.threeObject;
                 this._syncWithThree();
                 this._ready = true;
-                this._threeObject.Sculpt = this;
                 !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 break;
 
@@ -187,7 +196,6 @@ export class Sculpt extends EventEmitter {
                     this._threeObject = mesh;
                     this._syncWithThree();
                     this._ready = true;
-                    this._threeObject.Sculpt = this;
                     !deferReadyEvent && this.emitAsync(CONST.READY, new RodinEvent(this));
                 });
                 break;
@@ -202,7 +210,7 @@ export class Sculpt extends EventEmitter {
 
         /**
          * check if sculpt is ready
-         * @type {boolean}
+         * @type {Boolean}
          * @private
          */
         this._ready = false;
@@ -227,7 +235,7 @@ export class Sculpt extends EventEmitter {
      * Emit ready event, used when this event needs to be emitted manually (deferReadyEvent).
      * For example, when a class extended from Sculpt, builds an object in constructor,
      * and needs to emit ready event, only after the constructor has finished it's job.
-     * @return {boolean}
+     * @return {Boolean}
      */
     emitReady() {
         this.emitAsync(CONST.READY, new RodinEvent(this));
@@ -235,7 +243,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Gets visibility of the object
-     * @type {boolean}
+     * @type {Boolean}
      */
     get visible() {
         return this._threeObject.visible;
@@ -243,7 +251,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets visibility of the object
-     * @type {boolean}
+     * @type {Boolean}
      */
     set visible(value) {
         this._threeObject.visible = value;
@@ -252,7 +260,7 @@ export class Sculpt extends EventEmitter {
     /**
      * Gets the global visibility of sculpt.
      * Returns false, if one of parents is invisible, otherwise returns true.
-     * @type {boolean}
+     * @type {Boolean}
      */
     get globalVisible() {
         if (!this.visible) return false;
@@ -264,7 +272,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Checks if this object is of sculpt type.
-     * @type {boolean}
+     * @type {Boolean}
      */
     get isSculpt() {
         return true;
@@ -272,7 +280,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Checks if this sculpt object is ready.
-     * @type {boolean}
+     * @type {Boolean}
      */
     get isReady() {
         return this._ready
@@ -321,7 +329,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Checks if this sculpt is visible for gamepads.
-     * @type {boolean}
+     * @type {Boolean}
      */
     get gamepadVisible() {
         return this._gamepadVisible;
@@ -329,7 +337,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Sets this sculpt visible/invisible for gamepads.
-     * @type {boolean}
+     * @type {Boolean}
      */
     set gamepadVisible(value) {
         this._gamepadVisible = !!value;
@@ -589,7 +597,7 @@ export class Sculpt extends EventEmitter {
 	/**
 	 * Copies given object's parameters into this object
 	 * @param {Sculpt} sculpt
-	 * @param {boolean} [recursive=true]
+	 * @param {Boolean} [recursive=true]
 	 */
 	copy(sculpt, recursive = true) {
 		if (!sculpt.isSculpt) {
@@ -610,7 +618,7 @@ export class Sculpt extends EventEmitter {
 
     /**
      * Creates a new sculpt object that is a clone of this object
-     * @param {boolean} [recursive=true]
+     * @param {Boolean} [recursive=true]
      */
     clone(recursive = true) {
         return new this.constructor().copy(this, recursive);

@@ -40,7 +40,7 @@ import {Time} from '../time';
 import {messenger} from '../messenger';
 import * as CONST from '../constants';
 
-export var TWEEN = TWEEN || (function () {
+export const TWEEN = (function () {
 
         var _tweens = [];
 
@@ -843,34 +843,8 @@ TWEEN.Interpolation = {
             return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (- 3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
 
         }
-
     }
-
 };
-
-// UMD (Universal Module Definition)
-(function (root) {
-
-    if (typeof define === 'function' && define.amd) {
-
-        // AMD
-        define([], function () {
-            return TWEEN;
-        });
-
-    } else if (typeof module !== 'undefined' && typeof exports === 'object') {
-
-        // Node.js
-        module.exports = TWEEN;
-
-    } else if (root !== undefined) {
-
-        // Global variable
-        root.TWEEN = TWEEN;
-
-    }
-
-})(this);
 
 messenger.on(CONST.RENDER_START, () => {
     TWEEN.update();

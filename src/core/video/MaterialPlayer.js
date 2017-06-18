@@ -96,6 +96,37 @@ export class MaterialPlayer {
             this.currentSource = key;
         };
         /**
+         *
+         */
+        this.loadVideo = function (url_) {
+            if ((typeof url_) === "string") {
+                url_ = {
+                    0: url_,
+                    default: "0"
+                }
+            } else if (typeof url_ === "object") {
+                url_ = {
+                    HD: url_.HD,
+                    SD: url_.SD,
+                    default: "HD"
+                }
+            }
+            url = url_;
+            this.pause();
+
+            video.innerHTML = "";
+            let key = url.default;
+            let source = document.createElement("source");
+            const urlSplited = url[key].split('.');
+            source.type = "video/" + urlSplited[urlSplited.length - 1];
+            source.src = url[key];
+
+            video.appendChild(source);
+            video.load();
+            video.currentTime = 0;
+            this.currentSource = key;
+        };
+        /**
          * A customizable function call on buffering end.
          */
         this.onBufferEnd = function () {
@@ -180,15 +211,15 @@ export class MaterialPlayer {
         };
 
         this.update = (delta) => {
-/*            if (Time.speed  * speed !== video.playbackRate) {
-                video.playbackRate = Time.speed * speed;
-            }
+            /*            if (Time.speed  * speed !== video.playbackRate) {
+             video.playbackRate = Time.speed * speed;
+             }
 
-            currDelta += delta;
-            if (currDelta < frameDuration) {
-                return;
-            }
-            currDelta -= frameDuration;*/
+             currDelta += delta;
+             if (currDelta < frameDuration) {
+             return;
+             }
+             currDelta -= frameDuration;*/
 
 
             if (bufferCounter == 0 && !this.isBuffering && this.isPlaying()) {

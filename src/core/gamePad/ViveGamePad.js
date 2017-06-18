@@ -7,10 +7,10 @@ import {Vector3} from '../math';
 import {Avatar} from '../avatar';
 
 /**
- * A controller class for describing HTC Vive controllers event handlers.
+ * A gamepad class for describing HTC Vive gamepads event handlers.
  * @param {string} hand Required - "left" or "right".
  */
-export class ViveController extends GamePad {
+export class ViveGamePad extends GamePad {
     constructor(hand) {
         super('openvr', hand, CONST.VR);
         /**
@@ -19,9 +19,9 @@ export class ViveController extends GamePad {
          */
         this.buttons = [];
         if (hand === CONST.LEFT) {
-            this.buttons = [Buttons.viveLeftTrackpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
+            this.buttons = [Buttons.viveLeftTouchpad, Buttons.viveLeftTrigger, Buttons.viveLeftGrip, Buttons.viveLeftMenu];
         } else {
-            this.buttons = [Buttons.viveRightTrackpad, Buttons.viveRightTrigger, Buttons.viveRightGrip, Buttons.viveRightMenu];
+            this.buttons = [Buttons.viveRightTouchpad, Buttons.viveRightTrigger, Buttons.viveRightGrip, Buttons.viveRightMenu];
         }
 
         this.initControllerModel();
@@ -29,13 +29,13 @@ export class ViveController extends GamePad {
 
         messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
-        messenger.on(CONST.ACTIVE_SCENE, (scene) => {
+        messenger.on(CONST.ACTIVE_SCENE, () => {
             this.standingMatrix = Avatar.standingMatrix;
         });
     }
 
     /**
-     * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the controller's pointer ray.
+     * Get raycasted objects ({distance, point, face, faceIndex, indices, object})of the gamepad's pointer ray.
      * @returns {Sculpt[]}
      */
     getIntersections() {
@@ -46,8 +46,8 @@ export class ViveController extends GamePad {
     }
 
     /**
-     * Set Controller model to HTC Vive controller model.
-     * @param {string} [url] - url to .obj model of the controller.
+     * Set GamePad model to HTC Vive gamepad model.
+     * @param {string} [url] - url to .obj model of the gamepad.
      */
     initControllerModel(url = 'https://cdn.rodin.io/resources/models/ViveController_v2/controller.obj') {
         this.controllerModel = new Sculpt(url);
@@ -58,7 +58,7 @@ export class ViveController extends GamePad {
     }
 
     /**
-     * Init raycasting line. Create a line for controller direction
+     * Init raycasting line. Create a line for gamepad direction
      *
      * @param {number} [color=0xff0000]
      */
@@ -84,6 +84,6 @@ export class ViveController extends GamePad {
 messenger.post(CONST.REQUEST_RODIN_STARTED);
 
 messenger.once(CONST.RODIN_STARTED, () => {
-    GamePad.viveLeft = new ViveController(CONST.LEFT);
-    GamePad.viveRight = new ViveController(CONST.RIGHT);
+    GamePad.viveLeft = new ViveGamePad(CONST.LEFT);
+    GamePad.viveRight = new ViveGamePad(CONST.RIGHT);
 });

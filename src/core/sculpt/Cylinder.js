@@ -15,13 +15,13 @@ const constructorScheme = {
 
 /**
  * Simple Box
+ * @extends Sculpt
  * @param width {number} box width
  * @param height {number} box height
  * @param depth {number} box depth
  * @param material {THREE.Material}
+ * @memberof Sculpt
  */
-
-
 export class Cylinder extends Sculpt {
     constructor(...args) {
         args = AScheme.validate(args, constructorScheme, true);

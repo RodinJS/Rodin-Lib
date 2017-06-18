@@ -49,6 +49,10 @@ export class PerspectiveCamera extends Camera {
         return this._threeCamera.getFilmHeight();
     }
 
+    get worldDirection() {
+        return this._threeCamera.getWorldDirection();
+    }
+
     setViewOffset(...args) {
         // todo: implement with AScheme
         this._threeCamera.setViewOffset(...args);
