@@ -41,7 +41,6 @@ export class OculusTouchGamePad extends GamePad {
 
         this.initControllerModel();
         this.initRaycastingLine();
-        this.standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, 1.6, 0));
     }
 
     /**
