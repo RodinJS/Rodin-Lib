@@ -4,6 +4,7 @@ import {Sculpt} from '../sculpt';
 import {messenger} from '../messenger';
 import * as Buttons from '../button';
 import {Vector3} from '../math';
+import {Avatar} from '../avatar';
 
 /**
  * A gamepad class for describing Oculus Rift Touch gamepads event handlers.
@@ -24,11 +25,11 @@ export class OculusTouchGamePad extends GamePad {
         }
 
         this.on(CONST.UPDATE, () => {
-            if(!this.navigatorGamePad) {
+            if (!this.navigatorGamePad) {
                 return;
             }
 
-            if(!this.navigatorGamePad.polyfilledButtons) {
+            if (!this.navigatorGamePad.polyfilledButtons) {
                 this.navigatorGamePad.polyfilledButtons = [{value: 0, pressed: false}, {value: 0, pressed: false}];
             }
 
@@ -41,7 +42,6 @@ export class OculusTouchGamePad extends GamePad {
 
         this.initControllerModel();
         this.initRaycastingLine();
-        this.standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, 1.6, 0));
     }
 
     /**
