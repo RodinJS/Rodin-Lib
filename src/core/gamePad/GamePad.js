@@ -5,6 +5,7 @@ import {Sculpt} from '../sculpt';
 import {RodinEvent} from '../rodinEvent';
 import {Raycaster} from '../raycaster';
 import {Scene} from '../scene';
+import {Avatar} from '../avatar'
 
 function enforce() {
 }
@@ -98,7 +99,6 @@ export class GamePad extends EventEmitter {
          * Matrix used to correctly position the gamepad object (if any) in the scene.
          * @type {THREE.Matrix4}
          */
-        this.standingMatrix = new THREE.Matrix4().identity();
 
         this.sculpt.on(CONST.READY, () => {
             // todo: fix this later
@@ -304,7 +304,7 @@ export class GamePad extends EventEmitter {
         if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
         if (pose.orientation !== null) this.sculpt.quaternion.fromArray(pose.orientation);
         this.sculpt.matrix.compose(this.sculpt._threeObject.position, this.sculpt.quaternion, this.sculpt.scale);
-        this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(this.standingMatrix, this.sculpt._threeObject.matrix);
+        this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(Avatar.standingMatrix, this.sculpt._threeObject.matrix);
         this.sculpt._threeObject.matrixWorldNeedsUpdate = true;
     }
 

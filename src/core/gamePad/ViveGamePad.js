@@ -53,7 +53,8 @@ export class ViveGamePad extends GamePad {
         this.controllerModel = new Sculpt(url);
 
         this.controllerModel.on(CONST.READY, () => {
-            this.controllerModel.parent = this.sculpt;
+            //this.controllerModel.parent = this.sculpt;
+            this.sculpt.add(this.controllerModel);
         });
     }
 
@@ -77,7 +78,8 @@ export class ViveGamePad extends GamePad {
          */
         this.raycastingLine = new Sculpt(targetLine);
         this.raycastingLine.gamepadVisible = false;
-        this.raycastingLine.parent = this.sculpt;
+        //this.raycastingLine.parent = this.sculpt;
+        this.sculpt.add(this.raycastingLine);
     }
 }
 
