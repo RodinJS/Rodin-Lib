@@ -23,10 +23,6 @@ export class DaydreamGamePad extends GamePad {
         this.initRaycastingLine();
 
         messenger.post(CONST.REQUEST_ACTIVE_SCENE);
-
-        messenger.on(CONST.ACTIVE_SCENE, (scene) => {
-            this.standingMatrix = Avatar.standingMatrix;
-        });
     }
 
     /**
@@ -54,7 +50,7 @@ export class DaydreamGamePad extends GamePad {
         //if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
         if (pose.orientation !== null) this.sculpt.quaternion.fromArray(pose.orientation);
         this.sculpt.matrix.compose(this.sculpt._threeObject.position, this.sculpt.quaternion, this.sculpt.scale);
-        this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(this.standingMatrix, this.sculpt._threeObject.matrix);
+        this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(Avatar.standingMatrix, this.sculpt._threeObject.matrix);
         this.sculpt._threeObject.matrixWorldNeedsUpdate = true;
 
 

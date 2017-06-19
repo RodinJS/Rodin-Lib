@@ -5,6 +5,7 @@ import {AScheme} from '../utils/AScheme'
 import * as CONST from "../constants/";
 import {device} from '../device';
 import {postMessageTransport} from '../transport';
+import {Vector3} from "../math/Vector3";
 
 const constructorScheme = {
     trackPosition: AScheme.bool().default(true),
@@ -44,7 +45,6 @@ export class Avatar extends Sculpt {
     static _frameData = null;
     static _vrDisplay = null;
 
-    static standingMatrix = new THREE.Matrix4();
     static isRunning = false;
 
     /**
@@ -59,6 +59,8 @@ export class Avatar extends Sculpt {
 
     // we need to figure out if this is really static, or per avatar property
     static userHeight = 1.6;
+
+    static standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
 
     static init() {
         if ('VRFrameData' in window) {
