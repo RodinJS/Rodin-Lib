@@ -21,6 +21,7 @@ export class EventEmitter {
         if (!Array.isArray(eventNames)) {
             eventNames = [eventNames];
         }
+
         for (let i = 0; i < eventNames.length; i++) {
             let evt = eventNames[i];
             if (!this.events[evt]) {
