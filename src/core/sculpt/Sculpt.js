@@ -37,7 +37,19 @@ function normalizeArguments(args = {threeObject: new THREE.Object3D()}) {
     }, args);
 }
 
+const GAMEPAD_EVENTS = [
+    CONST.GAMEPAD_HOVER,
+    CONST.GAMEPAD_HOVER_OUT,
+    CONST.GAMEPAD_BUTTON_DOWN,
+    CONST.GAMEPAD_BUTTON_UP,
+    CONST.GAMEPAD_BUTTON_CHANGE,
+    CONST.GAMEPAD_BUTTON,
+    CONST.GAMEPAD_MOVE
+];
+
 const pendingElements = new Set();
+
+const raycastables = [];
 
 /**
  * Sculpt is a base class for a 3d object in Rodin Lib,
@@ -53,7 +65,7 @@ export class Sculpt extends EventEmitter {
         pendingElements.add(this);
         this.on(CONST.READY, () => {
             pendingElements.delete(this);
-            if(pendingElements.size === 0)
+            if (pendingElements.size === 0)
                 messenger.post(CONST.ALL_SCULPTS_READY, {});
         });
 
@@ -80,12 +92,12 @@ export class Sculpt extends EventEmitter {
          */
         this._gamepadVisible = true;
 
-		/**
-		 * Object's children
-		 * @type {Set}
-		 * @private
-		 */
-		this._children = [];
+        /**
+         * Object's children
+         * @type {Set}
+         * @private
+         */
+        this._children = [];
 
         /**
          * name
@@ -93,7 +105,7 @@ export class Sculpt extends EventEmitter {
          */
         this.name = args.name;
 
-		this.plugins = [];
+        this.plugins = [];
 
         /**
          * Position
@@ -220,16 +232,50 @@ export class Sculpt extends EventEmitter {
             this._threeObject.Sculpt = this;
         });
 
-		this.on(CONST.UPDATE, () => {
-		    for(let i = 0; i < this.children.length; i ++) {
+        this.on(CONST.UPDATE, (evt) => {
+            for (let i = 0; i < this.children.length; i++) {
                 if (this.children[i].isReady) {
-                    this.children[i].emit(CONST.UPDATE, new RodinEvent(this.children[i], {}));
+                    evt.target = this.children[i];
+                    this.children[i].emit(CONST.UPDATE, evt);
                 }
             }
-		});
+        });
 
-		this.install(AnimationPlugin);
-	}
+        this.install(AnimationPlugin);
+    }
+
+    /**
+     * todo: @serg mi hat esi nayi
+     * Override EventEmitter on method.
+     * @param channel {string[]|string}
+     * @param cb {Function}
+     */
+    on(channel, cb) {
+        super.on(channel, cb);
+
+        if (GAMEPAD_EVENTS.indexOf(channel) !== -1) {
+            // todo: fix this Logic. In Ready event
+            if (this.isReady) {
+                Sculpt.raycastables.push(this._threeObject);
+                for (let i = 0; i < this._threeObject.children.length; i++)
+                    Sculpt.raycastables.push(this._threeObject.children[i]);
+            }
+            else
+                this.on(CONST.READY, () => {
+                    Sculpt.raycastables.push(this._threeObject);
+                    for (let i = 0; i < this._threeObject.children.length; i++)
+                        Sculpt.raycastables.push(this._threeObject.children[i]);
+                })
+        }
+    }
+
+    /**
+     * Get all raycastable sculpts (Which has events from Gampepads)
+     * @return {Array}
+     */
+    static get raycastables() {
+        return raycastables;
+    }
 
     /**
      * Emit ready event, used when this event needs to be emitted manually (deferReadyEvent).
@@ -340,8 +386,9 @@ export class Sculpt extends EventEmitter {
      * @type {Boolean}
      */
     set gamepadVisible(value) {
-        this._gamepadVisible = !!value;
+        this._gamepadVisible = value;
     }
+
     /**
      * Gets the position of this object relative to it's parent (local)
      * @type {Vector3}
@@ -590,19 +637,19 @@ export class Sculpt extends EventEmitter {
      * Gets the Set of this object's children.
      * @type {Set.<Sculpt>}
      */
-	get children() {
-		return this._children;
-	}
+    get children() {
+        return this._children;
+    }
 
-	/**
-	 * Copies given object's parameters into this object
-	 * @param {Sculpt} sculpt
-	 * @param {Boolean} [recursive=true]
-	 */
-	copy(sculpt, recursive = true) {
-		if (!sculpt.isSculpt) {
-			throw new ErrorBadValueParameter('Sculpt');
-		}
+    /**
+     * Copies given object's parameters into this object
+     * @param {Sculpt} sculpt
+     * @param {Boolean} [recursive=true]
+     */
+    copy(sculpt, recursive = true) {
+        if (!sculpt.isSculpt) {
+            throw new ErrorBadValueParameter('Sculpt');
+        }
 
         this.name = sculpt.name;
         this._threeObject = sculpt._threeObject.clone(recursive);
@@ -673,7 +720,7 @@ export class Sculpt extends EventEmitter {
      */
 
     install(plugin, ...args) {
-        if(this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
+        if (this.plugins.filter(pluginInstance => pluginInstance.constructor === plugin).length > 0) {
             throw new ErrorPluginAlreadyInstalled(plugin);
         }
 

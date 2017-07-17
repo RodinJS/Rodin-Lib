@@ -1,6 +1,8 @@
 import {Scene} from '../scene';
+import {Sculpt} from '../sculpt';
 import * as utils from '../utils';
 
+// todo: remove this sheet.
 let allChildren = (obj) => {
     // todo: fix this with one loop
     let currChilds = new Set(obj.children.filter(i => i.isReady).map(i => i._threeObject));
@@ -40,8 +42,7 @@ export class Raycaster extends THREE.Raycaster {
         const ret = [];
         const used = {};
 
-        // todo: implement gamepadVisibles logic with messenger
-        let intersects = this.intersectObjects(Array.from(allChildren(Scene.active)));
+        let intersects = this.intersectObjects(Sculpt.raycastables);
 
         for (let i = 0; i < intersects.length; i++) {
             let centerObj = intersects[i].object;
@@ -72,7 +73,7 @@ export class Raycaster extends THREE.Raycaster {
             distance: Infinity
         });
 
-        if (ret.length > depth) ret.splice(depth, ret.length - 1 - depth);
+        if (ret.length > depth) ret.length = depth; // ret.splice(depth, ret.length - 1 - depth);
 
         return ret;
     }
