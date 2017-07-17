@@ -106,7 +106,9 @@ export class GamePad extends EventEmitter {
             messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
             messenger.on(CONST.ACTIVE_SCENE, () => {
-                this.sculpt.parent = Scene.active;
+                ///// Avatar active
+                Avatar.gamePads.add(this.sculpt);
+                //this.sculpt.parent = Scene.active;
             });
         });
 

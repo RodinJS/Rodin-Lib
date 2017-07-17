@@ -1,7 +1,9 @@
 import {Sculpt} from '../sculpt';
 import {HMDCamera} from '../camera'
+//import {ErrorProtectedClassInstance} from '../error';
 import {messenger} from '../messenger';
 import {AScheme} from '../utils/AScheme'
+import * as utils from '../utils';
 import * as CONST from "../constants/";
 import {device} from '../device';
 import {postMessageTransport} from '../transport';
@@ -13,9 +15,14 @@ const constructorScheme = {
     HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(() => new HMDCamera())
 };
 
+// let enforce = function () {
+// };
+
 let useWebVRPose = true;
 let pose = null;
 let poseRequesters = [];
+let activeAvatar =  null;
+let instances = {};
 
 /**
  * Avatar class represents the user in 3D experience. This helps to refer to the camera as an object in space.
@@ -27,19 +34,24 @@ let poseRequesters = [];
 export class Avatar extends Sculpt {
     constructor(...args) {
         args = AScheme.validate(args, constructorScheme);
-
         super();
+
         this._hmdCamera = args.HMDCamera;
         this.add(this._hmdCamera);
 
+        this._gamePads = args.gamePads;
+        this.add(this._gamePads);
+
         this.trackPosition = args.trackPosition;
         this.trackRotation = args.trackRotation;
-
-        Avatar.instances.push(this);
     }
 
     get HMDCamera() {
         return this._hmdCamera;
+    }
+
+    static get HMDCamera() {
+        return activeAvatar.HMDCamera;
     }
 
     static _frameData = null;
@@ -61,6 +73,8 @@ export class Avatar extends Sculpt {
     static userHeight = 1.6;
 
     static standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
+
+    static standing = true;
 
     static init() {
         if ('VRFrameData' in window) {
@@ -143,28 +157,30 @@ export class Avatar extends Sculpt {
         }
 
         /**
-         * update positions and rotations of all the instances
+         * update positions and rotations of the activeAvatar
          */
-        for (let i = 0; i < Avatar.instances.length; i++) {
-            if (Avatar.instances[i].trackPosition) {
-                Avatar.instances[i].position.copy(Avatar.trackingSculpt.position);
-            }
-
-            if (Avatar.instances[i].trackRotation) {
-                Avatar.instances[i].HMDCamera.quaternion.copy(Avatar.trackingSculpt.quaternion);
-                Avatar.instances[i].HMDCamera.updateProjectionMatrix();
-            }
+        if (activeAvatar.trackPosition) {
+            activeAvatar.position.copy(Avatar.trackingSculpt.position);
         }
-
-    }
-
-    static get active() {
-        //TODO: THIS IS NOT RIGHT
-        //TODO: FIX THIS LATER, NO TIME NOW
-        //TODO: FUCK THIS, FUCK THEM, FUCK YOU
-        return Avatar.instances[0];
+        if (activeAvatar.trackRotation) {
+            activeAvatar.HMDCamera.quaternion.copy(Avatar.trackingSculpt.quaternion);
+            activeAvatar.HMDCamera.updateProjectionMatrix();
+        }
     }
 }
+
+activeAvatar = new Avatar();
+
+messenger.post(CONST.REQUEST_ACTIVE_SCENE, {});
+
+messenger.on(CONST.ACTIVE_SCENE, (scene) => {
+    const sceneId = utils.object.getId(scene);
+    if (!instances[sceneId]) {
+        instances[sceneId] = new Avatar();
+    }
+    activeAvatar = instances[sceneId];
+    scene.add(activeAvatar);
+});
 
 messenger.on(CONST.TICK, () => {
     Avatar.update();
@@ -195,7 +211,7 @@ messenger.on(CONST.REQUEST_HMD_POSE, (data, transport) => {
 
 /**
  * if we are on ios and inside an iframe
- * orientation change events dont work
+ * orientation change events don't work
  * so we request hmd pose from parent iframe
  */
 if (device.isIOS && device.isIframe) {

@@ -66,9 +66,9 @@ export class Scene extends EventEmitter {
          * @type {Array}
          */
         this.cameras = [];
-        this.avatar = new Avatar();
-        this.add(this.avatar);
-        Avatar.standing = true;
+        // this.avatar = new Avatar();
+        // this.add(this.avatar);
+        // Avatar.standing = true;
         //this.addCamera(this.avatar.HMDCamera);
         //this._controls = new THREE.VRControls(this.HMDCamera._threeCamera);
         //this._controls.standing = true;
@@ -77,10 +77,9 @@ export class Scene extends EventEmitter {
         //TODO: get rid of this sh*t. this is to cover the bug with crash on vr exit on mobiles
 
         let x = new Sculpt(new THREE.Mesh(new THREE.BoxGeometry(0.0002, 0.0002, 0.0002), new THREE.MeshNormalMaterial()));
-        this.avatar.HMDCamera.add(x);
+        Avatar.HMDCamera.add(x);
 
         x.position.set(0, 1, -99);
-
     }
 
     /**
@@ -125,9 +124,9 @@ export class Scene extends EventEmitter {
      * Gets the main camera that renders to the hmd, or the screen
      * @returns {HMDCamera}
      */
-    get HMDCamera() {
-        return this.avatar.HMDCamera;
-    }
+    // get HMDCamera() {
+    //     return this.avatar.HMDCamera;
+    // }
 
     /**
      * Adds sculpts to the scene.
@@ -201,8 +200,8 @@ export class Scene extends EventEmitter {
      */
     onResize() {
         Scene.effect.setSize(window.innerWidth, window.innerHeight);
-        this.HMDCamera.aspect = window.innerWidth / window.innerHeight;
-        this.HMDCamera.updateProjectionMatrix();
+        Avatar.HMDCamera.aspect = window.innerWidth / window.innerHeight;
+        Avatar.HMDCamera.updateProjectionMatrix();
         Scene.renderer.setPixelRatio(window.devicePixelRatio >= 2 ? 2 : window.devicePixelRatio);
     }
 
@@ -271,7 +270,7 @@ export class Scene extends EventEmitter {
      * @constructor
      */
     static get HMDCamera() {
-        return activeScene.HMDCamera;
+        return Avatar.HMDCamera;
     }
 
     /**
@@ -380,7 +379,7 @@ export class Scene extends EventEmitter {
                 }
             }
 
-            Scene.webVRmanager.render(Scene.active._scene, Scene.HMDCamera._threeCamera, timestamp);
+            Scene.webVRmanager.render(Scene.active._scene, Avatar.HMDCamera._threeCamera, timestamp);
             messenger.post(CONST.RENDER, {realTimestamp: timestamp});
 
             // call all scene specific postrender functions
