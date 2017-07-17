@@ -372,11 +372,13 @@ export class Scene extends EventEmitter {
             }
 
             // emit update for all children
+            const evt = new RodinEvent(null, {});
             for (let i = 0; i < Scene.active.children.length; i++) {
                 const child = Scene.active.children[i];
 
                 if (child.isReady) {
-                    child.emit(CONST.UPDATE, new RodinEvent(child, {}));
+                    evt.target = child;
+                    child.emit(CONST.UPDATE, evt);
                 }
             }
 
