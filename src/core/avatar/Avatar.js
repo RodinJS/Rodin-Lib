@@ -39,8 +39,8 @@ export class Avatar extends Sculpt {
         this._hmdCamera = args.HMDCamera;
         this.add(this._hmdCamera);
 
-        this._gamePads = args.gamePads;
-        this.add(this._gamePads);
+        // this._gamePads = args.gamePads;
+        // this.add(this._gamePads);
 
         this.trackPosition = args.trackPosition;
         this.trackRotation = args.trackRotation;
@@ -67,14 +67,16 @@ export class Avatar extends Sculpt {
 
     static isStanding = false;
 
-    static instances = [];
-
     // we need to figure out if this is really static, or per avatar property
     static userHeight = 1.6;
 
     static standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
 
     static standing = true;
+
+    static add (...args){
+        activeAvatar.add(...args);
+    }
 
     static init() {
         if ('VRFrameData' in window) {
