@@ -39,19 +39,10 @@ export class Avatar extends Sculpt {
         this._hmdCamera = args.HMDCamera;
         this.add(this._hmdCamera);
 
-        // this._gamePads = args.gamePads;
-        // this.add(this._gamePads);
-
         this.trackPosition = args.trackPosition;
         this.trackRotation = args.trackRotation;
-    }
-
-    get HMDCamera() {
-        return this._hmdCamera;
-    }
-
-    static get HMDCamera() {
-        return activeAvatar.HMDCamera;
+        this.shiftPos = new Vector3();
+        this.offset = new Vector3();
     }
 
     static _frameData = null;
@@ -73,6 +64,18 @@ export class Avatar extends Sculpt {
     static standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
 
     static standing = true;
+
+    static get active() {
+        return activeAvatar;
+    }
+
+    static get HMDCamera() {
+        return activeAvatar.HMDCamera;
+    }
+
+    static get position() {
+        return activeAvatar.position;
+    }
 
     static add (...args){
         activeAvatar.add(...args);
@@ -162,12 +165,43 @@ export class Avatar extends Sculpt {
          * update positions and rotations of the activeAvatar
          */
         if (activeAvatar.trackPosition) {
-            activeAvatar.position.copy(Avatar.trackingSculpt.position);
+            activeAvatar._setSuperPosition(Avatar.trackingSculpt.position);
+            activeAvatar.HMDCamera.position.y = Avatar.trackingSculpt.position.y;
         }
         if (activeAvatar.trackRotation) {
             activeAvatar.HMDCamera.quaternion.copy(Avatar.trackingSculpt.quaternion);
             activeAvatar.HMDCamera.updateProjectionMatrix();
         }
+    }
+    _setSuperPosition (position) {
+        const vec = new Vector3().copy(this.shiftPos);
+        vec.x += position.x;
+        vec.z += position.z;
+        super.position = vec;
+    }
+
+    get HMDCamera() {
+        return this._hmdCamera;
+    }
+
+    get position() {
+        return super.position;
+    }
+
+    set position(position) {
+        this.shiftPos = new Vector3().copy(position);
+        this.shiftPos.x -= Avatar.trackingSculpt.position.x;
+        this.shiftPos.z -= Avatar.trackingSculpt.position.z;
+        super.position = this.shiftPos;
+    }
+
+    get globalPosition() {
+        return super.globalPosition;
+    }
+
+    set globalPosition(position) {
+        super.globalPosition = position;
+        this.position = super.position;
     }
 }
 

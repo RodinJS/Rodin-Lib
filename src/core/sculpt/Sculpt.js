@@ -245,31 +245,6 @@ export class Sculpt extends EventEmitter {
     }
 
     /**
-     * todo: @serg mi hat esi nayi
-     * Override EventEmitter on method.
-     * @param channel {string[]|string}
-     * @param cb {Function}
-     */
-    on(channel, cb) {
-        super.on(channel, cb);
-
-        if (GAMEPAD_EVENTS.indexOf(channel) !== -1) {
-            // todo: fix this Logic. In Ready event
-            if (this.isReady) {
-                Sculpt.raycastables.push(this._threeObject);
-                for (let i = 0; i < this._threeObject.children.length; i++)
-                    Sculpt.raycastables.push(this._threeObject.children[i]);
-            }
-            else
-                this.on(CONST.READY, () => {
-                    Sculpt.raycastables.push(this._threeObject);
-                    for (let i = 0; i < this._threeObject.children.length; i++)
-                        Sculpt.raycastables.push(this._threeObject.children[i]);
-                })
-        }
-    }
-
-    /**
      * Get all raycastable sculpts (Which has events from Gampepads)
      * @return {Array}
      */
@@ -639,6 +614,31 @@ export class Sculpt extends EventEmitter {
      */
     get children() {
         return this._children;
+    }
+
+    /**
+     * todo: @serg mi hat esi nayi
+     * Override EventEmitter on method.
+     * @param channel {string[]|string}
+     * @param cb {Function}
+     */
+    on(channel, cb) {
+        super.on(channel, cb);
+
+        if (GAMEPAD_EVENTS.indexOf(channel) !== -1) {
+            // todo: fix this Logic. In Ready event
+            if (this.isReady) {
+                Sculpt.raycastables.push(this._threeObject);
+                for (let i = 0; i < this._threeObject.children.length; i++)
+                    Sculpt.raycastables.push(this._threeObject.children[i]);
+            }
+            else
+                this.on(CONST.READY, () => {
+                    Sculpt.raycastables.push(this._threeObject);
+                    for (let i = 0; i < this._threeObject.children.length; i++)
+                        Sculpt.raycastables.push(this._threeObject.children[i]);
+                })
+        }
     }
 
     /**
