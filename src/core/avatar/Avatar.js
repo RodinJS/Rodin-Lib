@@ -1,6 +1,5 @@
 import {Sculpt} from '../sculpt';
 import {HMDCamera} from '../camera'
-//import {ErrorProtectedClassInstance} from '../error';
 import {messenger} from '../messenger';
 import {AScheme} from '../utils/AScheme'
 import * as utils from '../utils';
@@ -14,9 +13,6 @@ const constructorScheme = {
     trackRotation: AScheme.bool().default('$trackPosition'),
     HMDCamera: AScheme.any().hasProperty('isHMDCamera').default(() => new HMDCamera())
 };
-
-// let enforce = function () {
-// };
 
 let useWebVRPose = true;
 let pose = null;
@@ -41,7 +37,7 @@ export class Avatar extends Sculpt {
 
         this.trackPosition = args.trackPosition;
         this.trackRotation = args.trackRotation;
-        this.shiftPos = new Vector3();
+        this._shiftPos = new Vector3();
         this.offset = new Vector3();
     }
 
@@ -174,7 +170,7 @@ export class Avatar extends Sculpt {
         }
     }
     _setSuperPosition (position) {
-        const vec = new Vector3().copy(this.shiftPos);
+        const vec = new Vector3().copy(this._shiftPos);
         vec.x += position.x;
         vec.z += position.z;
         super.position = vec;
@@ -184,21 +180,39 @@ export class Avatar extends Sculpt {
         return this._hmdCamera;
     }
 
+    /**
+     * Gets position of the avatar relative to its parent
+     * @return {Vector3}
+     */
     get position() {
         return super.position;
     }
 
+    /**
+     * "Resets" the avatar position, and then sets it to the given point
+     * Calling this function will reset users movement in the real world
+     * @param position {Vector3}
+     */
     set position(position) {
-        this.shiftPos = new Vector3().copy(position);
-        this.shiftPos.x -= Avatar.trackingSculpt.position.x;
-        this.shiftPos.z -= Avatar.trackingSculpt.position.z;
-        super.position = this.shiftPos;
+        this._shiftPos = new Vector3().copy(position);
+        this._shiftPos.x -= Avatar.trackingSculpt.position.x;
+        this._shiftPos.z -= Avatar.trackingSculpt.position.z;
+        super.position = this._shiftPos;
     }
 
+    /**
+     * Gets position of the avatar relative to the scene
+     * @return {Vector3}
+     */
     get globalPosition() {
         return super.globalPosition;
     }
 
+    /**
+     * "Resets" the avatar position, and then sets the global position to the given point
+     * Calling this function will reset users movement in the real world
+     * @param position {Vector3}
+     */
     set globalPosition(position) {
         super.globalPosition = position;
         this.position = super.position;
