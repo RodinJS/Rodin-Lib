@@ -2,6 +2,7 @@ import {Sculpt} from '../sculpt';
 import {HMDCamera} from '../camera'
 import {messenger} from '../messenger';
 import {AScheme} from '../utils/AScheme'
+import * as utils from '../utils';
 import * as CONST from "../constants/";
 import {device} from '../device';
 import {postMessageTransport} from '../transport';
@@ -16,6 +17,8 @@ const constructorScheme = {
 let useWebVRPose = true;
 let pose = null;
 let poseRequesters = [];
+let activeAvatar =  null;
+let instances = {};
 
 /**
  * Avatar class represents the user in 3D experience. This helps to refer to the camera as an object in space.
@@ -27,19 +30,15 @@ let poseRequesters = [];
 export class Avatar extends Sculpt {
     constructor(...args) {
         args = AScheme.validate(args, constructorScheme);
-
         super();
+
         this._hmdCamera = args.HMDCamera;
         this.add(this._hmdCamera);
 
         this.trackPosition = args.trackPosition;
         this.trackRotation = args.trackRotation;
-
-        Avatar.instances.push(this);
-    }
-
-    get HMDCamera() {
-        return this._hmdCamera;
+        this._shiftPos = new Vector3();
+        this.offset = new Vector3();
     }
 
     static _frameData = null;
@@ -55,12 +54,28 @@ export class Avatar extends Sculpt {
 
     static isStanding = false;
 
-    static instances = [];
-
     // we need to figure out if this is really static, or per avatar property
     static userHeight = 1.6;
 
     static standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
+
+    static standing = true;
+
+    static get active() {
+        return activeAvatar;
+    }
+
+    static get HMDCamera() {
+        return activeAvatar.HMDCamera;
+    }
+
+    static get position() {
+        return activeAvatar.position;
+    }
+
+    static add (...args){
+        activeAvatar.add(...args);
+    }
 
     static init() {
         if ('VRFrameData' in window) {
@@ -143,28 +158,79 @@ export class Avatar extends Sculpt {
         }
 
         /**
-         * update positions and rotations of all the instances
+         * update positions and rotations of the activeAvatar
          */
-        for (let i = 0; i < Avatar.instances.length; i++) {
-            if (Avatar.instances[i].trackPosition) {
-                Avatar.instances[i].position.copy(Avatar.trackingSculpt.position);
-            }
-
-            if (Avatar.instances[i].trackRotation) {
-                Avatar.instances[i].HMDCamera.quaternion.copy(Avatar.trackingSculpt.quaternion);
-                Avatar.instances[i].HMDCamera.updateProjectionMatrix();
-            }
+        if (activeAvatar.trackPosition) {
+            activeAvatar._setSuperPosition(Avatar.trackingSculpt.position);
+            activeAvatar.HMDCamera.position.y = Avatar.trackingSculpt.position.y;
         }
-
+        if (activeAvatar.trackRotation) {
+            activeAvatar.HMDCamera.quaternion.copy(Avatar.trackingSculpt.quaternion);
+            activeAvatar.HMDCamera.updateProjectionMatrix();
+        }
+    }
+    _setSuperPosition (position) {
+        const vec = new Vector3().copy(this._shiftPos);
+        vec.x += position.x;
+        vec.z += position.z;
+        super.position = vec;
     }
 
-    static get active() {
-        //TODO: THIS IS NOT RIGHT
-        //TODO: FIX THIS LATER, NO TIME NOW
-        //TODO: FUCK THIS, FUCK THEM, FUCK YOU
-        return Avatar.instances[0];
+    get HMDCamera() {
+        return this._hmdCamera;
+    }
+
+    /**
+     * Gets position of the avatar relative to its parent
+     * @return {Vector3}
+     */
+    get position() {
+        return super.position;
+    }
+
+    /**
+     * "Resets" the avatar position, and then sets it to the given point
+     * Calling this function will reset users movement in the real world
+     * @param position {Vector3}
+     */
+    set position(position) {
+        this._shiftPos = new Vector3().copy(position);
+        this._shiftPos.x -= Avatar.trackingSculpt.position.x;
+        this._shiftPos.z -= Avatar.trackingSculpt.position.z;
+        super.position = this._shiftPos;
+    }
+
+    /**
+     * Gets position of the avatar relative to the scene
+     * @return {Vector3}
+     */
+    get globalPosition() {
+        return super.globalPosition;
+    }
+
+    /**
+     * "Resets" the avatar position, and then sets the global position to the given point
+     * Calling this function will reset users movement in the real world
+     * @param position {Vector3}
+     */
+    set globalPosition(position) {
+        super.globalPosition = position;
+        this.position = super.position;
     }
 }
+
+activeAvatar = new Avatar();
+
+messenger.post(CONST.REQUEST_ACTIVE_SCENE, {});
+
+messenger.on(CONST.ACTIVE_SCENE, (scene) => {
+    const sceneId = utils.object.getId(scene);
+    if (!instances[sceneId]) {
+        instances[sceneId] = new Avatar();
+    }
+    activeAvatar = instances[sceneId];
+    scene.add(activeAvatar);
+});
 
 messenger.on(CONST.TICK, () => {
     Avatar.update();
@@ -195,7 +261,7 @@ messenger.on(CONST.REQUEST_HMD_POSE, (data, transport) => {
 
 /**
  * if we are on ios and inside an iframe
- * orientation change events dont work
+ * orientation change events don't work
  * so we request hmd pose from parent iframe
  */
 if (device.isIOS && device.isIframe) {

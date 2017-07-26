@@ -106,10 +106,10 @@ export class GamePad extends EventEmitter {
             messenger.post(CONST.REQUEST_ACTIVE_SCENE);
 
             messenger.on(CONST.ACTIVE_SCENE, () => {
-                this.sculpt.parent = Scene.active;
+                ///
+                Avatar.add(this.sculpt);
             });
         });
-
 
         this.sculpt.on(CONST.UPDATE, () => {
             // todo: use enable and disable functions of sculpt
@@ -301,11 +301,20 @@ export class GamePad extends EventEmitter {
         if (!pose) return;
 
         // todo: check this logic
-        if (pose.position !== null) this.sculpt.position.fromArray(pose.position);
-        if (pose.orientation !== null) this.sculpt.quaternion.fromArray(pose.orientation);
+        if (pose.position !== null) {
+            this.sculpt.position.fromArray(pose.position);
+        }
+        if (pose.orientation !== null) {
+            this.sculpt.quaternion.fromArray(pose.orientation);
+        }
+        // todo: optimize this to run with one compose, or better yet with none!
         this.sculpt.matrix.compose(this.sculpt._threeObject.position, this.sculpt.quaternion, this.sculpt.scale);
         this.sculpt.matrix = this.sculpt.matrix.multiplyMatrices(Avatar.standingMatrix, this.sculpt._threeObject.matrix);
         this.sculpt._threeObject.matrixWorldNeedsUpdate = true;
+
+        this.sculpt.position.x -= Avatar.trackingSculpt.position.x;
+        this.sculpt.position.z -= Avatar.trackingSculpt.position.z;
+        this.sculpt.matrix.compose(this.sculpt._threeObject.position, this.sculpt.quaternion, this.sculpt.scale);
     }
 
     /**
