@@ -1,5 +1,7 @@
 ### Installation
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/RodinJS/Rodin-Lib.svg?token=5c4fdecb7c6bc34d6864d847e9bec6bf770110122be02f552ae1aac54573e906&ts=1502272826590)](https://greenkeeper.io/)
+
 The latest release of rodin.js Library can be installed from
 
 `npm install --save rodin/core`
