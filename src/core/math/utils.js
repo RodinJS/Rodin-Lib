@@ -106,3 +106,10 @@ export function getIntersectionsPlaneParabola(plane, parabola) {
     }
     return [];
 }
+
+export function triangleArea(vertex1, vertex2, vertex3){
+    const a = {x: vertex2.x - vertex1.x, y: vertex2.y - vertex1.y, z: vertex2.z - vertex1.z};
+    const b = {x: vertex3.x - vertex1.x, y: vertex3.y - vertex1.y, z: vertex3.z - vertex1.z};
+    const vCross ={x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x} ;
+    return Math.sqrt(vCross.x*vCross.x + vCross.y*vCross.y + vCross.z*vCross.z)/2;
+}

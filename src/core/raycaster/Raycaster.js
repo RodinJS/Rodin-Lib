@@ -79,7 +79,7 @@ export class Raycaster extends THREE.Raycaster {
             distance: Infinity
         });
 
-        if (ret.length > depth) ret.length = depth; // ret.splice(depth, ret.length - 1 - depth);
+        if (ret.length > depth) ret.length = depth;
 
         return ret;
     }
@@ -88,35 +88,24 @@ export class Raycaster extends THREE.Raycaster {
         super.setFromCamera(vec, camera._threeCamera);
     }
 
-    setFromSculpt(sculpt) {
-        this.sourceObject = sculpt;
+    set distance(distance) {
+        this._distance = distance;
+        this.closest = distance;
     }
 
+    get distance(){
+        return this._distance
+    }
 
-    /*
-     distance : 3.316217652662681
-     face : ct
-     faceIndex : 1
-     object : Et
-     point : c
-     uv : i
-     */
-
-
-
-    raycastCurve(curve, closestFace = true) {
+    raycastCurve(curve) {
         if (!Scene.isRendering) {
             return null;
         }
-
         const ret = [];
         const used = {};
-        //console.log(curve)
-        //debugger;
 
         //console.time("curve");
-        let intersects = this.intersectObjectsWithCurve(curve, Sculpt.raycastables, closestFace);
-
+        let intersects = this.intersectObjectsWithCurve(curve.clone(), Sculpt.raycastables);
         //console.timeEnd("curve");
 
         for (let i = 0; i < intersects.length; i++) {
@@ -138,7 +127,6 @@ export class Raycaster extends THREE.Raycaster {
                 });
             }
         }
-
         ret.push({
             sculpt: Scene.active,
             uv: null,
@@ -147,21 +135,15 @@ export class Raycaster extends THREE.Raycaster {
             point: null,
             distance: Infinity
         });
-
-        //if (ret.length > depth) ret.length = depth; // ret.splice(depth, ret.length - 1 - depth);
-
-
         return ret;
     }
 
-
     intersectObjectsWithCurve(curve, objects) {
-        //todo try to do loacaltoworld of the plane instead of three points
         const objLength = objects.length;
         let obj = null;
         let oi = 0;
         const ret = [];
-        //let t = .0;
+        let closest = this._distance;
         while (oi < objLength) {
             obj = objects[oi];
             if (!obj.geometry.boundingSphere) {
@@ -170,29 +152,27 @@ export class Raycaster extends THREE.Raycaster {
             obj.updateMatrixWorld();
             const faces = obj.geometry.faces;
             const vertices = obj.geometry.vertices;
-            const len = faces.length;
-
-            let fi = 0;
+            const fLen = faces.length;
             let intersected = false;
             const intersectedFaces = [];
             const intersectedFaceIds = [];
             const intersectedPoints = [];
             const intersectedDistances = [];
-            const objNormalMat = new THREE.Matrix3().getNormalMatrix(obj.matrixWorld);
-            const globalPos = obj.Sculpt.globalPosition;
-            while (fi < len) {
+            curve.matrix = new THREE.Matrix4().getInverse(obj.matrixWorld).elements;
+
+            let fi = 0;
+            while (fi < fLen) {
                 const face = faces[fi];
                 const vertex1 = vertices[face.a];
                 const vertex2 = vertices[face.b];
                 const vertex3 = vertices[face.c];
-                const globalNormal = face.normal.clone().applyMatrix3(objNormalMat);
-                const plane = this.getPlaneEquation(obj.localToWorld(vertex1.clone()), null, null, globalNormal);
-                const intersectionPoints = RodinMath.getIntersectionsPlaneParabola(plane, curve);
+                const plane = this.getPlaneEquation(vertex1, null, null, face.normal, obj);
+                const intersectionPoints = curve.intersectWithPlane(plane);
                 let ii = 0;
-                //let t_ = Date.now();
                 const iLen = intersectionPoints.length;
-                while(ii < iLen){
-                    if (this.checkPoint(intersectionPoints[ii].position, obj, vertex1, vertex2, vertex3, globalPos)) {
+
+                while (ii < iLen) {
+                    if (this.checkPoint(intersectionPoints[ii].position, obj, vertex1, vertex2, vertex3, face.normal)) {
                         intersected = true;
                         intersectedFaces.push(face);
                         intersectedFaceIds.push(fi);
@@ -202,7 +182,6 @@ export class Raycaster extends THREE.Raycaster {
                     }
                     ii++;
                 }
-                //t = t + Date.now() - t_;
                 ++fi;
             }
             if (intersected) {
@@ -220,43 +199,35 @@ export class Raycaster extends THREE.Raycaster {
                     uv: null,
                     face: intersectedFaces[closestId],
                     faceIndex: intersectedFaceIds[closestId],
-                    point: intersectedPoints[closestId],
+                    point: (new Vector3(intersectedPoints[closestId].x, intersectedPoints[closestId].y, intersectedPoints[closestId].z)),
                     distance: intersectedDistances[closestId]
                 });
+
+                if(intersectedDistances[closestId] < closest) {
+                    closest = intersectedDistances[closestId];
+                }
             }
             ++oi;
         }
-        //console.log(t)
+        this.closest = closest;
         return ret;
     }
 
 
     getPlaneEquation(point1, point2, point3, normal) {
         if (normal) {
-            return {normal: normal, shift: -(normal.x * point1.x + normal.y * point1.y + normal.z * point1.z)};
+            const d = (normal.x * point1.x + normal.y * point1.y + normal.z * point1.z);
+            return {normal: normal, shift: d};
         }
         const vecA = new Vector3(point2.x - point1.x, point2.y - point1.y, point2.z - point1.z);
         const vecB = new Vector3(point3.x - point1.x, point3.y - point1.y, point3.z - point1.z);
         const vecN = ((new Vector3()).crossVectors(vecA, vecB)).normalize();
         const d = -(vecN.x * point1.x + vecN.y * point1.y + vecN.z * point1.z);
-        /*         let planeGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
-         const plane = new Sculpt(new THREE.Mesh(planeGeometry, new THREE.MeshNormalMaterial({
-         wireframe: false,
-         transparent: true,
-         opacity: 0.4,
-         side: THREE.DoubleSide
-         })));
-         Scene.add(plane);
-         plane._threeObject.lookAt(vecN);
-         const planePos = (new Vector3(vecN.x, vecN.y, vecN.z)).multiplyScalar(-d);
-         plane.position.set(planePos.x, planePos.y, planePos.z);*/
         return {normal: vecN, shift: d};
     }
 
 
     getIntersectionLine(plane1, plane2) {
-
-        //console.log(plane2.normal.x, plane2.normal.y, plane2.normal.z);
 
         const a1 = plane1.normal.x;
         const c1 = plane1.normal.z;
@@ -276,67 +247,25 @@ export class Raycaster extends THREE.Raycaster {
         const n = new Vector3().crossVectors(v2, v1).normalize();
         const p = new Vector3(x, y, z);
 
-        // console.log("plane normal is: " + x + ", " + y + ", " + z);
-        /*        const h1 = new THREE.ArrowHelper(n, p, 4, 0xffffff);
-         Scene.add(new Sculpt(h1));*/
-
         return {n: n, p: p};
     }
 
-    getIntersectionPoints(curve, lineP1, lineP2) {
-        const line = new RodinMath.Line();
-        line.fromTwoPoints(lineP1, lineP2);
-        const points = RodinMath.getIntersections(line, curve);
-        /*
 
-         for (let i = -20; i < 20; i += 0.3) {
-         const o = new Box(.08, new THREE.MeshNormalMaterial({wireframe: true}));
-         Scene.add(o);
-         o.position.copy(line.eval(i));
-         }
-
-
-         for (let i = -20; i < 20; i += 0.3) {
-         const o = new Box(.08, new THREE.MeshNormalMaterial({wireframe: true}));
-         Scene.add(o);
-         o.position.copy(curve.eval(i));
-         }
-
-
-
-         const pointOBJ3 = new Box(.15, new THREE.MeshNormalMaterial({wireframe: false}));
-         //this.sourceObject.add(pointOBJ3);
-         //pointOBJ3.position.set(0, y[0], z[0]);
-         Scene.add(pointOBJ3);
-         pointOBJ3.position.copy(points[0]);
-
-
-         const pointOBJ4 = new Box(.15, new THREE.MeshNormalMaterial({wireframe: false}));
-         //this.sourceObject.add(pointOBJ4);
-         //pointOBJ4.position.set(0, y[1], z[1]);
-         Scene.add(pointOBJ4);
-         pointOBJ4.position.copy(points[1]);
-         //pointOBJ4.position.copy(new Vecto r3(-1 / 2, 1,-3));
-
-         console.log(points);
-         */
-        return points;
-    }
-
-    checkPoint(point, object, vertex1, vertex2, vertex3, pos) {
-        const dx = point.x - pos.x;
-        const dy = point.y - pos.y;
-        const dz = point.z - pos.z;
+    checkPoint(point, object, vertex1, vertex2, vertex3) {
+        const dx = point.x;
+        const dy = point.y;
+        const dz = point.z;
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (d > object.geometry.boundingSphere.radius) {
+        if (isNaN(d) || d > object.geometry.boundingSphere.radius) {
             return false;
         }
-        const p2 = new Vector3(point.x, point.y, point.z);
-        object.worldToLocal(p2);
-        const vertex = {x: p2.x, y: p2.y};
-        return RodinMath.pointInTriangle(vertex, vertex1, vertex2, vertex3);
+
+        const S = RodinMath.triangleArea(vertex1, vertex2, vertex3);
+        const S1 = RodinMath.triangleArea(vertex1, vertex2, point);
+        const S2 = RodinMath.triangleArea(vertex1, point, vertex3);
+        const S3 = RodinMath.triangleArea(point, vertex2, vertex3);
+        return S - (S1 + S2 + S3) > -0.01;
     }
 
 }
-
 
