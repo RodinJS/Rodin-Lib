@@ -43,9 +43,9 @@ export class AScheme {
         return new BoolType(...args);
     }
 
-	static function(...args) {
-		return new FunctionType(...args);
-	}
+    static function(...args) {
+        return new FunctionType(...args);
+    }
 
     static any(...args) {
         return new AnyType(...args);
@@ -90,7 +90,7 @@ export class AScheme {
         if (e !== enforce) {
             throw new ErrorProtectedMethodCall('isReference');
         }
-        return (value.constructor === String && value.length > 1 && value.charAt(0) == '$');
+        return value !== null && (value.constructor === String && value.length > 1 && value.charAt(0) == '$');
     }
 
     /**

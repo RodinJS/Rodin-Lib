@@ -4,6 +4,7 @@ export * from './Box';
 export * from './Plane';
 export * from './Sphere';
 export * from './Cylinder';
+export * from './Text3D';
 
 export * from './GazePoint';
 

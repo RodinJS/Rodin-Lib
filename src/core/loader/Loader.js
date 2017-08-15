@@ -1,5 +1,6 @@
 import {ErrorInstantiationFailed, ErrorUnsupportedModelType} from '../error';
 import {loadOBJ} from './loadOBJ';
+import {loadFile} from './loadFile';
 
 const supportedTypes = {
     'obj': loadOBJ
@@ -45,5 +46,8 @@ export class Loader {
     static loadTexture(url, onLoad, onProgress, onError) {
         // todo: implement with event emitter!!!!!!
         return textureLoader.load(url, onLoad, onProgress, onError);
+    }
+    static loadFont(url, onLoad) {
+        return loadFile(url, null, onLoad, "arraybuffer");
     }
 }
