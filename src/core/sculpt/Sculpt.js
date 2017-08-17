@@ -671,6 +671,27 @@ export class Sculpt extends EventEmitter {
         return new this.constructor().copy(this, recursive);
     }
 
+
+    get scene(){
+        return this._scene;
+    }
+
+    setScene(e, s){
+        if (e !== enforce) {
+            throw new ErrorProtectedMethodCall('setScene');
+            return;
+        }
+        this._scene = s;
+        const l = this.children.length;
+        for (let i = 0; i < l; i++) {
+            if (!this.children[i].isSculpt) {
+                throw new ErrorBadValueParameter('Sculpt');
+                continue;
+            }
+            this.children[i].setScene(enforce, s);
+        }
+    }
+
     /**
      * Adds object(s) to this object.
      * Call with one or more arguments of Sculpt type
@@ -689,6 +710,7 @@ export class Sculpt extends EventEmitter {
             e._parent = this;
             this._threeObject.add(e._threeObject);
             this.children.push(e);
+            e.setScene(enforce,  this._scene);
             return;
         }
 
@@ -709,6 +731,7 @@ export class Sculpt extends EventEmitter {
             this.children.push(arguments[i]);
 
             arguments[i].globalMatrix = globalMatrix;
+            arguments[i].setScene(enforce, this._scene);
         }
     }
 
@@ -742,6 +765,7 @@ export class Sculpt extends EventEmitter {
             }
             this.children.indexOf(e) > -1 && this.children.splice(this.children.indexOf(e), 1);
             this._threeObject.remove(e._threeObject);
+            e.setScene(enforce, null);
             return;
         }
 
@@ -752,6 +776,7 @@ export class Sculpt extends EventEmitter {
 
             this.children.indexOf(arguments[i]) > -1 && this.children.splice(this.children.indexOf(arguments[i]), 1);
             this._threeObject.remove(arguments[i]._threeObject);
+            arguments[i].setScene(enforce, null);
         }
     }
 
