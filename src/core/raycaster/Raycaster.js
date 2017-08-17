@@ -48,7 +48,7 @@ export class Raycaster extends THREE.Raycaster {
         const ret = [];
         const used = {};
 
-        let intersects = this.intersectObjects(Sculpt.raycastables);
+        let intersects = this.intersectObjects(Sculpt.raycastables.filter(s => s.Sculpt.scene === Scene.active));
 
         for (let i = 0; i < intersects.length; i++) {
             let centerObj = intersects[i].object;
@@ -105,7 +105,7 @@ export class Raycaster extends THREE.Raycaster {
         const used = {};
 
         //console.time("curve");
-        let intersects = this.intersectObjectsWithCurve(curve.clone(), Sculpt.raycastables);
+        let intersects = this.intersectObjectsWithCurve(curve.clone(), Sculpt.raycastables.filter(s => s.Sculpt.scene === Scene.active));
         //console.timeEnd("curve");
 
         for (let i = 0; i < intersects.length; i++) {

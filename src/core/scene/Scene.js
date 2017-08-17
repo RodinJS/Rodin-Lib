@@ -57,7 +57,7 @@ export class Scene extends EventEmitter {
         this._sculpt.on(CONST.READY, () => {
             this._scene.add(this._sculpt._threeObject);
         });
-
+        this._sculpt._scene = this;
         this._scene.add(new THREE.AmbientLight());
 
 
