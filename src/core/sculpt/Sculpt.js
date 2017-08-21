@@ -230,7 +230,7 @@ export class Sculpt extends EventEmitter {
         this.on(CONST.READY, () => {
             this._ready = true;
             this._threeObject.Sculpt = this;
-            if(!!args.url){
+            if(!!args.url || !!args.threeObject){
                 for(let i = 0; i < this._threeObject.children.length; i++){
                     this._threeObject.children[i].Sculpt = this;
                 }
