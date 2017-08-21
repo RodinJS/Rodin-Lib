@@ -268,7 +268,7 @@ export class GamePad extends EventEmitter {
 
         this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER_OUT, null);
         if (hoveredOutSculpts.length > 0) {
-            this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
+            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
         }
 
         this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
@@ -286,7 +286,7 @@ export class GamePad extends EventEmitter {
 
         this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER, null);
         if (hoveredSculpts.length > 0) {
-            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
+            this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
         }
 
         this.intersected = [...intersections];
