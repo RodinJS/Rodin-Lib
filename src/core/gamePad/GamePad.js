@@ -265,14 +265,6 @@ export class GamePad extends EventEmitter {
             return true;
         });
 
-
-        this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER_OUT, null);
-        if (hoveredOutSculpts.length > 0) {
-            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
-        }
-
-        this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
-
         let hoveredSculpts = intersections.filter(intersect => {
             for (let i = 0; i < this.intersected.length; i++) {
                 if (this.intersected[i].sculpt === intersect.sculpt) {
@@ -284,12 +276,20 @@ export class GamePad extends EventEmitter {
         });
 
 
+            this.intersected = [...intersections];
+
+
+        this.emitAll(enforce, hoveredOutSculpts, CONST.GAMEPAD_HOVER_OUT, null);
+        if (hoveredOutSculpts.length > 0) {
+            this.emit(CONST.GAMEPAD_HOVER_OUT, new RodinEvent(this));
+        }
+
+        this.emitAll(enforce, intersections, CONST.GAMEPAD_MOVE, null);
+
         this.emitAll(enforce, hoveredSculpts, CONST.GAMEPAD_HOVER, null);
         if (hoveredSculpts.length > 0) {
             this.emit(CONST.GAMEPAD_HOVER, new RodinEvent(this));
         }
-
-        this.intersected = [...intersections];
     }
 
     /**
