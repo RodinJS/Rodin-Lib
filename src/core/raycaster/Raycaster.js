@@ -40,15 +40,26 @@ export class Raycaster extends THREE.Raycaster {
      * @param {number} [depth = Infinity] the raycasting layers depth
      * @returns {Sculpt[]} all raycasted objects from the gamepadVisibles array, that are children of the scene (directly or not).
      */
-    raycast(depth = Infinity) {
+    raycast(depth = Infinity, objects) {
         if (!Scene.isRendering) {
             return null;
         }
 
         const ret = [];
         const used = {};
+        const raycastableMeshes = [];
+        let intersects = [];
+        if(objects){
+            for (let i = 0; i < objects.length; i++) {
+                if(objects[i]._threeObject && objects[i].scene === Scene.active) {
+                    raycastableMeshes.push(objects[i]._threeObject);
+                }
+            }
+            intersects = this.intersectObjects(raycastableMeshes);
+        } else {
+            intersects = this.intersectObjects(Sculpt.raycastables.filter(s => s.Sculpt.scene === Scene.active));
+        }
 
-        let intersects = this.intersectObjects(Sculpt.raycastables.filter(s => s.Sculpt.scene === Scene.active));
 
         for (let i = 0; i < intersects.length; i++) {
             let centerObj = intersects[i].object;
@@ -97,7 +108,7 @@ export class Raycaster extends THREE.Raycaster {
         return this._distance
     }
 
-    raycastCurve(curve) {
+    raycastCurve(curve, objects) {
         if (!Scene.isRendering) {
             return null;
         }
@@ -105,7 +116,7 @@ export class Raycaster extends THREE.Raycaster {
         const used = {};
 
         //console.time("curve");
-        let intersects = this.intersectObjectsWithCurve(curve.clone(), Sculpt.raycastables.filter(s => s.Sculpt.scene === Scene.active));
+        let intersects = this.intersectObjectsWithCurve(curve.clone(), objects ? objects.filter(s => s.scene === Scene.active) : Sculpt.raycastables.filter(s => s.Sculpt.scene === Scene.active));
         //console.timeEnd("curve");
 
         for (let i = 0; i < intersects.length; i++) {
@@ -146,6 +157,9 @@ export class Raycaster extends THREE.Raycaster {
         let closest = this._distance;
         while (oi < objLength) {
             obj = objects[oi];
+            if(obj.hasOwnProperty("_threeObject")){
+                obj =  obj._threeObject;
+            }
             if (!obj.geometry.boundingSphere) {
                 obj.geometry.computeBoundingSphere();
             }
@@ -159,7 +173,6 @@ export class Raycaster extends THREE.Raycaster {
             const intersectedPoints = [];
             const intersectedDistances = [];
             curve.matrix = new THREE.Matrix4().getInverse(obj.matrixWorld).elements;
-
             let fi = 0;
             while (fi < fLen) {
                 const face = faces[fi];
@@ -172,12 +185,12 @@ export class Raycaster extends THREE.Raycaster {
                 const iLen = intersectionPoints.length;
 
                 while (ii < iLen) {
-                    if (this.checkPoint(intersectionPoints[ii].position, obj, vertex1, vertex2, vertex3, face.normal)) {
+                    if (intersectionPoints[ii].distance > 0 && this.checkPoint(intersectionPoints[ii].position, obj, vertex1, vertex2, vertex3, face.normal)) {
                         intersected = true;
                         intersectedFaces.push(face);
                         intersectedFaceIds.push(fi);
                         intersectedPoints.push(intersectionPoints[ii].position);
-                        intersectedDistances.push(Math.abs(intersectionPoints[ii].distance));
+                        intersectedDistances.push(intersectionPoints[ii].distance);
                         break;
                     }
                     ii++;
