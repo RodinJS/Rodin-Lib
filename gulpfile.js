@@ -34,7 +34,7 @@ gulp.task('js', () => {
 		.pipe(plumber(ERROR_MESSAGE))
 		.pipe(babel())
 		.pipe(s)
-		 .pipe(gzip())
+		 //.pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist'))
 		.pipe(notify({
@@ -52,7 +52,7 @@ gulp.task('vendor', () => {
 		.pipe(concat('vendor.js'))
 		// .pipe(sourcemaps.write('.'))
 		.pipe(s)
-		 .pipe(gzip())
+		 //.pipe(gzip())
 		.pipe(plumber.stop())
 		.pipe(gulp.dest('./dist/vendor'))
 		.pipe(notify({
