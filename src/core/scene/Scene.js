@@ -121,6 +121,36 @@ export class Scene extends EventEmitter {
     }
 
     /**
+     * Returns Scene fog.
+     * @returns {object}
+     */
+    get fog() {
+        return this._scene.fog;
+    }
+    /**
+     * Sets Scene fog.
+     * @param {object} f
+     */
+    set fog(f) {
+        this._scene.fog = f ;
+    }
+
+    /**
+     * Returns Scene background.
+     * @returns {THREE.Color}
+     */
+    get background() {
+        return this._scene.background;
+    }
+    /**
+     * Sets Scene background.
+     * @param {THREE.Color} b
+     */
+    set background(b) {
+        this._scene.background = b ;
+    }
+
+    /**
      * Gets the main camera that renders to the hmd, or the screen
      * @returns {HMDCamera}
      */

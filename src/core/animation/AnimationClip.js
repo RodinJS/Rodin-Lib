@@ -38,7 +38,6 @@ export class AnimationClip extends EventEmitter {
     constructor(name, params) {
         super();
 
-
         this._loop = false;
         /**
          * The host Sculpt object.
@@ -300,3 +299,5 @@ export class AnimationClip extends EventEmitter {
         return res;
     }
 }
+
+AnimationClip.EASING = TWEEN.Easing;
