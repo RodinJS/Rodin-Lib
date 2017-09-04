@@ -9,12 +9,13 @@ const constructorScheme = {
     fontSize: AScheme.number().default(.1),
     thickness: AScheme.number().default(0),
     material: AScheme.any().hasProperty('isMaterial').default(null),
-    smoothness: AScheme.number().default(3),
+    smoothness: AScheme.number().default(2),
     bevel: AScheme.bool().default(false),
     bevelThickness: AScheme.number().default(0),
     bevelSize: AScheme.number().default(0),
     bevelSegments: AScheme.number().default(5)
 };
+
 const threeFontLoader = new THREE.FontLoader();
 /**
  *
@@ -296,7 +297,7 @@ export class Text3D extends Sculpt {
             bevelThickness: this._bevelThickness,
             bevelSize: this._bevelSize,
             bevelSegments: this._bevelSegments
-        }).geometry;
+        });
 
         // Finalizing
         this._threeObject = new THREE.Mesh(geometry, this._material);
@@ -309,50 +310,31 @@ export class Text3D extends Sculpt {
 }
 
 
-class TextGeometry {
+class TextGeometry extends THREE.Geometry {
     constructor(text, parameters) {
-        this.geometry = new THREE.Geometry();
-
-        this.geometry = new TextBufferGeometry(text, parameters).geometry;
-        this.geometry.mergeVertices();
-    }
-
-}
-
-// TextBufferGeometry
-
-class TextBufferGeometry {
-    constructor(text, parameters) {
-
+        super();
         parameters = parameters || {};
-
         var font = parameters.font;
 
         if (!( font && font.isFont )) {
-
-            console.error('THREE.TextGeometry: font parameter is not an instance of THREE.Font.');
             return new Geometry();
-
         }
 
         var shapes = font.generateShapes(text, parameters.size, parameters.curveSegments);
 
-        // translate parameters to ExtrudeGeometry API
         if(!parameters.height){
-            this.geometry = new THREE.ShapeGeometry(shapes, parameters.curveSegments);
+            this.copy( new THREE.ShapeGeometry(shapes, parameters.curveSegments));
         }else{
+            // translate parameters to ExtrudeGeometry API
             parameters.amount = parameters.height !== undefined ? parameters.height : 50;
-
-            // defaults
-
             if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
             if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
             if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
 
-            //this.geometry = new THREE.BufferGeometry().fromGeometry(new THREE.ExtrudeGeometry(shapes, parameters));
-            this.geometry = new THREE.ExtrudeGeometry(shapes, parameters);
+            this.copy( new THREE.ExtrudeGeometry(shapes, parameters));
         }
 
-        this.geometry.type = 'TextBufferGeometry';
+        this.type = 'TextBufferGeometry';
+        this.mergeVertices();
     }
 }
