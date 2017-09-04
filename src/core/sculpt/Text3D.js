@@ -7,12 +7,12 @@ const constructorScheme = {
     color: AScheme.number().default(0xffffff),
     font: AScheme.string().default('https://cdn.rodin.io/resources/fonts/helvetiker/helvetiker_regular.typeface.json'),
     fontSize: AScheme.number().default(.1),
-    thickness: AScheme.number().default(.001),
+    thickness: AScheme.number().default(0),
     material: AScheme.any().hasProperty('isMaterial').default(null),
     smoothness: AScheme.number().default(3),
     bevel: AScheme.bool().default(false),
-    bevelThickness: AScheme.number().default('$thickness'),
-    bevelSize: AScheme.number().default('$thickness'),
+    bevelThickness: AScheme.number().default(0),
+    bevelSize: AScheme.number().default(0),
     bevelSegments: AScheme.number().default(5)
 };
 const threeFontLoader = new THREE.FontLoader();
@@ -138,7 +138,8 @@ const convert = function (font, reverse = false) {
         result.cssFontStyle = "italic";
     } else {
         result.cssFontStyle = "normal";
-    };
+    }
+    ;
 
     return JSON.stringify(result);
 };
@@ -286,7 +287,7 @@ export class Text3D extends Sculpt {
     }
 
     draw(font) {
-        const geometry = new THREE.TextGeometry(this._text, {
+        const geometry = new TextGeometry(this._text, {
             font: font,
             size: this._fontSize,
             height: this._thickness,
@@ -295,7 +296,7 @@ export class Text3D extends Sculpt {
             bevelThickness: this._bevelThickness,
             bevelSize: this._bevelSize,
             bevelSegments: this._bevelSegments
-        });
+        }).geometry;
 
         // Finalizing
         this._threeObject = new THREE.Mesh(geometry, this._material);
@@ -304,5 +305,54 @@ export class Text3D extends Sculpt {
 
     center() {
         this._threeObject.geometry.center();
+    }
+}
+
+
+class TextGeometry {
+    constructor(text, parameters) {
+        this.geometry = new THREE.Geometry();
+
+        this.geometry = new TextBufferGeometry(text, parameters).geometry;
+        this.geometry.mergeVertices();
+    }
+
+}
+
+// TextBufferGeometry
+
+class TextBufferGeometry {
+    constructor(text, parameters) {
+
+        parameters = parameters || {};
+
+        var font = parameters.font;
+
+        if (!( font && font.isFont )) {
+
+            console.error('THREE.TextGeometry: font parameter is not an instance of THREE.Font.');
+            return new Geometry();
+
+        }
+
+        var shapes = font.generateShapes(text, parameters.size, parameters.curveSegments);
+
+        // translate parameters to ExtrudeGeometry API
+        if(!parameters.height){
+            this.geometry = new THREE.ShapeGeometry(shapes, parameters.curveSegments);
+        }else{
+            parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+
+            // defaults
+
+            if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
+            if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
+            if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
+
+            //this.geometry = new THREE.BufferGeometry().fromGeometry(new THREE.ExtrudeGeometry(shapes, parameters));
+            this.geometry = new THREE.ExtrudeGeometry(shapes, parameters);
+        }
+
+        this.geometry.type = 'TextBufferGeometry';
     }
 }
