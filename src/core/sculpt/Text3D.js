@@ -7,18 +7,18 @@ const constructorScheme = {
     color: AScheme.number().default(0xffffff),
     font: AScheme.string().default('https://cdn.rodin.io/resources/fonts/helvetiker/helvetiker_regular.typeface.json'),
     fontSize: AScheme.number().default(.1),
-    thickness: AScheme.number().default(.001),
+    lineHeight: AScheme.number().default(-1),
+    thickness: AScheme.number().default(0),
+    align: AScheme.string().default("left"),
     material: AScheme.any().hasProperty('isMaterial').default(null),
-    smoothness: AScheme.number().default(3),
+    smoothness: AScheme.number().default(2),
     bevel: AScheme.bool().default(false),
-    bevelThickness: AScheme.number().default('$thickness'),
-    bevelSize: AScheme.number().default('$thickness'),
+    bevelThickness: AScheme.number().default(0),
+    bevelSize: AScheme.number().default(0),
     bevelSegments: AScheme.number().default(5)
 };
+
 const threeFontLoader = new THREE.FontLoader();
-/**
- *
- */
 
 const reverseCommands = function (commands) {
     const paths = [];
@@ -138,7 +138,8 @@ const convert = function (font, reverse = false) {
         result.cssFontStyle = "italic";
     } else {
         result.cssFontStyle = "normal";
-    };
+    }
+    ;
 
     return JSON.stringify(result);
 };
@@ -146,86 +147,7 @@ const convert = function (font, reverse = false) {
 
 
 
-/*var convert = function(font){
 
- font = opentype.parse(font);
- console.log(font);
-
- var scale = (1000 * 100) / ( (font.unitsPerEm || 2048) *72);
- var result = {};
- result.glyphs = {};
-
-
- font.glyphs.forEach(function(glyph){
- if (glyph.unicode !== undefined) {
- var glyphCharacter = String.fromCharCode (glyph.unicode);
- var needToExport = true;
- if (needToExport) {
-
- var token = {};
- token.ha = Math.round(glyph.advanceWidth * scale);
- token.x_min = Math.round(glyph.xMin * scale);
- token.x_max = Math.round(glyph.xMax * scale);
- token.o = ""
- //if (reverseTypeface.checked) {glyph.path.commands = reverseCommands(glyph.path.commands);}
- glyph.path.commands.forEach(function(command,i){
- if (command.type.toLowerCase() === "c") {command.type = "b";}
- token.o += command.type.toLowerCase();
- token.o += " "
- if (command.x !== undefined && command.y !== undefined){
- token.o += Math.round(command.x * scale);
- token.o += " "
- token.o += Math.round(command.y * scale);
- token.o += " "
- }
- if (command.x1 !== undefined && command.y1 !== undefined){
- token.o += Math.round(command.x1 * scale);
- token.o += " "
- token.o += Math.round(command.y1 * scale);
- token.o += " "
- }
- if (command.x2 !== undefined && command.y2 !== undefined){
- token.o += Math.round(command.x2 * scale);
- token.o += " "
- token.o += Math.round(command.y2 * scale);
- token.o += " "
- }
- });
- result.glyphs[String.fromCharCode(glyph.unicode)] = token;
- }
- };
- });
- result.familyName = font.familyName;
- result.ascender = Math.round(font.ascender * scale);
- result.descender = Math.round(font.descender * scale);
- result.underlinePosition = font.tables.post.underlinePosition;
- result.underlineThickness = font.tables.post.underlineThickness;
- result.boundingBox = {
- "yMin": font.tables.head.yMin,
- "xMin": font.tables.head.xMin,
- "yMax": font.tables.head.yMax,
- "xMax": font.tables.head.xMax
- };
- result.resolution = 1000;
- result.original_font_information = font.tables.name;
- if (font.styleName.toLowerCase().indexOf("bold") > -1){
- result.cssFontWeight = "bold";
- } else {
- result.cssFontWeight = "normal";
- };
-
- if (font.styleName.toLowerCase().indexOf("italic") > -1){
- result.cssFontStyle = "italic";
- } else {
- result.cssFontStyle = "normal";
- };
-
- if(true) {
- return JSON.stringify(result);
- } else {
- return "if (_typeface_js && _typeface_js.loadFace) _typeface_js.loadFace("+ JSON.stringify(result) + ");"
- }
- };*/
 
 export class Text3D extends Sculpt {
     static instances = [];
@@ -259,6 +181,10 @@ export class Text3D extends Sculpt {
         }
     }
 
+    /**
+     * Text3D is a class for text mesh objects.
+     * @param {String|Hex|String|Number|Boolean|Number|THREE.Material|Number|Number|Number|Number} args
+     */
     constructor(...args) {
         args = AScheme.validate(args, constructorScheme);
         super(new THREE.Object3D(), "deferReady");
@@ -266,6 +192,8 @@ export class Text3D extends Sculpt {
         this._color = args.color;
         this._font = args.font;
         this._fontSize = args.fontSize;
+        this._lineHeight = args.lineHeight > 0 ? args.lineHeight : args.fontSize * 1.4;
+        this._align = args.align;
         this._bevel = args.bevel;
         this._thickness = args.thickness;
         this._material = !!args.material ? args.material : new THREE.MeshBasicMaterial({color: this._color});
@@ -286,23 +214,88 @@ export class Text3D extends Sculpt {
     }
 
     draw(font) {
-        const geometry = new THREE.TextGeometry(this._text, {
-            font: font,
-            size: this._fontSize,
-            height: this._thickness,
-            curveSegments: this._smoothness,
-            bevelEnabled: this._bevel,
-            bevelThickness: this._bevelThickness,
-            bevelSize: this._bevelSize,
-            bevelSegments: this._bevelSegments
-        });
+
+        const geos = [];
+        const text = this._text.split('\n');
+        let maxWidth = 0;
+        for (let i = 0; i < text.length; i++) {
+            const g = new TextGeometry(text[i], {
+                font: font,
+                size: this._fontSize,
+                lineHeight: this._lineHeight,
+                height: this._thickness,
+                curveSegments: this._smoothness,
+                bevelEnabled: this._bevel,
+                bevelThickness: this._bevelThickness,
+                bevelSize: this._bevelSize,
+                bevelSegments: this._bevelSegments
+            });
+            g.computeBoundingBox();
+            g.width = g.boundingBox.max.x - g.boundingBox.min.x;
+            geos.push(g);
+            maxWidth = maxWidth < g.width ? g.width : maxWidth;
+        }
+        const geometry = new THREE.Geometry();
+        if (this._align === "left") {
+            for (let i = 0; i < geos.length; i++) {
+                const g = geos[i];
+                g.translate(0, -i * this._lineHeight, 0);
+                geometry.merge(g);
+            }
+        }
+        else if (this._align === "center") {
+            for (let i = 0; i < geos.length; i++) {
+                const g = geos[i];
+                g.translate(-g.width / 2, -i * this._lineHeight, 0);
+                geometry.merge(g);
+            }
+        }
+        else if (this._align === "right") {
+            for (let i = 0; i < geos.length; i++) {
+                const g = geos[i];
+                g.translate(-g.width, -i * this._lineHeight, 0);
+                geometry.merge(g);
+            }
+        }
+
 
         // Finalizing
         this._threeObject = new THREE.Mesh(geometry, this._material);
         this.emitReady();
-    };
+    }
 
-    center() {
+    center()
+    {
         this._threeObject.geometry.center();
     }
+};
+
+class TextGeometry extends THREE.Geometry {
+    constructor(text, parameters) {
+        super();
+        parameters = parameters || {};
+        var font = parameters.font;
+
+        if (!( font && font.isFont )) {
+            return new Geometry();
+        }
+
+        var shapes = font.generateShapes(text, parameters.size, parameters.curveSegments);
+
+        if (!parameters.height) {
+            this.copy(new THREE.ShapeGeometry(shapes, parameters.curveSegments));
+        } else {
+            // translate parameters to ExtrudeGeometry API
+            parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+            if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
+            if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
+            if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
+
+            this.copy(new THREE.ExtrudeGeometry(shapes, parameters));
+        }
+
+        this.type = 'TextBufferGeometry';
+        this.mergeVertices();
+    }
 }
+
