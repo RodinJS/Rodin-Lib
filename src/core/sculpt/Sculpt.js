@@ -248,6 +248,7 @@ export class Sculpt extends EventEmitter {
         });
 
         this.install(AnimationPlugin);
+
     }
 
     /**
@@ -267,6 +268,38 @@ export class Sculpt extends EventEmitter {
     emitReady() {
         this.emitAsync(CONST.READY, new RodinEvent(this));
     };
+
+    /**
+     * Gets the geometry of the object
+     * @type {THREE.Geometry}
+     */
+    get geometry() {
+        return this._threeObject.geometry;
+    }
+
+    /**
+     * Sets geometry of the object
+     * @type {THREE.Geometry}
+     */
+    set geometry(geo) {
+        this._threeObject.geometry = geo;
+    }
+
+    /**
+     * Gets the material of the object
+     * @type {THREE.Material}
+     */
+    get material() {
+        return this._threeObject.material;
+    }
+
+    /**
+     * Sets material of the object
+     * @type {THREE.Material}
+     */
+    set material(mat) {
+        this._threeObject.material = mat;
+    }
 
     /**
      * Gets visibility of the object
@@ -500,6 +533,13 @@ export class Sculpt extends EventEmitter {
         //create a new Euler in order to use silentCopy
         this._globalRotation.silentCopy(new Euler().setFromQuaternion(initialRotation, this._globalRotation.order));
         return this._globalRotation;
+    }
+    /**
+     * Gets the direction of this object relative to the scene
+     * @type {Vector3}
+     */
+    get globalDirection() {
+        return this._threeObject.getWorldDirection();
     }
 
     /**
