@@ -235,15 +235,6 @@ export class Scene extends EventEmitter {
         Scene.renderer.setPixelRatio(window.devicePixelRatio >= 2 ? 2 : window.devicePixelRatio);
     }
 
-    /**
-     * Sets the current camera property
-     * @param {string} property
-     * @param {*} value
-     */
-    setCameraProperty(property, value) {
-        Object.setProperty(this._camera, property, value);
-        this._camera.projectionMatrixNeedsUpdate = true;
-    }
 
     /**
      * Adds the provided method to a list of methods that are being called before each render call of this scene
