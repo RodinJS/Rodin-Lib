@@ -208,6 +208,7 @@ export class MaterialPlayer {
         };
 
         this.jumpTo = (percent) => {
+            if(isNaN(this.getLength())) return;
             video.currentTime = video.duration * percent;
         };
 
