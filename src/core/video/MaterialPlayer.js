@@ -172,6 +172,14 @@ export class MaterialPlayer {
             video.muted = value;
         };
         /**
+         * volume. 0.0 to 1.0
+         * @param {number}
+         */
+        this.volume = (value) => {
+            if(!value) return video.volume;
+            video.volume = value;
+        };
+        /**
          * play
          * @param {DOMEvent}
          */
@@ -200,6 +208,7 @@ export class MaterialPlayer {
         };
 
         this.jumpTo = (percent) => {
+            if(isNaN(this.getLength())) return;
             video.currentTime = video.duration * percent;
         };
 
