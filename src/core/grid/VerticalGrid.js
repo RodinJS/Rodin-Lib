@@ -1,10 +1,10 @@
-import {ListView} from './listView'
-import {Vector3} from '../math'
-import * as CONST from '../constants';
-import {Plane} from '../sculpt'
-import {Scene} from '../scene';
-import {Quaternion} from "../math/Quaternion";
-import {RodinEvent} from '../rodinEvent';
+import {ListView} from './listView.js';
+import {Vector3} from '../math/index.js';
+import * as CONST from '../constants/index.js';
+import {Plane} from '../sculpt/index.js';
+import {Scene} from '../scene/index.js';
+import {Quaternion} from "../math/Quaternion.js";
+import {RodinEvent} from '../rodinEvent/index.js';
 
 /**
  * VerticalGrid class creates vertical grid to represent info(thumbs, text etc.) in that grid.

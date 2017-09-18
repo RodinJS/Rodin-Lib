@@ -1,10 +1,10 @@
-import {ClassType} from './argumentScheme/ClassType';
-import {NumberType} from './argumentScheme/NumberType';
-import {StringType} from './argumentScheme/StringType';
-import {ArrayType} from './argumentScheme/ArrayType';
-import {AnyType} from './argumentScheme/AnyType';
-import {BoolType} from './argumentScheme/BoolType';
-import {FunctionType} from './argumentScheme/FunctionType';
+import {ClassType} from './argumentScheme/ClassType.js';
+import {NumberType} from './argumentScheme/NumberType.js';
+import {StringType} from './argumentScheme/StringType.js';
+import {ArrayType} from './argumentScheme/ArrayType.js';
+import {AnyType} from './argumentScheme/AnyType.js';
+import {BoolType} from './argumentScheme/BoolType.js';
+import {FunctionType} from './argumentScheme/FunctionType.js';
 
 import {
     ErrorInstantiationFailed,
@@ -13,7 +13,7 @@ import {
     ErrorNoDefaultValue,
     ErrorArgumentType,
     ErrorUndefinedReference
-} from '../error';
+} from '../error/index.js';
 
 function enforce() {
 }

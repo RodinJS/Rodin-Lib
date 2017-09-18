@@ -1,5 +1,3 @@
-'use strict';
-
-export * from './Text';
-export * from './Element';
-export * from './DynamicText';
+export * from './Text.js';
+export * from './Element.js';
+export * from './DynamicText.js';

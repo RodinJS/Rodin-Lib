@@ -1,1 +1,1 @@
-export * from './EventEmitter';
+export * from './EventEmitter.js';

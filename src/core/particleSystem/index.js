@@ -1,1 +1,1 @@
-export * from './ParticleSystem';
+export * from './ParticleSystem.js';

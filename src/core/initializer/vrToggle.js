@@ -1,8 +1,8 @@
-import {Scene} from '../scene';
-import {device} from '../device';
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
-import {postMessageTransport} from '../transport';
+import {Scene} from '../scene/index.js';
+import {device} from '../device/index.js';
+import {messenger} from '../messenger/index.js';
+import * as CONST from '../constants/index.js';
+import {postMessageTransport} from '../transport/index.js';
 
 /**
  * Enters VR mode

@@ -1,7 +1,7 @@
-import {AnimationClip} from './AnimationClip';
-import {SculptPlugin} from '../plugin';
-import * as CONST from '../constants';
-import {object} from '../utils';
+import {AnimationClip} from './AnimationClip.js';
+import {SculptPlugin} from '../plugin/index.js';
+import * as CONST from '../constants/index.js';
+import {object} from '../utils/index.js';
 
 /**
  * Each Sculpt object has its own Animation.

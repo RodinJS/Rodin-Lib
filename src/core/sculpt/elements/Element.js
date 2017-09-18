@@ -1,7 +1,7 @@
 'use strict';
 
-import {Sculpt} from '../Sculpt';
-import {utils3D} from '../../utils';
+import {Sculpt} from '../Sculpt.js';
+import {utils3D} from '../../utils/index.js';
 
 /**
  * Element Class (experimental), used to create flat objects, parameters have the following structure:

@@ -1,6 +1,6 @@
-import {AScheme} from './AScheme';
-import * as number from './number';
-import {Vector3} from '../math'
+import {AScheme} from './AScheme.js';
+import * as number from './number.js';
+import {Vector3} from '../math/index.js';
 
 const addNoiseScheme = {
     vec: AScheme.any().hasProperty('isVector3').default(new Vector3(0, 0, 0)),

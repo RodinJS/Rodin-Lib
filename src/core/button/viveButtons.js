@@ -1,6 +1,6 @@
-import {Button} from './Button';
-import {Joystick} from './Joystick';
-import * as CONST from '../constants';
+import {Button} from './Button.js';
+import {Joystick} from './Joystick.js';
+import * as CONST from '../constants/index.js';
 
 export const viveLeftTouchpad = new Joystick(CONST.VIVE_LEFT_TOUCHPAD);
 export const viveLeftTrigger = new Button(CONST.VIVE_LEFT_TRIGGER);

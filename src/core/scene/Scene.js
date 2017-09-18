@@ -1,12 +1,12 @@
-import {EventEmitter} from '../eventEmitter';
-import {messenger} from '../messenger';
-import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error';
-import * as utils from '../utils';
-import * as CONST from '../constants';
-import {RodinEvent} from '../rodinEvent';
-import {Sculpt} from '../sculpt';
-import {Avatar} from '../avatar';
-import {device} from '../device';
+import {EventEmitter} from '../eventEmitter/index.js';
+import {messenger} from '../messenger/index.js';
+import {ErrorProtectedMethodCall, ErrorBadValueParameter} from '../error/index.js';
+import * as utils from '../utils/index.js';
+import * as CONST from '../constants/index.js';
+import {RodinEvent} from '../rodinEvent/index.js';
+import {Sculpt} from '../sculpt/index.js';
+import {Avatar} from '../avatar/index.js';
+import {device} from '../device/index.js';
 
 
 function enforce() {

@@ -1,6 +1,6 @@
-import {Transport} from './Transport';
-import * as CONST from '../constants';
-import {messenger} from '../messenger';
+import {Transport} from './Transport.js';
+import * as CONST from '../constants/index.js';
+import {messenger} from '../messenger/Messenger.js';
 
 /**
  * A transport for sending messages inside a single session

@@ -1,7 +1,7 @@
-import {ErrorProtectedClassInstance, ErrorProtectedMethodCall} from '../error';
-import {messenger} from '../messenger';
-import * as CONSTANTS from '../constants';
-import * as utils from '../utils';
+import {ErrorProtectedClassInstance, ErrorProtectedMethodCall} from '../error/index.js';
+import {messenger} from '../messenger/index.js';
+import * as CONSTANTS from '../constants/index.js';
+import * as utils from '../utils/index.js';
 
 
 let instance = null;

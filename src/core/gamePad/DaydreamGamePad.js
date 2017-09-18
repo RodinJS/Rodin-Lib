@@ -1,10 +1,10 @@
-import {GamePad} from "./GamePad";
-import * as CONST from '../constants';
-import {Sculpt} from '../sculpt';
-import {messenger} from '../messenger';
-import * as Buttons from '../button';
-import {Vector3, Quaternion} from '../math';
-import {Avatar} from '../avatar';
+import {GamePad} from "./GamePad.js";
+import * as CONST from '../constants/index.js';
+import {Sculpt} from '../sculpt/index.js';
+import {messenger} from '../messenger/index.js';
+import * as Buttons from '../button/index.js';
+import {Vector3, Quaternion} from '../math/index.js';
+import {Avatar} from '../avatar/index.js';
 
 /**
  * A gamepad class for describing Google DayDream gamepads event handlers.

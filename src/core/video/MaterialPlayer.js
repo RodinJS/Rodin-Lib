@@ -1,4 +1,4 @@
-import {Time} from '../time/Time';
+import {Time} from '../time/index.js';
 
 /**
  * Video player (on Material) Class

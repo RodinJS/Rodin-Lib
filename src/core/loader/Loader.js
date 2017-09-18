@@ -1,6 +1,6 @@
-import {ErrorInstantiationFailed, ErrorUnsupportedModelType} from '../error';
-import {loadOBJ} from './loadOBJ';
-import {loadFile} from './loadFile';
+import {ErrorInstantiationFailed, ErrorUnsupportedModelType} from '../error/index.js';
+import {loadOBJ} from './loadOBJ.js';
+import {loadFile} from './loadFile.js';
 
 const supportedTypes = {
     'obj': loadOBJ

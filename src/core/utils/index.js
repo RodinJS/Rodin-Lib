@@ -1,9 +1,9 @@
-import * as string from './string';
-import * as number from './number';
-import * as object from './object';
-import * as vector3 from './vector3';
-import * as Enum from './enum';
-import * as utils3D from './3Dutils';
+import * as string from './string.js';
+import * as number from './number.js';
+import * as object from './object.js';
+import * as vector3 from './vector3.js';
+import * as Enum from './enum.js';
+import * as utils3D from './3Dutils.js';
 
 export {
     string,
@@ -14,4 +14,4 @@ export {
     utils3D
 }
 
-export * from './AScheme';
+export * from './AScheme.js';

@@ -1,4 +1,4 @@
-import {UID} from '../utils/string';
+import {UID} from '../utils/string.js';
 
 /**
  * Unique id for each RODIN session

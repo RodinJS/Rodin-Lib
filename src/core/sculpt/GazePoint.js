@@ -1,4 +1,4 @@
-import {Sculpt} from './Sculpt';
+import {Sculpt} from './Sculpt.js';
 
 /**
  * A simple gaze point class for cardboard controller or any other gazing selection based controller

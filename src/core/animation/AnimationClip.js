@@ -1,12 +1,12 @@
-import {TWEEN} from './tween';
-import {RodinEvent} from '../rodinEvent';
-import * as CONST from '../constants';
-import {ErrorProtectedMethodCall} from '../error';
-import {Sculpt} from '../sculpt/Sculpt';
-import {EventEmitter} from '../eventEmitter';
-import {messenger} from '../messenger';
+import {TWEEN} from './tween.js';
+import {RodinEvent} from '../rodinEvent/index.js';
+import * as CONST from '../constants/index.js';
+import {ErrorProtectedMethodCall} from '../error/index.js';
+import {Sculpt} from '../sculpt/Sculpt.js';
+import {EventEmitter} from '../eventEmitter/index.js';
+import {messenger} from '../messenger/index.js';
 
-import {object} from '../utils';
+import {object} from '../utils/index.js';
 function enforce() {
 }
 

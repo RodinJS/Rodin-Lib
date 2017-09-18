@@ -1,6 +1,6 @@
-import {Enum} from '../utils'
+import {EnumGenerator} from '../utils/enum.js'
 
-let KeyCodes = new Enum.EnumGenerator();
+let KeyCodes = new EnumGenerator();
 
 export const MOUSE_RIGHT = KeyCodes.value;
 export const MOUSE_LEFT = KeyCodes.next();

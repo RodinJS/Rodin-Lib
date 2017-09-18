@@ -1,12 +1,12 @@
-import {Sculpt} from '../sculpt';
-import {HMDCamera} from '../camera'
-import {messenger} from '../messenger';
-import {AScheme} from '../utils/AScheme'
-import * as utils from '../utils';
-import * as CONST from "../constants/";
-import {device} from '../device';
-import {postMessageTransport} from '../transport';
-import {Vector3} from "../math/Vector3";
+import {Sculpt} from '../sculpt/index.js';
+import {HMDCamera} from '../camera/index.js'
+import {messenger} from '../messenger/index.js';
+import {AScheme} from '../utils/AScheme.js'
+import * as utils from '../utils/index.js';
+import * as CONST from "../constants/index.js";
+import {device} from '../device/index.js';
+import {postMessageTransport} from '../transport/index.js';
+import {Vector3} from "../math/Vector3.js";
 
 const constructorScheme = {
     trackPosition: AScheme.bool().default(true),
@@ -40,26 +40,6 @@ export class Avatar extends Sculpt {
         this._shiftPos = new Vector3();
         this.offset = new Vector3();
     }
-
-    static _frameData = null;
-    static _vrDisplay = null;
-
-    static isRunning = false;
-
-    /**
-     * This is the Sculpt object that carries the position and the rotation of the HMDCamera (headset perspective)
-     * @type {Sculpt}
-     */
-    static trackingSculpt = new Sculpt();
-
-    static isStanding = false;
-
-    // we need to figure out if this is really static, or per avatar property
-    static userHeight = 1.6;
-
-    static standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
-
-    static standing = true;
 
     static get active() {
         return activeAvatar;
@@ -284,3 +264,23 @@ if (device.isIOS && device.isIframe) {
     });
 }
 
+
+Avatar._frameData = null;
+Avatar._vrDisplay = null;
+
+Avatar.isRunning = false;
+
+/**
+ * This is the Sculpt object that carries the position and the rotation of the HMDCamera (headset perspective)
+ * @type {Sculpt}
+ */
+Avatar.trackingSculpt = new Sculpt();
+
+Avatar.isStanding = false;
+
+// We need to figure out if this is really static, or per avatar property
+Avatar.userHeight = 1.6;
+
+Avatar.standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
+
+Avatar.standing = true;

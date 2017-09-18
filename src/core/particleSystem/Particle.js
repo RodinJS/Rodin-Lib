@@ -1,9 +1,9 @@
-import {Sculpt} from '../sculpt';
-import {Time} from '../time';
-import {number, vector3} from '../utils';
-import * as CONST from '../constants';
-import {ErrorProtectedMethodCall} from '../error';
-import {Vector3} from '../math';
+import {Sculpt} from '../sculpt/index.js';
+import {Time} from '../time/index.js';
+import {number, vector3} from '../utils/index.js';
+import * as CONST from '../constants/index.js';
+import {ErrorProtectedMethodCall} from '../error/index.js';
+import {Vector3} from '../math/index.js';
 
 function enforce() {
 }

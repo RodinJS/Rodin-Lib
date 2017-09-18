@@ -1,1 +1,1 @@
-export * from './MaterialPlayer';
+export * from './MaterialPlayer.js';

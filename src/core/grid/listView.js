@@ -1,9 +1,9 @@
-import {Sculpt} from '../sculpt/Sculpt'
-import * as CONST from '../constants';
-import {Vector3} from '../math';
-import {Time} from '../time';
-import {EventEmitter} from '../eventEmitter';
-import {RodinEvent} from '../rodinEvent';
+import {Sculpt} from '../sculpt/Sculpt.js';
+import * as CONST from '../constants/index.js';
+import {Vector3} from '../math/index.js';
+import {Time} from '../time/index.js';
+import {EventEmitter} from '../eventEmitter/index.js';
+import {RodinEvent} from '../rodinEvent/index.js';
 
 
 export class ListView extends EventEmitter {

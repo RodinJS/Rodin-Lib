@@ -1,4 +1,4 @@
-import {EventEmitter} from '../eventEmitter';
+import {EventEmitter} from '../eventEmitter/index.js';
 /**
  * Base class for plugins.
  * Extend plugin types from this class.

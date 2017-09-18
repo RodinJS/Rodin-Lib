@@ -1,5 +1,3 @@
-'use strict';
-
-export * from './Curve';
-export * from './Parabola';
-export * from './Line';
+export * from './Curve.js';
+export * from './Parabola.js';
+export * from './Line.js';

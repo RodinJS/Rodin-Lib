@@ -1,2 +1,2 @@
-export * from './Animation';
-export * from './AnimationClip';
+export * from './Animation.js';
+export * from './AnimationClip.js';

@@ -1,4 +1,4 @@
-import {AScheme} from './AScheme';
+import {AScheme} from './AScheme.js';
 
 const addNoiseScheme = {
     n: AScheme.number().default(0),

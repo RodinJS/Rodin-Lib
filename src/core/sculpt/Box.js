@@ -1,5 +1,5 @@
-import {Sculpt} from './Sculpt';
-import {AScheme} from '../utils';
+import {Sculpt} from './Sculpt.js';
+import {AScheme} from '../utils/index.js';
 
 const constructorScheme = {
     width: AScheme.number().default(.4),

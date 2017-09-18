@@ -1,5 +1,5 @@
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
+import {messenger} from '../messenger/index.js';
+import * as CONST from '../constants/index.js';
 
 /**
  * Call this method before setting up anything.

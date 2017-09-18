@@ -1,12 +1,12 @@
-import {ErrorBadValueParameter, ErrorPluginAlreadyInstalled} from '../error';
-import {EventEmitter} from '../eventEmitter';
-import {string} from '../utils';
-import {RodinEvent} from '../rodinEvent';
-import * as CONST from '../constants';
-import {Vector3, Euler, Quaternion} from '../math';
-import {AnimationPlugin} from '../animation';
-import {Loader} from '../loader';
-import {messenger} from '../messenger';
+import {ErrorBadValueParameter, ErrorPluginAlreadyInstalled} from '../error/index.js';
+import {EventEmitter} from '../eventEmitter/index.js';
+import {string} from '../utils/index.js';
+import {RodinEvent} from '../rodinEvent/index.js';
+import * as CONST from '../constants/index.js';
+import {Vector3, Euler, Quaternion} from '../math/index.js';
+import {AnimationPlugin} from '../animation/index.js';
+import {Loader} from '../loader/index.js';
+import {messenger} from '../messenger/index.js';
 
 function enforce() {
 }

@@ -1,5 +1,4 @@
-import {Camera} from './Camera';
-import {AScheme} from '../utils/AScheme'
+import {Camera} from './Camera.js';
 
 class OrthographicCamera extends Camera {
     constructor(...args) {

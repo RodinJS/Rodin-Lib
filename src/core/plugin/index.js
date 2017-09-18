@@ -1,2 +1,2 @@
-export * from './Plugin';
-export * from './SculptPlugin';
+export * from './Plugin.js';
+export * from './SculptPlugin.js';

@@ -35,10 +35,10 @@
  * Thank you all, you're awesome!
  */
 
-import {Time} from '../time';
+import {Time} from '../time/index.js';
 
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
+import {messenger} from '../messenger/index.js';
+import * as CONST from '../constants/index.js';
 
 export const TWEEN = (function () {
 

@@ -1,6 +1,5 @@
-import {Curve} from './Curve';
-import {Vector3} from '../Vector3';
-import {solveQuadratic} from '../utils';
+import {Curve} from './Curve.js';
+import {solveQuadratic} from '../utils.js';
 
 export class Parabola extends Curve {
     constructor(direction,
@@ -225,5 +224,9 @@ export class Parabola extends Curve {
 
     get c() {
         return this._c;
+    }
+
+    get isParabola() {
+        return true;
     }
 }

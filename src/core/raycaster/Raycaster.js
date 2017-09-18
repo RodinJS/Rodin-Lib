@@ -1,10 +1,8 @@
-import {Scene} from '../scene';
-import {Sculpt} from '../sculpt';
-import {Box} from '../sculpt/Box';
-import {Sphere} from '../sculpt/Sphere';
-import {Vector3} from '../math/Vector3';
-import * as utils from '../utils';
-import * as RodinMath from '../math';
+import {Scene} from '../scene/index.js';
+import {Sculpt} from '../sculpt/index.js';
+import {Vector3} from '../math/Vector3.js';
+import * as utils from '../utils/index.js';
+import * as RodinMath from '../math/index.js';
 
 // todo: remove this sheet.
 let allChildren = (obj) => {

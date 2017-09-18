@@ -1,5 +1,6 @@
-import {localTransport} from '../transport/LocalTransport';
-import {UID} from '../utils/string';
+import {localTransport} from '../transport/LocalTransport.js';
+console.log('messenger.js');
+
 
 /**
  * Messenger for collaborating classes
@@ -85,6 +86,4 @@ export class Messenger {
     }
 }
 
-const messenger = new Messenger();
-
-export {messenger};
+export const messenger = new Messenger();

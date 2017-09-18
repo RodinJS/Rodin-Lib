@@ -1,8 +1,8 @@
-import {GamePad} from './GamePad';
-import {Scene} from '../scene';
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
-import * as Buttons from '../button';
+import {GamePad} from './GamePad.js';
+import {Scene} from '../scene/index.js';
+import {messenger} from '../messenger/index.js';
+import * as CONST from '../constants/index.js';
+import * as Buttons from '../button/index.js';
 
 /**
  * Polyfilled mouse gamepad class, for MouseGamepad, by default the navigator does not see mouse as a gamepad device.

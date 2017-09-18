@@ -1,4 +1,4 @@
-import {UID} from './string';
+import {UID} from './string.js';
 
 /**
  * If object have not unique id, assign id to it

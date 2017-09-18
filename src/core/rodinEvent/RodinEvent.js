@@ -1,4 +1,4 @@
-import {Time} from '../time';
+import {Time} from '../time/index.js';
 
 export class RodinEvent {
     /**

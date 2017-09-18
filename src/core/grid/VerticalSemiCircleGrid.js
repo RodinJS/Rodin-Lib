@@ -1,10 +1,7 @@
-import {VerticalGrid} from './VerticalGrid'
-import {Vector3} from '../math'
-import * as CONST from '../constants';
-import {Cylinder} from '../sculpt'
-import {Scene} from '../scene';
-import {Quaternion} from "../math/Quaternion";
-import {RodinEvent} from '../rodinEvent';
+import {VerticalGrid} from './VerticalGrid.js';
+import {Vector3} from '../math/index.js';
+import {Cylinder} from '../sculpt/index.js';
+import {Quaternion} from "../math/Quaternion.js";
 
 /**
  * VerticalSemiCircleGrid class creates vertical semicircle grid to represent info(thumbs, text etc.) in that grid.

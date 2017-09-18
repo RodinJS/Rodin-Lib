@@ -1,6 +1,6 @@
-import {Sculpt} from './Sculpt';
-import {AScheme} from '../utils';
-import {Loader} from '../loader';
+import {Sculpt} from './Sculpt.js';
+import {AScheme} from '../utils/index.js';
+import {Loader} from '../loader/index.js';
 
 const constructorScheme = {
     text: AScheme.string().default("text"),
@@ -150,8 +150,6 @@ const convert = function (font, reverse = false) {
 
 
 export class Text3D extends Sculpt {
-    static instances = [];
-    static fonts = {};
 
     static loadFont(font, reverse = false) {
         if (Text3D.fonts.hasOwnProperty(font)) return;
@@ -299,3 +297,5 @@ class TextGeometry extends THREE.Geometry {
     }
 }
 
+Text3D.instances = [];
+Text3D.fonts = {};

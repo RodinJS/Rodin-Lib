@@ -1,5 +1,5 @@
-import {Curve} from './Curve';
-import {Vector3} from '../Vector3';
+import {Curve} from './Curve.js';
+import {Vector3} from '../Vector3.js';
 
 export class Line extends Curve{
     constructor(a = 1, b = 1, c = 1, initialPoint = {x : 0, y : 0, z : 0}) {

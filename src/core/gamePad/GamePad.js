@@ -1,11 +1,11 @@
-import {EventEmitter} from '../eventEmitter';
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
-import {Sculpt} from '../sculpt';
-import {RodinEvent} from '../rodinEvent';
-import {Raycaster} from '../raycaster';
-import {Scene} from '../scene';
-import {Avatar} from '../avatar'
+import {EventEmitter} from '../eventEmitter/index.js';
+import {messenger} from '../messenger/index.js';
+import * as CONST from '../constants/index.js';
+import {Sculpt} from '../sculpt/index.js';
+import {RodinEvent} from '../rodinEvent/index.js';
+import {Raycaster} from '../raycaster/index.js';
+import {Scene} from '../scene/index.js';
+import {Avatar} from '../avatar/index.js';
 
 function enforce() {
 }

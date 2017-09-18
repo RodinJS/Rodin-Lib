@@ -1,3 +1,3 @@
-export * from './Transport';
-export * from './LocalTransport';
-export * from './PostMessageTransport';
+export * from './Transport.js';
+export * from './LocalTransport.js';
+export * from './PostMessageTransport.js';

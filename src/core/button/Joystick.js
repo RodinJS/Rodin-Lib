@@ -1,4 +1,4 @@
-import {Button} from './Button';
+import {Button} from './Button.js';
 /**
  * Joystick
  * Represents a Joystick on a GamePad, with overridden {x,y} coordinates as a value

@@ -1,4 +1,4 @@
-import {Sculpt} from '../sculpt/Sculpt';
+import {Sculpt} from '../sculpt/Sculpt.js';
 
 export class Camera extends Sculpt {
     constructor(threeCamera = new THREE.Camera()) {

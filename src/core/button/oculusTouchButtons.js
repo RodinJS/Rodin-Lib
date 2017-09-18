@@ -1,6 +1,6 @@
-import {Button} from './Button';
-import {Joystick} from './Joystick';
-import * as CONST from '../constants';
+import {Button} from './Button.js';
+import {Joystick} from './Joystick.js';
+import * as CONST from '../constants/index.js';
 
 export const oculusTouchX = new Button(CONST.OCULUS_TOUCH_X);
 export const oculusTouchY = new Button(CONST.OCULUS_TOUCH_Y);

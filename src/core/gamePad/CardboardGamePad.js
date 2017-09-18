@@ -1,12 +1,12 @@
-import {GamePad} from './GamePad';
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
-import * as Buttons from '../button';
-import {GazePoint} from '../sculpt/GazePoint';
+import {GamePad} from './GamePad.js';
+import {messenger} from '../messenger/index.js';
+import * as CONST from '../constants/index.js';
+import * as Buttons from '../button/index.js';
+import {GazePoint} from '../sculpt/GazePoint.js';
 
 // todo: implement with messenger
-import {Scene} from '../scene';
-import {Avatar} from "../avatar/Avatar";
+import {Scene} from '../scene/index.js';
+import {Avatar} from "../avatar/Avatar.js";
 
 /**
  * Custom (virtual) navigator gamepad class, for CardboardGamePad.

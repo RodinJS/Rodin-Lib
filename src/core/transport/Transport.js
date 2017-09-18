@@ -1,4 +1,4 @@
-import {ErrorAbstractClassInstance} from '../error';
+import {ErrorAbstractClassInstance} from '../error/index.js';
 
 /**
  * Use it for sending messages with messenger

@@ -1,4 +1,4 @@
-import * as number from '../utils/number';
+import * as number from '../utils/number.js';
 
 /**
  * Vector3 representing class, with some extra features.

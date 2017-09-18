@@ -1,7 +1,4 @@
-import {PerspectiveCamera} from './PerspectiveCamera';
-import {Sculpt} from '../sculpt';
-import {messenger} from '../messenger';
-import * as CONST from '../constants';
+import {PerspectiveCamera} from './PerspectiveCamera.js';
 
 // just a polyfill for now
 // will implement when RO-678 gets done

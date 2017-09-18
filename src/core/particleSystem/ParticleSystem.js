@@ -1,11 +1,11 @@
-import {Particle} from './Particle';
-import {Sculpt} from '../sculpt';
-import {Time} from '../time';
-import {number, vector3, object} from '../utils';
-import {ErrorProtectedMethodCall} from '../error';
-import * as CONST from '../constants';
-import {Loader} from '../loader';
-import {Vector3} from '../math';
+import {Particle} from './Particle.js';
+import {Sculpt} from '../sculpt/index.js';
+import {Time} from '../time/index.js';
+import {number, vector3} from '../utils/index.js';
+import {ErrorProtectedMethodCall} from '../error/index.js';
+import * as CONST from '../constants/index.js';
+import {Loader} from '../loader/index.js';
+import {Vector3} from '../math/index.js';
 
 const enforce = function () {
 };

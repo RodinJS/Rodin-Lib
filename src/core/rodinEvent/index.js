@@ -1,1 +1,1 @@
-export * from './RodinEvent';
+export * from './RodinEvent.js';

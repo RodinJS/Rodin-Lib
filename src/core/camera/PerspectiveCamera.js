@@ -1,5 +1,5 @@
-import {Camera} from './Camera';
-import {AScheme} from '../utils/AScheme'
+import {Camera} from './Camera.js';
+import {AScheme} from '../utils/AScheme.js'
 
 
 const constructorScheme = {

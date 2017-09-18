@@ -1,9 +1,9 @@
-import {EventEmitter} from '../eventEmitter';
-import * as CONST from '../constants';
-import {ErrorUnknownDevice} from '../error';
-import {messenger} from '../messenger';
-import {localTransport} from '../transport';
-import {RodinEvent} from '../rodinEvent';
+import {EventEmitter} from '../eventEmitter/index.js';
+import * as CONST from '../constants/index.js';
+import {ErrorUnknownDevice} from '../error/index.js';
+import {messenger} from '../messenger/index.js';
+import {localTransport} from '../transport/index.js';
+import {RodinEvent} from '../rodinEvent/index.js';
 
 /**
  * Class for getting current device information such as

@@ -1,6 +1,6 @@
-import {Sculpt} from '../Sculpt';
-import {utils3D} from '../../utils';
-import {Vector3} from '../../math';
+import {Sculpt} from '../Sculpt.js';
+import {utils3D} from '../../utils/index.js';
+import {Vector3} from '../../math/index.js';
 
 /**
  * DynamicText Class (experimental), used to create flat text objects with wrapping capability, parameters have the following structure:

@@ -1,4 +1,4 @@
-import {Type} from './Type';
+import {Type} from './Type.js';
 
 export class NumberType extends Type {
 	constructor() {

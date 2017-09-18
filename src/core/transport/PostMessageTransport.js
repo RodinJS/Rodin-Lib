@@ -1,8 +1,8 @@
-import {Transport} from './Transport';
-import * as CONST from '../constants';
-import {messenger} from '../messenger';
-import {RODIN_ID} from '../initializer';
-import {device} from '../device';
+import {Transport} from './Transport.js';
+import * as CONST from '../constants/index.js';
+import {messenger} from '../messenger/index.js';
+import {RODIN_ID} from '../initializer/rodinId.js';
+import {device} from '../device/index.js';
 
 
 /**
@@ -26,10 +26,6 @@ export class PostMessageTransport extends Transport {
     get isPostMessageTransport() {
         return true;
     }
-
-    static parent = window.parent;
-    static parentId = '';
-    static children = {};
 
     /**
      * setup packet for sending
@@ -163,6 +159,10 @@ messenger.once(CONST.RODIN_STARTED, () => {
         pingParent();
     }
 });
+
+PostMessageTransport.parent = window.parent;
+PostMessageTransport.parentId = '';
+PostMessageTransport.children = {};
 
 /**
  * Notify parent when all sculpts are loaded

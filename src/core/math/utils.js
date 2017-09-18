@@ -1,9 +1,5 @@
-import {Curve} from './shape/Curve';
-import {Parabola} from './shape/Parabola';
-import {Line} from './shape/Line';
-import {Vector3} from './Vector3';
-import {Quaternion} from './Quaternion';
-import {Euler} from './Euler';
+import {Line} from './shape/Line.js';
+import {Vector3} from './Vector3.js';
 
 
 export function solveQuadratic(a, b, c) {
