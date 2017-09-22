@@ -224,12 +224,12 @@ export class Text3D extends Sculpt {
             bevelSize: this._bevelSize,
             bevelSegments: this._bevelSegments
         };
-        const lines = this._text.split('\n');
+        const lines = this._text.replace(/\s+/g, ' ').split('\n');
 
         let maxWidth = 0;
         for (let i = 0; i < lines.length; i++) {
             if (this._maxWidth) {
-                const words = lines[i].split(' ');
+                const words = lines[i].split(/\s/);
                 let currentWidth = 0;
                 let currentText = '';
 
