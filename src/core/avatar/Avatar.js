@@ -199,6 +199,34 @@ export class Avatar extends Sculpt {
     }
 }
 
+/**
+ * STATICS
+ * @private
+ */
+Avatar._frameData = null;
+Avatar._vrDisplay = null;
+
+Avatar.isRunning = false;
+
+/**
+ * This is the Sculpt object that carries the position and the rotation of the HMDCamera (headset perspective)
+ * @type {Sculpt}
+ */
+Avatar.trackingSculpt = new Sculpt();
+
+Avatar.isStanding = false;
+
+// We need to figure out if this is really static, or per avatar property
+Avatar.userHeight = 1.6;
+
+Avatar.standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
+
+Avatar.standing = true;
+/**
+ * End STATICS
+ * @type {Avatar}
+ */
+
 activeAvatar = new Avatar();
 
 messenger.post(CONST.REQUEST_ACTIVE_SCENE, {});
@@ -263,24 +291,3 @@ if (device.isIOS && device.isIframe) {
         }
     });
 }
-
-
-Avatar._frameData = null;
-Avatar._vrDisplay = null;
-
-Avatar.isRunning = false;
-
-/**
- * This is the Sculpt object that carries the position and the rotation of the HMDCamera (headset perspective)
- * @type {Sculpt}
- */
-Avatar.trackingSculpt = new Sculpt();
-
-Avatar.isStanding = false;
-
-// We need to figure out if this is really static, or per avatar property
-Avatar.userHeight = 1.6;
-
-Avatar.standingMatrix = new THREE.Matrix4().setPosition(new Vector3(0, Avatar.userHeight, 0));
-
-Avatar.standing = true;
