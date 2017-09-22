@@ -1,6 +1,4 @@
 import {localTransport} from '../transport/LocalTransport.js';
-console.log('messenger.js');
-
 
 /**
  * Messenger for collaborating classes
