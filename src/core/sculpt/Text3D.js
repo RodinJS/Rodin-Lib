@@ -15,7 +15,8 @@ const constructorScheme = {
     bevel: AScheme.bool().default(false),
     bevelThickness: AScheme.number().default(0),
     bevelSize: AScheme.number().default(0),
-    bevelSegments: AScheme.number().default(5)
+    bevelSegments: AScheme.number().default(5),
+    maxWidth: AScheme.number().default(null),
 };
 
 const threeFontLoader = new THREE.FontLoader();
@@ -145,17 +146,13 @@ const convert = function (font, reverse = false) {
 };
 
 
-
-
-
-
 export class Text3D extends Sculpt {
 
     static loadFont(font, reverse = false) {
         if (Text3D.fonts.hasOwnProperty(font)) return;
         Text3D.fonts[font] = null;
         if (!font.substring(font.lastIndexOf('.') + 1).startsWith("json")) {
-            Loader.loadFont(font, (rawFont)=> {
+            Loader.loadFont(font, (rawFont) => {
                 Text3D.fonts[font] = threeFontLoader.parse(
                     JSON.parse(
                         convert(rawFont, reverse)
@@ -168,7 +165,7 @@ export class Text3D extends Sculpt {
                 }
             })
         } else {
-            threeFontLoader.load(font, (_font)=> {
+            threeFontLoader.load(font, (_font) => {
                 Text3D.fonts[font] = _font;
                 for (let i = 0; i < Text3D.instances.length; i++) {
                     if (Text3D.instances[i]._font === font) {
@@ -199,6 +196,7 @@ export class Text3D extends Sculpt {
         this._bevelThickness = args.bevelThickness;
         this._bevelSize = args.bevelSize;
         this._bevelSegments = args.bevelSegments;
+        this._maxWidth = args.maxWidth;
 
         if (!Text3D.fonts.hasOwnProperty(this._font)) {
             Text3D.instances.push(this);
@@ -212,27 +210,58 @@ export class Text3D extends Sculpt {
     }
 
     draw(font) {
-
         const geos = [];
-        const text = this._text.split('\n');
+        const textGeometryParams = {
+            font: font,
+            size: this._fontSize,
+            lineHeight: this._lineHeight,
+            height: this._thickness,
+            curveSegments: this._smoothness,
+            bevelEnabled: this._bevel,
+            bevelThickness: this._bevelThickness,
+            bevelSize: this._bevelSize,
+            bevelSegments: this._bevelSegments
+        };
+        const lines = this._text.replace(/\s+/g, ' ').split('\n');
+
         let maxWidth = 0;
-        for (let i = 0; i < text.length; i++) {
-            const g = new TextGeometry(text[i], {
-                font: font,
-                size: this._fontSize,
-                lineHeight: this._lineHeight,
-                height: this._thickness,
-                curveSegments: this._smoothness,
-                bevelEnabled: this._bevel,
-                bevelThickness: this._bevelThickness,
-                bevelSize: this._bevelSize,
-                bevelSegments: this._bevelSegments
-            });
-            g.computeBoundingBox();
-            g.width = g.boundingBox.max.x - g.boundingBox.min.x;
-            geos.push(g);
-            maxWidth = maxWidth < g.width ? g.width : maxWidth;
+        for (let i = 0; i < lines.length; i++) {
+            if (this._maxWidth) {
+                const words = lines[i].split(/\s/);
+                let currentWidth = 0;
+                let currentText = '';
+
+                for (let j = 0; j < words.length; j++) {
+                    const g = new TextGeometry(words[j], textGeometryParams);
+                    g.computeBoundingBox();
+                    g.width = g.boundingBox.max.x - g.boundingBox.min.x;
+
+                    if (currentWidth + g.width > this._maxWidth && g.width < this._maxWidth) {
+                        lines.splice(i + 1, 0, words.filter((a, index) => index >= j).join(' '));
+                        break;
+                    }
+                    currentWidth += g.width;
+                    currentText += words[j] + ' ';
+
+                    if (g.width > this._maxWidth){
+                        lines.splice(i + 1, 0, words.filter((a, index) => index > j).join(' '));
+                        break;
+                    }
+                }
+                const currentGeometry = new TextGeometry(currentText, textGeometryParams);
+                currentGeometry.computeBoundingBox();
+                currentGeometry.width = currentGeometry.boundingBox.max.x - currentGeometry.boundingBox.min.x;
+                geos.push(currentGeometry);
+            } else {
+                const g = new TextGeometry(lines[i], textGeometryParams);
+                g.computeBoundingBox();
+                g.width = g.boundingBox.max.x - g.boundingBox.min.x;
+                geos.push(g);
+                maxWidth = maxWidth < g.width ? g.width : maxWidth;
+            }
         }
+
+
         const geometry = new THREE.Geometry();
         if (this._align === "left") {
             for (let i = 0; i < geos.length; i++) {
@@ -262,11 +291,11 @@ export class Text3D extends Sculpt {
         this.emitReady();
     }
 
-    center()
-    {
+    center() {
         this._threeObject.geometry.center();
     }
-};
+}
+;
 
 class TextGeometry extends THREE.Geometry {
     constructor(text, parameters) {
