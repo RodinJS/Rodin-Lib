@@ -235,9 +235,9 @@ messenger.on(CONST.ACTIVE_SCENE, (scene) => {
     const sceneId = utils.object.getId(scene);
     if (!instances[sceneId]) {
         instances[sceneId] = new Avatar();
+        activeAvatar = instances[sceneId];
+        scene.add(activeAvatar);
     }
-    activeAvatar = instances[sceneId];
-    scene.add(activeAvatar);
 });
 
 messenger.on(CONST.TICK, () => {
