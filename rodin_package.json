@@ -1,0 +1,15 @@
+{
+  "name": "Rodin-Lib",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "env": "prod",
+  "dependencies": {
+    "webvr-boilerplate": "0.*",
+    "rodin/webvr-polyfill": "0.1.*",
+    "threejs/main": "r87",
+    "threejs/loaders": "r87",
+    "threejs/vrcontrols": "r87",
+    "threejs/vreffect": "r87",
+    "opentype": "0.7.*"
+  }
+}

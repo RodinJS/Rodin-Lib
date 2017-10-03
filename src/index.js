@@ -1,3 +1,11 @@
+import 'threejs/main';
+import 'threejs/loaders';
+import 'threejs/vrcontrols';
+import 'threejs/vreffect';
+import 'webvr-boilerplate';
+import 'rodin/webvr-polyfill';
+import 'opentype';
+
 import * as CONST from './constants/index.js';
 import * as Buttons from './button/index.js';
 import * as utils from './utils/index.js';
@@ -30,4 +38,4 @@ export {
     utils
 };
 
-export let v = '0.0.7';
+export const v = '0.1.0';
