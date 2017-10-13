@@ -219,6 +219,9 @@ export class MaterialPlayer {
             return video.duration;
         };
 
+        this.playbackRate = (rate) => {
+            video.playbackRate = rate;
+        }
         this.update = (delta) => {
             /*            if (Time.speed  * speed !== video.playbackRate) {
              video.playbackRate = Time.speed * speed;
@@ -248,14 +251,15 @@ export class MaterialPlayer {
             bufferCounter += bufferCounter < this.framesToLoader ? 1 : 0;
             lastTime = video.currentTime;
 
-            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+            if (video.readyState < video.HAVE_FUTURE_DATA) {
                 return;
-            } else {
+            } /*else {
                 if (this.isPlaying() || !userPaused && !this.isPlaying()) {
                     this.play();
                 }
             }
-
+*/
+            //console.log(video.currentTime,video.currentTime*fps);
             textureL.needsUpdate = true;
             if (stereoscopic) {
                 textureR.needsUpdate = true;
