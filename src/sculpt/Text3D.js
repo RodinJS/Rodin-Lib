@@ -222,7 +222,7 @@ export class Text3D extends Sculpt {
             bevelSize: this._bevelSize,
             bevelSegments: this._bevelSegments
         };
-        const lines = this._text.replace(/\s+/g, ' ').split('\n');
+        const lines = this._text.replace(/[\t\f\v ]+/g, ' ').split('\n');
 
         let maxWidth = 0;
         for (let i = 0; i < lines.length; i++) {
